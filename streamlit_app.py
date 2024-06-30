@@ -9,31 +9,14 @@ from st_aggrid import AgGrid
 # Set page configuration
 st.set_page_config(page_title="Fanflux Intensity Finder", page_icon="🏆")
 
-# Custom CSS for scorecards
+# Custom CSS for pie chart container
 st.markdown(
     """
     <style>
-    .card {
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        padding: 20px;
-        margin: 10px;
-        text-align: center;
-        flex: 1;
-        font-size: 16px;
-    }
-    .card-container {
+    .chart-container {
         display: flex;
         justify-content: space-around;
         flex-wrap: wrap;
-    }
-    .card h3 {
-        font-size: 18px;
-        margin: 10px 0;
-    }
-    .card p {
-        font-size: 24px;
-        margin: 0;
     }
     </style>
     """,
@@ -50,7 +33,7 @@ st.write(
 )
 
 # Load data from CSV files
-@st.cache
+@st.cache_data
 def load_data(file_path):
     return pd.read_csv(file_path)
 
@@ -102,7 +85,7 @@ races = st.multiselect(
 intensity = st.slider("Intensity", 0, 100, (0, 100))
 
 # Filter data based on widget input
-@st.cache
+@st.cache_data
 def filter_data(data, teams, leagues, races, intensity_range):
     return data[
         (data["Team"].isin(teams)) & 
@@ -114,7 +97,7 @@ def filter_data(data, teams, leagues, races, intensity_range):
 df_filtered = filter_data(intensity_data, teams, leagues, races, intensity)
 
 # Calculate metrics
-@st.cache
+@st.cache_data
 def calculate_metrics(filtered_data, income_cols):
     average_intensity = filtered_data["Dispersion Score"].mean()
     race_totals = {}
@@ -126,12 +109,26 @@ def calculate_metrics(filtered_data, income_cols):
 
 average_intensity, race_totals = calculate_metrics(df_filtered, income_columns)
 
-# Display metric cards using custom styling
+# Create a pie chart for race distribution
+race_totals_df = pd.DataFrame(list(race_totals.items()), columns=['Race', 'Total'])
+pie_chart = alt.Chart(race_totals_df).mark_arc().encode(
+    theta=alt.Theta(field="Total", type="quantitative"),
+    color=alt.Color(field="Race", type="nominal")
+).properties(title="Race Distribution")
+
+# Display the pie chart and bar chart side by side
 st.write("## Metrics")
-st.markdown('<div class="card-container">', unsafe_allow_html=True)
-st.markdown(f'<div class="card"><h3>Average Intensity Score</h3><p>{average_intensity:.2f}</p></div>', unsafe_allow_html=True)
-for race, total in race_totals.items():
-    st.markdown(f'<div class="card"><h3>Number of {race} fans</h3><p>{total}</p></div>', unsafe_allow_html=True)
+st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+col1, col2 = st.columns(2)
+with col1:
+    st.altair_chart(pie_chart, use_container_width=True)
+with col2:
+    bar_chart = alt.Chart(df_filtered).mark_bar().encode(
+        x=alt.X("Team:N", title="Team"),
+        y=alt.Y("Dispersion Score:Q", title="Intensity Score"),
+        color="Race:N",
+    ).properties(height=320)
+    st.altair_chart(bar_chart, use_container_width=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
 # Filter out unwanted columns for display table but keep for map
@@ -143,15 +140,8 @@ df_display = df_filtered[columns_to_display]
 st.write("## Filtered Data Table")
 AgGrid(df_display)
 
-# Button to trigger map display
-if 'show_map' not in st.session_state:
-    st.session_state['show_map'] = False
-
-if st.button("Show me a map"):
-    st.session_state['show_map'] = True
-
 # Add interactive map using folium with MarkerCluster
-if st.session_state['show_map'] and not df_filtered.empty:
+if not df_filtered.empty:
     m = folium.Map(location=[df_filtered['US lat'].mean(), df_filtered['US lon'].mean()], zoom_start=11)
     marker_cluster = MarkerCluster().add_to(m)
     for _, row in df_filtered.iterrows():
@@ -173,6 +163,6 @@ if st.session_state['show_map'] and not df_filtered.empty:
         ).add_to(marker_cluster)
     st.write("## Map")
     st_folium(m, width=700, height=450)
-elif st.session_state['show_map'] and df_filtered.empty:
+else:
     st.write("## Map")
     st.write("No data available for the selected filters.")
