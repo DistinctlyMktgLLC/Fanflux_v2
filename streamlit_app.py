@@ -57,6 +57,26 @@ def load_data(file_path):
 # Load the intensity data
 intensity_data = load_data('data/Intensity_MLB_ALLRaces.csv')
 
+# Identify income level columns
+income_columns = [
+    'Struggling (Less than $10,000)',
+    'Getting By ($10,000 to $14,999)',
+    'Getting By ($15,000 to $19,999)',
+    'Starting Out ($20,000 to $24,999)',
+    'Starting Out ($25,000 to $29,999)',
+    'Starting Out ($30,000 to $34,999)',
+    'Middle Class ($35,000 to $39,999)',
+    'Middle Class ($40,000 to $44,999)',
+    'Middle Class ($45,000 to $49,999)',
+    'Comfortable ($50,000 to $59,999)',
+    'Comfortable ($60,000 to $74,999)',
+    'Doing Well ($75,000 to $99,999)',
+    'Prosperous ($100,000 to $124,999)',
+    'Prosperous ($125,000 to $149,999)',
+    'Wealthy ($150,000 to $199,999)',
+    'Affluent ($200,000 or more)'
+]
+
 # Show multiselect widget for teams
 teams = st.multiselect(
     "Teams",
@@ -91,14 +111,20 @@ df_filtered = intensity_data[
 
 # Calculate metrics
 average_intensity = df_filtered["Dispersion Score"].mean()
-race_counts = df_filtered["Race"].value_counts()
+
+# Calculate total number of people for each race
+race_totals = {}
+for race in races:
+    race_data = df_filtered[df_filtered["Race"] == race]
+    total_people = race_data[income_columns].sum().sum()
+    race_totals[race] = total_people
 
 # Display metric cards using custom styling
 st.write("## Metrics")
 st.markdown('<div class="card-container">', unsafe_allow_html=True)
 st.markdown(f'<div class="card"><h3>Average Intensity Score</h3><p>{average_intensity:.2f}</p></div>', unsafe_allow_html=True)
-for race in races:
-    st.markdown(f'<div class="card"><h3>Number of {race} fans</h3><p>{race_counts.get(race, 0)}</p></div>', unsafe_allow_html=True)
+for race, total in race_totals.items():
+    st.markdown(f'<div class="card"><h3>Number of {race} fans</h3><p>{total}</p></div>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
 # Filter out unwanted columns for display table but keep for map
@@ -134,7 +160,7 @@ if not df_filtered.empty:
             f"Team: {row['Team']}<br>"
             f"League: {row['League']}<br>"
             f"Income Level: {row['helper']}<br>"  # Adjust this column name as needed
-            f"# of Fans: {row['Dispersion Score']}"  # Adjust this column name as needed
+            f"# of Fans: {row[income_columns].sum()}"  # Adjust this to sum the number of fans
         )
         folium.CircleMarker(
             location=[row['US lat'], row['US lon']],
