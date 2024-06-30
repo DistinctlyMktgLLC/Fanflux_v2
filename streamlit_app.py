@@ -1,66 +1,78 @@
-import altair as alt
-import pandas as pd
 import streamlit as st
+import pandas as pd
+import altair as alt
+import pydeck as pdk
 
-# Show the page title and description.
-st.set_page_config(page_title="Movies dataset", page_icon="🎬")
-st.title("🎬 Movies dataset")
+# Set page configuration
+st.set_page_config(page_title="Fanflux Intensity Finder", page_icon="🏆")
+
+# Show the page title and description
+st.title("🏆 Find Fans")
 st.write(
     """
-    This app visualizes data from [The Movie Database (TMDB)](https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata).
-    It shows which movie genre performed best at the box office over the years. Just 
-    click on the widgets below to explore!
+    Fanflux visualizes Fan data from our Database that shows where fans live, how much they 
+    make and their team and league preferences. Just click on the widgets below to explore!
     """
 )
 
-
-# Load the data from a CSV. We're caching this so it doesn't reload every time the app
-# reruns (e.g. if the user interacts with the widgets).
+# Load data from CSV files
 @st.cache_data
-def load_data():
-    df = pd.read_csv("data/movies_genres_summary.csv")
-    return df
+def load_data(file_path):
+    return pd.read_csv(file_path)
 
+# Load the intensity data
+intensity_data = load_data('data/Intensity_MLB_ALLRaces.csv')
 
-df = load_data()
-
-# Show a multiselect widget with the genres using `st.multiselect`.
-genres = st.multiselect(
-    "Genres",
-    df.genre.unique(),
-    ["Action", "Adventure", "Biography", "Comedy", "Drama", "Horror"],
+# Show multiselect widget for fan types
+fan_types = st.multiselect(
+    "Fan Types",
+    intensity_data['fan_type'].unique(),
+    ["avid", "casual", "not at all"],
 )
 
-# Show a slider widget with the years using `st.slider`.
-years = st.slider("Years", 1986, 2006, (2000, 2016))
+# Show slider widget for intensity
+intensity = st.slider("Intensity", 0, 100, (0, 100))
 
-# Filter the dataframe based on the widget input and reshape it.
-df_filtered = df[(df["genre"].isin(genres)) & (df["year"].between(years[0], years[1]))]
-df_reshaped = df_filtered.pivot_table(
-    index="year", columns="genre", values="gross", aggfunc="sum", fill_value=0
-)
-df_reshaped = df_reshaped.sort_values(by="year", ascending=False)
+# Filter data based on widget input
+df_filtered = intensity_data[
+    (intensity_data["fan_type"].isin(fan_types)) & 
+    (intensity_data["intensity_score"].between(intensity[0], intensity[1]))
+]
 
+# Display the filtered data as a table
+st.dataframe(df_filtered)
 
-# Display the data as a table using `st.dataframe`.
-st.dataframe(
-    df_reshaped,
-    use_container_width=True,
-    column_config={"year": st.column_config.TextColumn("Year")},
-)
-
-# Display the data as an Altair chart using `st.altair_chart`.
-df_chart = pd.melt(
-    df_reshaped.reset_index(), id_vars="year", var_name="genre", value_name="gross"
-)
+# Display the data as an Altair chart
 chart = (
-    alt.Chart(df_chart)
-    .mark_line()
+    alt.Chart(df_filtered)
+    .mark_bar()
     .encode(
-        x=alt.X("year:N", title="Year"),
-        y=alt.Y("gross:Q", title="Gross earnings ($)"),
-        color="genre:N",
+        x=alt.X("team:N", title="Team"),
+        y=alt.Y("intensity_score:Q", title="Intensity Score"),
+        color="fan_type:N",
     )
     .properties(height=320)
 )
 st.altair_chart(chart, use_container_width=True)
+
+# Add interactive map
+st.pydeck_chart(pdk.Deck(
+    map_style='mapbox://styles/mapbox/light-v9',
+    initial_view_state=pdk.ViewState(
+        latitude=df_filtered['latitude'].mean(),
+        longitude=df_filtered['longitude'].mean(),
+        zoom=11,
+        pitch=50,
+    ),
+    layers=[
+        pdk.Layer(
+            'ScatterplotLayer',
+            data=df_filtered,
+            get_position='[longitude, latitude]',
+            get_color='[200, 30, 0, 160]',
+            get_radius=200,
+            pickable=True,
+        ),
+    ],
+    tooltip={"text": "{team}\n{league}"}
+))
