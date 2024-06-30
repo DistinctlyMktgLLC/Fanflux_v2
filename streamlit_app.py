@@ -102,22 +102,29 @@ races = st.multiselect(
 intensity = st.slider("Intensity", 0, 100, (0, 100))
 
 # Filter data based on widget input
-df_filtered = intensity_data[
-    (intensity_data["Team"].isin(teams)) & 
-    (intensity_data["League"].isin(leagues)) &
-    (intensity_data["Race"].isin(races)) &
-    (intensity_data["Dispersion Score"].between(intensity[0], intensity[1]))
-]
+@st.cache_data
+def filter_data(data, teams, leagues, races, intensity_range):
+    return data[
+        (data["Team"].isin(teams)) & 
+        (data["League"].isin(leagues)) &
+        (data["Race"].isin(races)) &
+        (data["Dispersion Score"].between(intensity_range[0], intensity_range[1]))
+    ]
+
+df_filtered = filter_data(intensity_data, teams, leagues, races, intensity)
 
 # Calculate metrics
-average_intensity = df_filtered["Dispersion Score"].mean()
+@st.cache_data
+def calculate_metrics(filtered_data, income_cols):
+    average_intensity = filtered_data["Dispersion Score"].mean()
+    race_totals = {}
+    for race in filtered_data["Race"].unique():
+        race_data = filtered_data[filtered_data["Race"] == race]
+        total_people = race_data[income_cols].sum().sum()
+        race_totals[race] = total_people
+    return average_intensity, race_totals
 
-# Calculate total number of people for each race
-race_totals = {}
-for race in races:
-    race_data = df_filtered[df_filtered["Race"] == race]
-    total_people = race_data[income_columns].sum().sum()
-    race_totals[race] = total_people
+average_intensity, race_totals = calculate_metrics(df_filtered, income_columns)
 
 # Display metric cards using custom styling
 st.write("## Metrics")
