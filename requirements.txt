@@ -2,4 +2,5 @@ streamlit
 pandas
 altair
 pydeck
-
+shadcn_ui
+streamlit-aggrid
