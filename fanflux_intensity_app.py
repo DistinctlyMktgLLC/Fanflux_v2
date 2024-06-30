@@ -3,6 +3,7 @@ import pandas as pd
 import altair as alt
 import folium
 from streamlit_folium import st_folium
+from folium.plugins import MarkerCluster
 from st_aggrid import AgGrid
 
 # Set page configuration
@@ -122,9 +123,10 @@ chart = (
 )
 st.altair_chart(chart, use_container_width=True)
 
-# Add interactive map using folium
+# Add interactive map using folium with MarkerCluster
 if not df_filtered.empty:
     m = folium.Map(location=[df_filtered['US lat'].mean(), df_filtered['US lon'].mean()], zoom_start=11)
+    marker_cluster = MarkerCluster().add_to(m)
     for _, row in df_filtered.iterrows():
         tooltip_text = (
             f"Neighborhood: {row['Neighborhood']}<br>"
@@ -141,7 +143,7 @@ if not df_filtered.empty:
             color='blue',
             fill=True,
             fill_color='blue'
-        ).add_to(m)
+        ).add_to(marker_cluster)
     st.write("## Map")
     st_folium(m, width=700, height=450)
 else:
