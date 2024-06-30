@@ -21,7 +21,7 @@ def load_data(file_path):
     return pd.read_csv(file_path)
 
 # Load the intensity data
-intensity_data = load_data('/mnt/data/Intensity_MLB_ALLRaces.csv')
+intensity_data = load_data('data/Intensity_MLB_ALLRaces.csv')
 
 # Show multiselect widget for teams
 teams = st.multiselect(
