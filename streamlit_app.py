@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 import pydeck as pdk
-from shadcn_ui import Card, Text
 from st_aggrid import AgGrid
 
 # Set page configuration
@@ -61,20 +60,13 @@ df_filtered = intensity_data[
 average_intensity = df_filtered["Dispersion Score"].mean()
 race_counts = df_filtered["Race"].value_counts()
 
-# Display metric cards
+# Display metric cards using Streamlit's built-in functionality
 st.write("## Metrics")
-# Average Intensity Score card
-Card(
-    title="Average Intensity Score",
-    content=f"{average_intensity:.2f}"
-).render()
+st.metric(label="Average Intensity Score", value=f"{average_intensity:.2f}")
 
 # Race count cards
 for race in races:
-    Card(
-        title=f"Number of {race} fans",
-        content=race_counts.get(race, 0)
-    ).render()
+    st.metric(label=f"Number of {race} fans", value=race_counts.get(race, 0))
 
 # Filter out unwanted columns
 columns_to_display = [col for col in df_filtered.columns if col not in ["dCategory", "US lat", "US lon", "helper"]]
