@@ -143,21 +143,15 @@ df_display = df_filtered[columns_to_display]
 st.write("## Filtered Data Table")
 AgGrid(df_display)
 
-# Display the data as an Altair chart
-chart = (
-    alt.Chart(df_display)
-    .mark_bar()
-    .encode(
-        x=alt.X("Team:N", title="Team"),
-        y=alt.Y("Dispersion Score:Q", title="Intensity Score"),
-        color="Race:N",
-    )
-    .properties(height=320)
-)
-st.altair_chart(chart, use_container_width=True)
+# Button to trigger map display
+if 'show_map' not in st.session_state:
+    st.session_state['show_map'] = False
+
+if st.button("Show me a map"):
+    st.session_state['show_map'] = True
 
 # Add interactive map using folium with MarkerCluster
-if not df_filtered.empty:
+if st.session_state['show_map'] and not df_filtered.empty:
     m = folium.Map(location=[df_filtered['US lat'].mean(), df_filtered['US lon'].mean()], zoom_start=11)
     marker_cluster = MarkerCluster().add_to(m)
     for _, row in df_filtered.iterrows():
@@ -179,6 +173,6 @@ if not df_filtered.empty:
         ).add_to(marker_cluster)
     st.write("## Map")
     st_folium(m, width=700, height=450)
-else:
+elif st.session_state['show_map'] and df_filtered.empty:
     st.write("## Map")
     st.write("No data available for the selected filters.")
