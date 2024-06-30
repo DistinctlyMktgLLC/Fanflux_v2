@@ -1,5 +1,6 @@
 streamlit
 pandas
 altair
-pydeck
+folium
+streamlit-folium
 streamlit-aggrid
