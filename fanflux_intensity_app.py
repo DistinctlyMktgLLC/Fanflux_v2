@@ -18,10 +18,21 @@ st.markdown(
         padding: 20px;
         margin: 10px;
         text-align: center;
+        flex: 1;
+        font-size: 16px;
     }
     .card-container {
         display: flex;
         justify-content: space-around;
+        flex-wrap: wrap;
+    }
+    .card h3 {
+        font-size: 18px;
+        margin: 10px 0;
+    }
+    .card p {
+        font-size: 24px;
+        margin: 0;
     }
     </style>
     """,
@@ -81,15 +92,13 @@ df_filtered = intensity_data[
 average_intensity = df_filtered["Dispersion Score"].mean()
 race_counts = df_filtered["Race"].value_counts()
 
-# Display metric cards using Streamlit's built-in functionality
+# Display metric cards using custom styling
 st.write("## Metrics")
-col1, col2, col3, col4 = st.columns(4)
-with col1:
-    st.markdown('<div class="card"><h3>Average Intensity Score</h3><p>' + f"{average_intensity:.2f}" + '</p></div>', unsafe_allow_html=True)
-
-for i, race in enumerate(races):
-    with [col2, col3, col4][i % 3]:
-        st.markdown(f'<div class="card"><h3>Number of {race} fans</h3><p>{race_counts.get(race, 0)}</p></div>', unsafe_allow_html=True)
+st.markdown('<div class="card-container">', unsafe_allow_html=True)
+st.markdown(f'<div class="card"><h3>Average Intensity Score</h3><p>{average_intensity:.2f}</p></div>', unsafe_allow_html=True)
+for race in races:
+    st.markdown(f'<div class="card"><h3>Number of {race} fans</h3><p>{race_counts.get(race, 0)}</p></div>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Filter out unwanted columns for display table but keep for map
 columns_to_hide = ["dCategory", "helper"]
@@ -117,10 +126,18 @@ st.altair_chart(chart, use_container_width=True)
 if not df_filtered.empty:
     m = folium.Map(location=[df_filtered['US lat'].mean(), df_filtered['US lon'].mean()], zoom_start=11)
     for _, row in df_filtered.iterrows():
+        tooltip_text = (
+            f"Neighborhood: {row['Neighborhood']}<br>"
+            f"Race: {row['Race']}<br>"
+            f"Team: {row['Team']}<br>"
+            f"League: {row['League']}<br>"
+            f"Income Level: {row['helper']}<br>"  # Adjust this column name as needed
+            f"# of Fans: {row['Dispersion Score']}"  # Adjust this column name as needed
+        )
         folium.CircleMarker(
             location=[row['US lat'], row['US lon']],
             radius=5,
-            popup=f"{row['Team']} ({row['League']})",
+            popup=tooltip_text,
             color='blue',
             fill=True,
             fill_color='blue'
