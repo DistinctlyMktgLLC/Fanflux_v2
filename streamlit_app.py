@@ -4,7 +4,6 @@ import altair as alt
 import folium
 from streamlit_folium import st_folium
 from folium.plugins import MarkerCluster
-from st_aggrid import AgGrid
 
 # Set page configuration
 st.set_page_config(page_title="Fanflux Intensity Finder", page_icon="🏆")
@@ -138,7 +137,7 @@ df_display = df_filtered[columns_to_display]
 
 # Display the filtered data as a table using ag-Grid
 st.write("## Filtered Data Table")
-AgGrid(df_display)
+st.dataframe(df_display)
 
 # Add interactive map using folium with MarkerCluster
 if not df_filtered.empty:
