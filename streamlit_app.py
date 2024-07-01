@@ -106,15 +106,6 @@ except Exception as e:
     st.stop()
 
 # Show the map using leafmap
-st.sidebar.title("About")
-markdown = """
-A Streamlit map template
-<https://github.com/opengeos/streamlit-map-template>
-"""
-st.sidebar.info(markdown)
-logo = "https://i.imgur.com/UbOXYAU.png"
-st.sidebar.image(logo)
-
 st.title("Interactive Map")
 
 col1, col2 = st.columns([4, 1])
@@ -138,7 +129,6 @@ with col1:
             f"Race: {row['Race']}<br>"
             f"Team: {row['Team']}<br>"
             f"League: {row['League']}<br>"
-            f"Income Level: {row['helper']}<br>"
             f"# of Fans: {row[income_columns].sum()}"
         )
         folium.CircleMarker(
