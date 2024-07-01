@@ -28,12 +28,6 @@ st.write(
     """
 )
 
-# Load data from CSV files
-@st.cache_data
-def load_data(file_path):
-    return pd.read_csv(file_path, usecols=[
-        'Team', 'League', 'City', 'City Alt.', 'Neighborhood', 'zipcode', 'Intensity Score', 'US lat', 'US lon', 'helper'] + income_columns)
-
 # Define income columns globally
 income_columns = [
     'Struggling (Less than $10,000)',
@@ -54,6 +48,12 @@ income_columns = [
     'Affluent ($200,000 or more)'
 ]
 
+# Load data from CSV files
+@st.cache_data
+def load_data(file_path):
+    return pd.read_csv(file_path, usecols=[
+        'Team', 'League', 'City', 'City Alt.', 'Neighborhood', 'zipcode', 'Intensity Score', 'US lat', 'US lon', 'helper'] + income_columns)
+
 # Try loading the data and display basic information
 try:
     intensity_data = load_data('data/Intensity_MLB_ALLRaces.csv')
@@ -61,6 +61,7 @@ try:
     intensity_data.rename(columns={"Dispersion Score": "Intensity Score"}, inplace=True)
 except Exception as e:
     st.error(f"Error loading data: {e}")
+    st.stop()
 
 # Show multiselect widget for teams with no default selections
 teams = st.multiselect(
@@ -104,6 +105,7 @@ try:
     df_filtered = filter_data(intensity_data, teams, leagues, races, intensity)
 except Exception as e:
     st.error(f"Error filtering data: {e}")
+    st.stop()
 
 # Pagination function
 def paginate_dataframe(dataframe, page_size=100):
