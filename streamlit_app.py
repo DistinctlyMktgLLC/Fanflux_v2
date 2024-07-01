@@ -22,11 +22,29 @@ st.write(
 def load_data(file_path):
     return pd.read_csv(file_path)
 
+# Define income columns globally
+income_columns = [
+    'Struggling (Less than $10,000)',
+    'Getting By ($10,000 to $14,999)',
+    'Getting By ($15,000 to $19,999)',
+    'Starting Out ($20,000 to $24,999)',
+    'Starting Out ($25,000 to $29,999)',
+    'Starting Out ($30,000 to $34,999)',
+    'Middle Class ($35,000 to $39,999)',
+    'Middle Class ($40,000 to $44,999)',
+    'Middle Class ($45,000 to $49,999)',
+    'Comfortable ($50,000 to $59,999)',
+    'Comfortable ($60,000 to $74,999)',
+    'Doing Well ($75,000 to $99,999)',
+    'Prosperous ($100,000 to $124,999)',
+    'Prosperous ($125,000 to $149,999)',
+    'Wealthy ($150,000 to $199,999)',
+    'Affluent ($200,000 or more)'
+]
+
 # Try loading the data and display basic information
 try:
     intensity_data = load_data('data/Intensity_MLB_ALLRaces.csv')
-    st.write("Data loaded successfully!")
-    st.write(intensity_data.head())
 except Exception as e:
     st.error(f"Error loading data: {e}")
 
@@ -66,8 +84,6 @@ def filter_data(data, teams, leagues, races, intensity_range):
 
 try:
     df_filtered = filter_data(intensity_data, teams, leagues, races, intensity)
-    st.write("Data filtered successfully!")
-    st.write(df_filtered.head())
 except Exception as e:
     st.error(f"Error filtering data: {e}")
 
@@ -83,24 +99,7 @@ def calculate_metrics(filtered_data, income_cols):
     return average_intensity, race_totals
 
 try:
-    average_intensity, race_totals = calculate_metrics(df_filtered, [
-        'Struggling (Less than $10,000)',
-        'Getting By ($10,000 to $14,999)',
-        'Getting By ($15,000 to $19,999)',
-        'Starting Out ($20,000 to $24,999)',
-        'Starting Out ($25,000 to $29,999)',
-        'Starting Out ($30,000 to $34,999)',
-        'Middle Class ($35,000 to $39,999)',
-        'Middle Class ($40,000 to $44,999)',
-        'Middle Class ($45,000 to $49,999)',
-        'Comfortable ($50,000 to $59,999)',
-        'Comfortable ($60,000 to $74,999)',
-        'Doing Well ($75,000 to $99,999)',
-        'Prosperous ($100,000 to $124,999)',
-        'Prosperous ($125,000 to $149,999)',
-        'Wealthy ($150,000 to $199,999)',
-        'Affluent ($200,000 or more)'
-    ])
+    average_intensity, race_totals = calculate_metrics(df_filtered, income_columns)
     race_totals_df = pd.DataFrame(list(race_totals.items()), columns=['Race', 'Total'])
     pie_chart = alt.Chart(race_totals_df).mark_arc().encode(
         theta=alt.Theta(field="Total", type="quantitative"),
