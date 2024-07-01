@@ -107,17 +107,25 @@ try:
 except Exception as e:
     st.error(f"Error filtering data: {e}")
 
+# Pagination function
+def paginate_dataframe(dataframe, page_size=100):
+    total_pages = (len(dataframe) - 1) // page_size + 1
+    page = st.number_input("Page", min_value=1, max_value=total_pages, value=1)
+    start_index = (page - 1) * page_size
+    end_index = start_index + page_size
+    return dataframe[start_index:end_index]
+
 # Filter out unwanted columns for display table but keep for map
 columns_to_hide = ["US lat", "US lon", "dCategory", "helper"]
 columns_to_display = [col for col in df_filtered.columns if col not in columns_to_hide and not col.startswith("Unnamed")]
 df_display = df_filtered[columns_to_display]
 
-# Display the filtered data as a table using st.dataframe without row numbers
+# Paginate the filtered data
+df_paginated = paginate_dataframe(df_display)
+
+# Display the paginated data as a table using st.dataframe without row numbers
 st.write("## Filtered Data Table")
-st.dataframe(df_display.style.set_table_styles({
-    '': [{'selector': 'thead tr th:first-child, tbody tr th:first-child',
-          'props': [('display', 'none')]}]
-}))  # Hide row numbers
+st.dataframe(df_paginated.reset_index(drop=True))  # Reset index to remove row numbers
 
 # Add interactive map using folium with MarkerCluster and additional details
 try:
