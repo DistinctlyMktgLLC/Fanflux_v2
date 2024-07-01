@@ -1,4 +1,6 @@
 streamlit==1.10.0
 pandas
 altair
-
+folium
+streamlit-folium
+st-aggrid
