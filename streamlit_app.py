@@ -48,15 +48,14 @@ income_columns = [
     'Affluent ($200,000 or more)'
 ]
 
-# Load data from CSV files
+# Load data from Parquet files
 @st.cache_data
 def load_data(file_path):
-    return pd.read_csv(file_path, usecols=[
-        'Team', 'League', 'City', 'City Alt.', 'Neighborhood', 'zipcode', 'Intensity Score', 'US lat', 'US lon', 'helper'] + income_columns)
+    return pd.read_parquet(file_path)
 
 # Try loading the data and display basic information
 try:
-    intensity_data = load_data('data/Intensity_MLB_ALLRaces.csv')
+    intensity_data = load_data('data/Intensity_MLB_ALLRaces.parquet')
     intensity_data["zipcode"] = intensity_data["zipcode"].astype(str).str.zfill(5)
     intensity_data.rename(columns={"Dispersion Score": "Intensity Score"}, inplace=True)
 except Exception as e:

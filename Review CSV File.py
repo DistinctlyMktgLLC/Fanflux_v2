@@ -1,8 +1,12 @@
 import pandas as pd
 
 # Load the CSV file
-file_path = '/mnt/data/Intensity_MLB_ALLRaces.csv'
-data = pd.read_csv(file_path)
+csv_file_path = 'data/Intensity_MLB_ALLRaces.csv'
+data = pd.read_csv(csv_file_path)
 
-# Display the first few rows of the dataframe
-data.head()
+# Save the DataFrame as a Parquet file
+parquet_file_path = 'data/Intensity_MLB_ALLRaces.parquet'
+data.to_parquet(parquet_file_path, index=False)
+
+print(f"CSV file has been converted to Parquet and saved at {parquet_file_path}")
+
