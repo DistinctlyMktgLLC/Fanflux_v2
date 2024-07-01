@@ -1,9 +1,8 @@
 import streamlit as st
 import pandas as pd
-import altair as alt
 import folium
 from streamlit_folium import st_folium
-from folium.plugins import MarkerCluster
+from folium.plugins import MarkerCluster, MeasureControl, MousePosition
 
 # Set page configuration
 st.set_page_config(page_title="Fanflux Intensity Finder", page_icon="🏆")
@@ -48,25 +47,25 @@ try:
 except Exception as e:
     st.error(f"Error loading data: {e}")
 
-# Show multiselect widget for teams
+# Show multiselect widget for teams with no default selections
 teams = st.multiselect(
     "Teams",
     intensity_data['Team'].unique(),
-    intensity_data['Team'].unique()
+    []
 )
 
-# Show multiselect widget for leagues
+# Show multiselect widget for leagues with no default selections
 leagues = st.multiselect(
     "Leagues",
     intensity_data['League'].unique(),
-    intensity_data['League'].unique()
+    []
 )
 
-# Show multiselect widget for races
+# Show multiselect widget for races with no default selections
 races = st.multiselect(
     "Race",
     intensity_data['Race'].unique(),
-    intensity_data['Race'].unique()
+    []
 )
 
 # Show slider widget for intensity
@@ -75,41 +74,21 @@ intensity = st.slider("Intensity", 0, 100, (0, 100))
 # Filter data based on widget input
 @st.cache_data
 def filter_data(data, teams, leagues, races, intensity_range):
-    return data[
-        (data["Team"].isin(teams)) & 
-        (data["League"].isin(leagues)) &
-        (data["Race"].isin(races)) &
+    filtered_data = data[
         (data["Dispersion Score"].between(intensity_range[0], intensity_range[1]))
     ]
+    if teams:
+        filtered_data = filtered_data[filtered_data["Team"].isin(teams)]
+    if leagues:
+        filtered_data = filtered_data[filtered_data["League"].isin(leagues)]
+    if races:
+        filtered_data = filtered_data[filtered_data["Race"].isin(races)]
+    return filtered_data
 
 try:
     df_filtered = filter_data(intensity_data, teams, leagues, races, intensity)
 except Exception as e:
     st.error(f"Error filtering data: {e}")
-
-# Create a pie chart for race distribution
-@st.cache_data
-def calculate_metrics(filtered_data, income_cols):
-    average_intensity = filtered_data["Dispersion Score"].mean()
-    race_totals = {}
-    for race in filtered_data["Race"].unique():
-        race_data = filtered_data[filtered_data["Race"] == race]
-        total_people = race_data[income_cols].sum().sum()
-        race_totals[race] = total_people
-    return average_intensity, race_totals
-
-try:
-    average_intensity, race_totals = calculate_metrics(df_filtered, income_columns)
-    race_totals_df = pd.DataFrame(list(race_totals.items()), columns=['Race', 'Total'])
-    pie_chart = alt.Chart(race_totals_df).mark_arc().encode(
-        theta=alt.Theta(field="Total", type="quantitative"),
-        color=alt.Color(field="Race", type="nominal")
-    ).properties(title="Race Distribution")
-
-    st.write("## Race Distribution")
-    st.altair_chart(pie_chart, use_container_width=True)
-except Exception as e:
-    st.error(f"Error creating visualizations: {e}")
 
 # Filter out unwanted columns for display table but keep for map
 columns_to_hide = ["dCategory", "helper"]
@@ -120,10 +99,21 @@ df_display = df_filtered[columns_to_display]
 st.write("## Filtered Data Table")
 st.dataframe(df_display)
 
-# Add interactive map using folium with MarkerCluster
+# Add interactive map using folium with MarkerCluster and additional details
 try:
     if not df_filtered.empty:
         m = folium.Map(location=[df_filtered['US lat'].mean(), df_filtered['US lon'].mean()], zoom_start=11)
+
+        # Add layer control
+        folium.TileLayer('openstreetmap').add_to(m)
+        folium.TileLayer('stamenterrain').add_to(m)
+        folium.TileLayer('stamentoner').add_to(m)
+        folium.TileLayer('Stamen Watercolor').add_to(m)
+        folium.TileLayer('cartodbpositron').add_to(m)
+        folium.TileLayer('cartodbdark_matter').add_to(m)
+        folium.LayerControl().add_to(m)
+
+        # Add marker cluster
         marker_cluster = MarkerCluster().add_to(m)
         for _, row in df_filtered.iterrows():
             tooltip_text = (
@@ -142,6 +132,24 @@ try:
                 fill=True,
                 fill_color='blue'
             ).add_to(marker_cluster)
+
+        # Add measure control
+        m.add_child(MeasureControl())
+
+        # Add mouse position
+        formatter = "function(num) {return L.Util.formatNum(num, 5);};"
+        mouse_position = MousePosition(
+            position='topright',
+            separator=' Long: ',
+            empty_string='NaN',
+            lng_first=True,
+            num_digits=20,
+            prefix='Coordinates:',
+            lat_formatter=formatter,
+            lng_formatter=formatter,
+        )
+        m.add_child(mouse_position)
+
         st.write("## Map")
         st_folium(m, width=700, height=450)
     else:
