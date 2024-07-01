@@ -56,6 +56,8 @@ income_columns = [
 # Try loading the data and display basic information
 try:
     intensity_data = load_data('data/Intensity_MLB_ALLRaces.csv')
+    intensity_data["zipcode"] = intensity_data["zipcode"].astype(str).str.zfill(5)
+    intensity_data.rename(columns={"Dispersion Score": "Intensity Score"}, inplace=True)
 except Exception as e:
     st.error(f"Error loading data: {e}")
 
@@ -87,7 +89,7 @@ intensity = st.slider("Intensity", 0, 100, (0, 100))
 @st.cache_data
 def filter_data(data, teams, leagues, races, intensity_range):
     filtered_data = data[
-        (data["Dispersion Score"].between(intensity_range[0], intensity_range[1]))
+        (data["Intensity Score"].between(intensity_range[0], intensity_range[1]))
     ]
     if teams:
         filtered_data = filtered_data[filtered_data["Team"].isin(teams)]
@@ -103,13 +105,13 @@ except Exception as e:
     st.error(f"Error filtering data: {e}")
 
 # Filter out unwanted columns for display table but keep for map
-columns_to_hide = ["dCategory", "helper"]
+columns_to_hide = ["US lat", "US lon", "dCategory", "helper"]
 columns_to_display = [col for col in df_filtered.columns if col not in columns_to_hide and not col.startswith("Unnamed")]
 df_display = df_filtered[columns_to_display]
 
-# Display the filtered data as a table using st.dataframe (to avoid duplication issues)
+# Display the filtered data as a table using st.dataframe without row numbers
 st.write("## Filtered Data Table")
-st.dataframe(df_display)
+st.dataframe(df_display.reset_index(drop=True))  # Reset index to remove row numbers
 
 # Add interactive map using folium with MarkerCluster and additional details
 try:
