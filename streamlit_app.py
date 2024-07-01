@@ -140,22 +140,25 @@ try:
         # Add marker cluster
         marker_cluster = MarkerCluster().add_to(m)
         for _, row in df_filtered.iterrows():
-            tooltip_text = (
-                f"Neighborhood: {row['Neighborhood']}<br>"
-                f"Race: {row['Race']}<br>"
-                f"Team: {row['Team']}<br>"
-                f"League: {row['League']}<br>"
-                f"Income Level: {row['helper']}<br>"
-                f"# of Fans: {row[income_columns].sum()}"
-            )
-            folium.CircleMarker(
-                location=[row['US lat'], row['US lon']],
-                radius=5,
-                popup=tooltip_text,
-                color='blue',
-                fill=True,
-                fill_color='blue'
-            ).add_to(marker_cluster)
+            try:
+                tooltip_text = (
+                    f"Neighborhood: {row['Neighborhood']}<br>"
+                    f"Race: {row['Race']}<br>"
+                    f"Team: {row['Team']}<br>"
+                    f"League: {row['League']}<br>"
+                    f"Income Level: {row['helper']}<br>"
+                    f"# of Fans: {row[income_columns].sum()}"
+                )
+                folium.CircleMarker(
+                    location=[row['US lat'], row['US lon']],
+                    radius=5,
+                    popup=tooltip_text,
+                    color='blue',
+                    fill=True,
+                    fill_color='blue'
+                ).add_to(marker_cluster)
+            except KeyError as e:
+                st.warning(f"Missing key {e} in row {row.name}")
 
         # Add measure control
         m.add_child(MeasureControl())
