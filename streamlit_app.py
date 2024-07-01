@@ -32,7 +32,7 @@ st.write(
 )
 
 # Load data from CSV files
-@st.cache
+@st.cache_data
 def load_data(file_path):
     return pd.read_csv(file_path)
 
@@ -84,7 +84,7 @@ races = st.multiselect(
 intensity = st.slider("Intensity", 0, 100, (0, 100))
 
 # Filter data based on widget input
-@st.cache
+@st.cache_data
 def filter_data(data, teams, leagues, races, intensity_range):
     return data[
         (data["Team"].isin(teams)) & 
@@ -96,7 +96,7 @@ def filter_data(data, teams, leagues, races, intensity_range):
 df_filtered = filter_data(intensity_data, teams, leagues, races, intensity)
 
 # Calculate metrics
-@st.cache
+@st.cache_data
 def calculate_metrics(filtered_data, income_cols):
     average_intensity = filtered_data["Dispersion Score"].mean()
     race_totals = {}
