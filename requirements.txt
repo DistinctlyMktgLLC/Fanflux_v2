@@ -1,6 +1,6 @@
-streamlit==1.10.0
-pandas
-altair
-folium
-streamlit-folium
-st-aggrid
+streamlit==1.25.0
+pandas==2.2.2
+altair==4.2.2
+folium==0.17.0
+streamlit-folium==0.21.0
+
