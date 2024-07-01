@@ -121,8 +121,8 @@ df_display = df_filtered[columns_to_display]
 df_paginated = paginate_dataframe(df_display)
 
 # Display the paginated data as a table using st.dataframe without row numbers
-st.write("## Fan Insights")
-st.dataframe(df_paginated)  # No need to reset index as Streamlit's dataframe method hides the index by default
+st.write("## Filtered Data Table")
+st.dataframe(df_paginated.style.hide(axis='index'))  # Hide row numbers
 
 # Add interactive map using folium with MarkerCluster and additional details
 try:
