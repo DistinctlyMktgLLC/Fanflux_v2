@@ -143,5 +143,9 @@ with col1:
     m.to_streamlit(height=700)
 
 # Optional: If you want to add a table as well
+# Remove specific columns from the table
+columns_to_display = [col for col in df_filtered.columns if col not in ['dCategory', 'US lat', 'US lon', 'helper']]
+df_display = df_filtered[columns_to_display]
+
 st.write("## Filtered Data Table")
-st.dataframe(df_filtered.reset_index(drop=True))  # Reset index to remove row numbers
+st.dataframe(df_display.reset_index(drop=True))  # Reset index to remove row numbers
