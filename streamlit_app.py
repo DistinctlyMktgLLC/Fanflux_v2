@@ -31,7 +31,8 @@ st.write(
 # Load data from CSV files
 @st.cache_data
 def load_data(file_path):
-    return pd.read_csv(file_path)
+    return pd.read_csv(file_path, usecols=[
+        'Team', 'League', 'City', 'City Alt.', 'Neighborhood', 'zipcode', 'Intensity Score', 'US lat', 'US lon', 'helper'] + income_columns)
 
 # Define income columns globally
 income_columns = [
