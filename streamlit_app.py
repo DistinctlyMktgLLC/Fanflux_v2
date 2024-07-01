@@ -14,6 +14,9 @@ st.markdown(
     .dataframe th, .dataframe td {
         border: none !important;
     }
+    .css-1d391kg tr {
+        display: none;
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -111,7 +114,10 @@ df_display = df_filtered[columns_to_display]
 
 # Display the filtered data as a table using st.dataframe without row numbers
 st.write("## Filtered Data Table")
-st.dataframe(df_display.reset_index(drop=True))  # Reset index to remove row numbers
+st.dataframe(df_display.style.set_table_styles({
+    '': [{'selector': 'thead tr th:first-child, tbody tr th:first-child',
+          'props': [('display', 'none')]}]
+}))  # Hide row numbers
 
 # Add interactive map using folium with MarkerCluster and additional details
 try:
