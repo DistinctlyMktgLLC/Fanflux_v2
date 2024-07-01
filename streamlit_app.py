@@ -1,27 +1,9 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
-import folium
-from streamlit_folium import st_folium
-from folium.plugins import MarkerCluster
-from st_aggrid import AgGrid
 
 # Set page configuration
 st.set_page_config(page_title="Fanflux Intensity Finder", page_icon="🏆")
-
-# Custom CSS for pie chart container
-st.markdown(
-    """
-    <style>
-    .chart-container {
-        display: flex;
-        justify-content: space-around;
-        flex-wrap: wrap;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
 
 # Show the page title and description
 st.title("🏆 Find Fans")
@@ -116,53 +98,10 @@ pie_chart = alt.Chart(race_totals_df).mark_arc().encode(
     color=alt.Color(field="Race", type="nominal")
 ).properties(title="Race Distribution")
 
-# Display the pie chart and bar chart side by side
-st.write("## Metrics")
-st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-col1, col2 = st.columns(2)
-with col1:
-    st.altair_chart(pie_chart, use_container_width=True)
-with col2:
-    bar_chart = alt.Chart(df_filtered).mark_bar().encode(
-        x=alt.X("Team:N", title="Team"),
-        y=alt.Y("Dispersion Score:Q", title="Intensity Score"),
-        color="Race:N",
-    ).properties(height=320)
-    st.altair_chart(bar_chart, use_container_width=True)
-st.markdown('</div>', unsafe_allow_html=True)
+# Display the pie chart
+st.write("## Race Distribution")
+st.altair_chart(pie_chart, use_container_width=True)
 
-# Filter out unwanted columns for display table but keep for map
-columns_to_hide = ["dCategory", "helper"]
-columns_to_display = [col for col in df_filtered.columns if col not in columns_to_hide and not col.startswith("Unnamed")]
-df_display = df_filtered[columns_to_display]
-
-# Display the filtered data as a table using ag-Grid
+# Display the filtered data as a table
 st.write("## Filtered Data Table")
-AgGrid(df_display)
-
-# Add interactive map using folium with MarkerCluster
-if not df_filtered.empty:
-    m = folium.Map(location=[df_filtered['US lat'].mean(), df_filtered['US lon'].mean()], zoom_start=11)
-    marker_cluster = MarkerCluster().add_to(m)
-    for _, row in df_filtered.iterrows():
-        tooltip_text = (
-            f"Neighborhood: {row['Neighborhood']}<br>"
-            f"Race: {row['Race']}<br>"
-            f"Team: {row['Team']}<br>"
-            f"League: {row['League']}<br>"
-            f"Income Level: {row['helper']}<br>"  # Adjust this column name as needed
-            f"# of Fans: {row[income_columns].sum()}"  # Adjust this to sum the number of fans
-        )
-        folium.CircleMarker(
-            location=[row['US lat'], row['US lon']],
-            radius=5,
-            popup=tooltip_text,
-            color='blue',
-            fill=True,
-            fill_color='blue'
-        ).add_to(marker_cluster)
-    st.write("## Map")
-    st_folium(m, width=700, height=450)
-else:
-    st.write("## Map")
-    st.write("No data available for the selected filters.")
+st.dataframe(df_filtered)
