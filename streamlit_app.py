@@ -120,9 +120,9 @@ df_display = df_filtered[columns_to_display]
 # Paginate the filtered data
 df_paginated = paginate_dataframe(df_display)
 
-# Display the paginated data as a table using st.dataframe without row numbers
+# Display the paginated data as a table using st.table
 st.write("## Filtered Data Table")
-st.dataframe(df_paginated.style.hide_index())  # Hide row numbers
+st.table(df_paginated.reset_index(drop=True))  # Hide row numbers
 
 # Add interactive map using folium with MarkerCluster and additional details
 try:
