@@ -7,6 +7,18 @@ from folium.plugins import MarkerCluster, MeasureControl, MousePosition
 # Set page configuration
 st.set_page_config(page_title="Fanflux Intensity Finder", page_icon="🏆")
 
+# Custom CSS to remove row lines from the table
+st.markdown(
+    """
+    <style>
+    .dataframe th, .dataframe td {
+        border: none !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 # Show the page title and description
 st.title("🏆 Find Fans")
 st.write(
@@ -104,13 +116,13 @@ try:
     if not df_filtered.empty:
         m = folium.Map(location=[df_filtered['US lat'].mean(), df_filtered['US lon'].mean()], zoom_start=11)
 
-        # Add layer control
-        folium.TileLayer('openstreetmap').add_to(m)
-        folium.TileLayer('stamenterrain').add_to(m)
-        folium.TileLayer('stamentoner').add_to(m)
-        folium.TileLayer('Stamen Watercolor').add_to(m)
-        folium.TileLayer('cartodbpositron').add_to(m)
-        folium.TileLayer('cartodbdark_matter').add_to(m)
+        # Add layer control with attribution
+        folium.TileLayer('openstreetmap', name='OpenStreetMap', attr='© OpenStreetMap contributors').add_to(m)
+        folium.TileLayer('stamenterrain', name='Stamen Terrain', attr='© Stamen Design').add_to(m)
+        folium.TileLayer('stamentoner', name='Stamen Toner', attr='© Stamen Design').add_to(m)
+        folium.TileLayer('stamenwatercolor', name='Stamen Watercolor', attr='© Stamen Design').add_to(m)
+        folium.TileLayer('cartodbpositron', name='CartoDB Positron', attr='© OpenStreetMap contributors, © CartoDB').add_to(m)
+        folium.TileLayer('cartodbdark_matter', name='CartoDB Dark Matter', attr='© OpenStreetMap contributors, © CartoDB').add_to(m)
         folium.LayerControl().add_to(m)
 
         # Add marker cluster
