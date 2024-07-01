@@ -2,22 +2,9 @@ import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import st_folium
-from folium.plugins import MarkerCluster, MeasureControl, MousePosition
 
 # Set page configuration
 st.set_page_config(page_title="Fanflux Intensity Finder", page_icon="🏆")
-
-# Custom CSS to remove row lines from the table
-st.markdown(
-    """
-    <style>
-    .dataframe th, .dataframe td {
-        border: none !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
 
 # Show the page title and description
 st.title("🏆 Find Fans")
@@ -104,39 +91,15 @@ try:
 except Exception as e:
     st.error(f"Error filtering data: {e}")
 
-# Pagination function
-def paginate_dataframe(dataframe, page_size=100):
-    total_pages = (len(dataframe) - 1) // page_size + 1
-    page = st.number_input("Page", min_value=1, max_value=total_pages, value=1)
-    start_index = (page - 1) * page_size
-    end_index = start_index + page_size
-    return dataframe[start_index:end_index]
+# Display the filtered data as a table using st.table
+st.write("## Fan Insights")
+st.table(df_filtered)
 
-# Filter out unwanted columns for display table but keep for map
-columns_to_hide = ["US lat", "US lon", "dCategory", "helper"]
-columns_to_display = [col for col in df_filtered.columns if col not in columns_to_hide and not col.startswith("Unnamed")]
-df_display = df_filtered[columns_to_display]
-
-# Paginate the filtered data
-df_paginated = paginate_dataframe(df_display)
-
-# Display the paginated data as a table using st.table
-st.write("## Filtered Data Table")
-st.table(df_paginated.reset_index(drop=True))  # Hide row numbers
-
-# Add interactive map using folium with MarkerCluster and additional details
+# Add interactive map using folium with basic markers
 try:
     if not df_filtered.empty:
-        m = folium.Map(location=[df_filtered['US lat'].mean(), df_filtered['US lon'].mean()], zoom_start=11)
+        m = folium.Map(location=[df_filtered['US lat'].mean(), df_filtered['US lon'].mean()], zoom_start=5)
 
-        # Add layer control with attribution
-        folium.TileLayer('openstreetmap', name='OpenStreetMap', attr='© OpenStreetMap contributors').add_to(m)
-        folium.TileLayer('cartodbpositron', name='CartoDB Positron', attr='© OpenStreetMap contributors, © CartoDB').add_to(m)
-        folium.TileLayer('cartodbdark_matter', name='CartoDB Dark Matter', attr='© OpenStreetMap contributors, © CartoDB').add_to(m)
-        folium.LayerControl().add_to(m)
-
-        # Add marker cluster
-        marker_cluster = MarkerCluster().add_to(m)
         for _, row in df_filtered.iterrows():
             tooltip_text = (
                 f"Neighborhood: {row['Neighborhood']}<br>"
@@ -146,31 +109,11 @@ try:
                 f"Income Level: {row['helper']}<br>"
                 f"# of Fans: {row[income_columns].sum()}"
             )
-            folium.CircleMarker(
+            folium.Marker(
                 location=[row['US lat'], row['US lon']],
-                radius=5,
                 popup=tooltip_text,
-                color='blue',
-                fill=True,
-                fill_color='blue'
-            ).add_to(marker_cluster)
-
-        # Add measure control
-        m.add_child(MeasureControl())
-
-        # Add mouse position
-        formatter = "function(num) {return L.Util.formatNum(num, 5);};"
-        mouse_position = MousePosition(
-            position='topright',
-            separator=' Long: ',
-            empty_string='NaN',
-            lng_first=True,
-            num_digits=20,
-            prefix='Coordinates:',
-            lat_formatter=formatter,
-            lng_formatter=formatter,
-        )
-        m.add_child(mouse_position)
+                tooltip=tooltip_text
+            ).add_to(m)
 
         st.write("## Map")
         st_folium(m, width=700, height=450)
