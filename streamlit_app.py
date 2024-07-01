@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 import altair as alt
+import folium
+from streamlit_folium import st_folium
+from folium.plugins import MarkerCluster
 
 # Set page configuration
 st.set_page_config(page_title="Fanflux Intensity Finder", page_icon="🏆")
@@ -36,75 +39,4 @@ teams = st.multiselect(
 
 # Show multiselect widget for leagues
 leagues = st.multiselect(
-    "Leagues",
-    intensity_data['League'].unique(),
-    intensity_data['League'].unique()
-)
-
-# Show multiselect widget for races
-races = st.multiselect(
-    "Race",
-    intensity_data['Race'].unique(),
-    intensity_data['Race'].unique()
-)
-
-# Show slider widget for intensity
-intensity = st.slider("Intensity", 0, 100, (0, 100))
-
-# Filter data based on widget input
-@st.cache_data
-def filter_data(data, teams, leagues, races, intensity_range):
-    return data[
-        (data["Team"].isin(teams)) & 
-        (data["League"].isin(leagues)) &
-        (data["Race"].isin(races)) &
-        (data["Dispersion Score"].between(intensity_range[0], intensity_range[1]))
-    ]
-
-try:
-    df_filtered = filter_data(intensity_data, teams, leagues, races, intensity)
-    st.write("Data filtered successfully!")
-    st.write(df_filtered.head())
-except Exception as e:
-    st.error(f"Error filtering data: {e}")
-
-# Create a pie chart for race distribution
-@st.cache_data
-def calculate_metrics(filtered_data, income_cols):
-    average_intensity = filtered_data["Dispersion Score"].mean()
-    race_totals = {}
-    for race in filtered_data["Race"].unique():
-        race_data = filtered_data[filtered_data["Race"] == race]
-        total_people = race_data[income_cols].sum().sum()
-        race_totals[race] = total_people
-    return average_intensity, race_totals
-
-try:
-    average_intensity, race_totals = calculate_metrics(df_filtered, [
-        'Struggling (Less than $10,000)',
-        'Getting By ($10,000 to $14,999)',
-        'Getting By ($15,000 to $19,999)',
-        'Starting Out ($20,000 to $24,999)',
-        'Starting Out ($25,000 to $29,999)',
-        'Starting Out ($30,000 to $34,999)',
-        'Middle Class ($35,000 to $39,999)',
-        'Middle Class ($40,000 to $44,999)',
-        'Middle Class ($45,000 to $49,999)',
-        'Comfortable ($50,000 to $59,999)',
-        'Comfortable ($60,000 to $74,999)',
-        'Doing Well ($75,000 to $99,999)',
-        'Prosperous ($100,000 to $124,999)',
-        'Prosperous ($125,000 to $149,999)',
-        'Wealthy ($150,000 to $199,999)',
-        'Affluent ($200,000 or more)'
-    ])
-    race_totals_df = pd.DataFrame(list(race_totals.items()), columns=['Race', 'Total'])
-    pie_chart = alt.Chart(race_totals_df).mark_arc().encode(
-        theta=alt.Theta(field="Total", type="quantitative"),
-        color=alt.Color(field="Race", type="nominal")
-    ).properties(title="Race Distribution")
-
-    st.write("## Race Distribution")
-    st.altair_chart(pie_chart, use_container_width=True)
-except Exception as e:
-    st.error(f"Error creating visualizations: {e}")
+    "Le
