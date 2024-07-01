@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import folium
+import leafmap.foliumap as leafmap
 from streamlit_folium import st_folium
 from folium.plugins import MarkerCluster, MeasureControl, MousePosition
 
@@ -104,61 +105,53 @@ except Exception as e:
     st.error(f"Error filtering data: {e}")
     st.stop()
 
-# Add interactive map using folium with MarkerCluster and additional details
-try:
-    if not df_filtered.empty:
-        m = folium.Map(location=[df_filtered['US lat'].mean(), df_filtered['US lon'].mean()], zoom_start=5)
+# Show the map using leafmap
+st.sidebar.title("About")
+markdown = """
+A Streamlit map template
+<https://github.com/opengeos/streamlit-map-template>
+"""
+st.sidebar.info(markdown)
+logo = "https://i.imgur.com/UbOXYAU.png"
+st.sidebar.image(logo)
 
-        # Add layer control with attribution
-        folium.TileLayer('openstreetmap', name='OpenStreetMap', attr='© OpenStreetMap contributors').add_to(m)
-        folium.TileLayer('cartodbpositron', name='CartoDB Positron', attr='© OpenStreetMap contributors, © CartoDB').add_to(m)
-        folium.TileLayer('cartodbdark_matter', name='CartoDB Dark Matter', attr='© OpenStreetMap contributors, © CartoDB').add_to(m)
-        folium.LayerControl().add_to(m)
+st.title("Interactive Map")
 
-        # Add marker cluster
-        marker_cluster = MarkerCluster().add_to(m)
-        for _, row in df_filtered.iterrows():
-            try:
-                tooltip_text = (
-                    f"Neighborhood: {row['Neighborhood']}<br>"
-                    f"Race: {row['Race']}<br>"
-                    f"Team: {row['Team']}<br>"
-                    f"League: {row['League']}<br>"
-                    f"Income Level: {row['helper']}<br>"
-                    f"# of Fans: {row[income_columns].sum()}"
-                )
-                folium.CircleMarker(
-                    location=[row['US lat'], row['US lon']],
-                    radius=5,
-                    popup=tooltip_text,
-                    color='blue',
-                    fill=True,
-                    fill_color='blue'
-                ).add_to(marker_cluster)
-            except KeyError as e:
-                st.warning(f"Missing key {e} in row {row.name}")
+col1, col2 = st.columns([4, 1])
+options = list(leafmap.basemaps.keys())
+index = options.index("OpenTopoMap")
 
-        # Add measure control
-        m.add_child(MeasureControl())
+with col2:
+    basemap = st.selectbox("Select a basemap:", options, index)
 
-        # Add mouse position
-        formatter = "function(num) {return L.Util.formatNum(num, 5);};"
-        mouse_position = MousePosition(
-            position='topright',
-            separator=' Long: ',
-            empty_string='NaN',
-            lng_first=True,
-            num_digits=20,
-            prefix='Coordinates:',
-            lat_formatter=formatter,
-            lng_formatter=formatter,
+with col1:
+    m = leafmap.Map(
+        locate_control=True, latlon_control=True, draw_export=True, minimap_control=True
+    )
+    m.add_basemap(basemap)
+
+    # Add markers from filtered data
+    marker_cluster = MarkerCluster().add_to(m)
+    for _, row in df_filtered.iterrows():
+        tooltip_text = (
+            f"Neighborhood: {row['Neighborhood']}<br>"
+            f"Race: {row['Race']}<br>"
+            f"Team: {row['Team']}<br>"
+            f"League: {row['League']}<br>"
+            f"Income Level: {row['helper']}<br>"
+            f"# of Fans: {row[income_columns].sum()}"
         )
-        m.add_child(mouse_position)
+        folium.CircleMarker(
+            location=[row['US lat'], row['US lon']],
+            radius=5,
+            popup=tooltip_text,
+            color='blue',
+            fill=True,
+            fill_color='blue'
+        ).add_to(marker_cluster)
 
-        st.write("## Map")
-        st_folium(m, width=700, height=450)
-    else:
-        st.write("## Map")
-        st.write("No data available for the selected filters.")
-except Exception as e:
-    st.error(f"Error creating map: {e}")
+    m.to_streamlit(height=700)
+
+# Optional: If you want to add a table as well
+st.write("## Filtered Data Table")
+st.dataframe(df_filtered.reset_index(drop=True))  # Reset index to remove row numbers
