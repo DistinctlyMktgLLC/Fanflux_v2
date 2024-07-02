@@ -58,8 +58,20 @@ def app():
 
     st.dataframe(df[existing_columns])
 
+    # Calculate Total Fans
+    income_cols = [
+        'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)',
+        'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)',
+        'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)',
+        'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)',
+        'Middle Class ($45,000 to $49,999)', 'Comfortable ($50,000 to $59,999)',
+        'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)',
+        'Wealthy ($100,000 to $149,999)', 'Rich ($150,000 or more)'
+    ]
+    df['Total Fans'] = df[income_cols].sum(axis=1)
+
     # Create an interactive map with options
-    st.title("Mapping AAPI Baseball Fans")
+    st.title("Interactive Map")
 
     col1, col2 = st.columns([4, 1])
     options = list(leafmap.basemaps.keys())
@@ -77,8 +89,14 @@ def app():
         # Add markers from the dataframe
         if 'US lat' in df.columns and 'US lon' in df.columns:
             for idx, row in df.iterrows():
+                tooltip_text = (f"Neighborhood: {row['Neighborhood']}<br>"
+                                f"Race: {row['Race']}<br>"
+                                f"Team: {row['Team']}<br>"
+                                f"League: {row['League']}<br>"
+                                f"Fandom Level: {row['Fandom Level']}<br>"
+                                f"Total Fans: {row['Total Fans']}")
                 folium.Marker([row['US lat'], row['US lon']], 
-                              popup=f"{row['Neighborhood']} - Intensity: {row['Intensity']}").add_to(m)
+                              popup=tooltip_text).add_to(m)
         else:
             st.warning("Latitude and Longitude data not available for map visualization.")
 
