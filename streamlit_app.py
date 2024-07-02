@@ -4,6 +4,7 @@ import folium
 import leafmap.foliumap as leafmap
 from streamlit_folium import st_folium
 from folium.plugins import MarkerCluster
+import asyncio
 
 # Set page configuration
 st.set_page_config(page_title="Fanflux Intensity Finder", page_icon="🏆", layout="wide")
@@ -181,3 +182,35 @@ end_index = start_index + page_size
 df_paginated = df_filtered.iloc[start_index:end_index]
 
 st.dataframe(df_paginated[columns_to_display].reset_index(drop=True))  # Reset index to remove row numbers
+
+# Add collapsible sidebar
+if st.sidebar.button('Toggle Sidebar'):
+    st.session_state.sidebar_state = not st.session_state.sidebar_state
+
+if 'sidebar_state' not in st.session_state:
+    st.session_state.sidebar_state = True
+
+st.sidebar.empty()
+
+if st.session_state.sidebar_state:
+    st.sidebar.markdown(
+        """
+        <style>
+        .stSidebar {
+            display: block;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+else:
+    st.sidebar.markdown(
+        """
+        <style>
+        .stSidebar {
+            display: none;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
