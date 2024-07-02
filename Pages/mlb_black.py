@@ -97,7 +97,7 @@ def app():
     AgGrid(df[existing_columns], gridOptions=grid_options, enable_enterprise_modules=True)
 
     # Create an interactive map with options
-    st.title("Mapping Fandom")
+    st.title("A Fandom Map")
 
     col1, col2 = st.columns([4, 1])
     options = list(leafmap.basemaps.keys())
