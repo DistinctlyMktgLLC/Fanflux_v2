@@ -8,12 +8,16 @@ from folium.plugins import MarkerCluster
 # Set page configuration
 st.set_page_config(page_title="Fanflux Intensity Finder", page_icon="🏆", layout="wide")
 
-# Custom CSS to remove row lines from the table
+# Custom CSS to remove row lines from the table and style the sidebar
 st.markdown(
     """
     <style>
     .dataframe th, .dataframe td {
         border: none !important;
+    }
+    .stSidebar {
+        background-color: #f0f0f0;
+        padding: 1rem;
     }
     .stButton>button {
         display: none;
@@ -28,7 +32,7 @@ st.title("🏆 Find Fans")
 st.write(
     """
     Fanflux visualizes Fan data from our Database that shows where fans live, how much they 
-    make and their team and league preferences. Just click on the widgets below to explore!
+    make, and their team and league preferences. Just click on the widgets below to explore!
     """
 )
 
@@ -61,43 +65,48 @@ def load_data(file_path):
 try:
     intensity_data = load_data('data/Intensity_MLB_ALLRaces.parquet')
     intensity_data["zipcode"] = intensity_data["zipcode"].astype(str).str.zfill(5)
-    # Ensure Fandom Level is in the correct format
     intensity_data["Fandom Level"] = intensity_data["Fandom Level"].astype(str)
 except Exception as e:
     st.error(f"Error loading data: {e}")
     st.stop()
 
-# Sidebar for filters
+# Sidebar for filters with collapsible sections
 st.sidebar.header("Filters")
-teams = st.sidebar.multiselect(
-    "Teams",
-    intensity_data['Team'].unique(),
-    []
-)
 
-leagues = st.sidebar.multiselect(
-    "Leagues",
-    intensity_data['League'].unique(),
-    []
-)
+with st.sidebar.expander("Teams"):
+    teams = st.multiselect(
+        "Select Teams",
+        intensity_data['Team'].unique(),
+        []
+    )
 
-races = st.sidebar.multiselect(
-    "Race",
-    intensity_data['Race'].unique(),
-    []
-)
+with st.sidebar.expander("Leagues"):
+    leagues = st.multiselect(
+        "Select Leagues",
+        intensity_data['League'].unique(),
+        []
+    )
 
-fandom_levels = st.sidebar.multiselect(
-    "Fandom Level",
-    intensity_data['Fandom Level'].unique(),
-    []
-)
+with st.sidebar.expander("Race"):
+    races = st.multiselect(
+        "Select Race",
+        intensity_data['Race'].unique(),
+        []
+    )
 
-income_levels = st.sidebar.multiselect(
-    "Income Level",
-    income_columns,
-    []
-)
+with st.sidebar.expander("Fandom Level"):
+    fandom_levels = st.multiselect(
+        "Select Fandom Level",
+        intensity_data['Fandom Level'].unique(),
+        []
+    )
+
+with st.sidebar.expander("Income Level"):
+    income_levels = st.multiselect(
+        "Select Income Level",
+        income_columns,
+        []
+    )
 
 # Filter data based on widget input
 @st.cache_data
