@@ -89,7 +89,7 @@ def app():
 
     with col1:
         m = leafmap.Map(
-            locate_control=True, latlon_control=True, draw_export=True, minimap_control=True
+            locate_control=True, latlon_control=True, draw_export=False, minimap_control=True  # Disable export
         )
         m.add_basemap(basemap)
 
@@ -108,6 +108,9 @@ def app():
             st.warning("Latitude and Longitude data not available for map visualization.")
 
         m.to_streamlit(height=700)
+
+    # Force table to rerender after map style change
+    st.dataframe(df[existing_columns])
 
 if __name__ == "__main__":
     app()
