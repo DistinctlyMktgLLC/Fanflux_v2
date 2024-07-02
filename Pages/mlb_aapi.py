@@ -48,7 +48,8 @@ def app():
                           'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)',
                           'Middle Class ($45,000 to $49,999)', 'Comfortable ($50,000 to $59,999)',
                           'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)',
-                          'Wealthy ($100,000 to $149,999)', 'Rich ($150,000 or more)']
+                          'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)',
+                          'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)']
     
     existing_columns = [col for col in columns_to_display if col in df.columns]
     missing_columns = set(columns_to_display) - set(existing_columns)
@@ -66,9 +67,15 @@ def app():
         'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)',
         'Middle Class ($45,000 to $49,999)', 'Comfortable ($50,000 to $59,999)',
         'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)',
-        'Wealthy ($100,000 to $149,999)', 'Rich ($150,000 or more)'
+        'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)',
+        'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)'
     ]
-    df['Total Fans'] = df[income_cols].sum(axis=1)
+    existing_income_cols = [col for col in income_cols if col in df.columns]
+
+    if existing_income_cols:
+        df['Total Fans'] = df[existing_income_cols].sum(axis=1)
+    else:
+        df['Total Fans'] = 0
 
     # Create an interactive map with options
     st.title("Interactive Map")
