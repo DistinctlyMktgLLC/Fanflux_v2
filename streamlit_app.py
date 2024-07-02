@@ -36,6 +36,22 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# JavaScript to toggle the sidebar
+st.markdown(
+    """
+    <script>
+    const toggleButton = document.createElement("button");
+    toggleButton.classList.add("sidebar-toggle");
+    toggleButton.innerHTML = "&#9776;";  // Hamburger menu icon
+    toggleButton.onclick = function() {
+        document.querySelector(".sidebar .sidebar-content").classList.toggle("hidden");
+    };
+    document.body.appendChild(toggleButton);
+    </script>
+    """,
+    unsafe_allow_html=True,
+)
+
 # Show the page title and description
 st.title("🏆 Find Fans")
 st.write(
@@ -99,7 +115,13 @@ races = st.sidebar.multiselect(
     []
 )
 
-incomes = st.sidebar.multiselect(
+fandom_levels = st.sidebar.multiselect(
+    "Fandom Level",
+    intensity_data['Fandom Level'].unique(),
+    []
+)
+
+income_levels = st.sidebar.multiselect(
     "Income Level",
     income_columns,
     []
@@ -109,7 +131,7 @@ intensity = st.sidebar.slider("Intensity", 0, 100, (0, 100))
 
 # Filter data based on widget input
 @st.cache_data
-def filter_data(data, teams, leagues, races, intensity_range, incomes):
+def filter_data(data, teams, leagues, races, fandom_levels, income_levels, intensity_range):
     filtered_data = data[
         (data["Intensity Score"].between(intensity_range[0], intensity_range[1]))
     ]
@@ -119,14 +141,14 @@ def filter_data(data, teams, leagues, races, intensity_range, incomes):
         filtered_data = filtered_data[filtered_data["League"].isin(leagues)]
     if races:
         filtered_data = filtered_data[filtered_data["Race"].isin(races)]
-    if incomes:
-        filtered_data = filtered_data[
-            filtered_data[income_columns].apply(lambda row: any(row.index[row > 0].isin(incomes)), axis=1)
-        ]
+    if fandom_levels:
+        filtered_data = filtered_data[filtered_data["Fandom Level"].isin(fandom_levels)]
+    if income_levels:
+        filtered_data = filtered_data[filtered_data[income_levels].sum(axis=1) > 0]
     return filtered_data
 
 try:
-    df_filtered = filter_data(intensity_data, teams, leagues, races, intensity, incomes)
+    df_filtered = filter_data(intensity_data, teams, leagues, races, fandom_levels, income_levels, intensity)
 except Exception as e:
     st.error(f"Error filtering data: {e}")
     st.stop()
@@ -169,28 +191,8 @@ with col1:
     m.to_streamlit(height=700)
 
 # Optional: If you want to add a table as well
-# Remove specific columns from the table
-columns_to_display = [col for col in df_filtered.columns if col not in ['dCategory', 'US lat', 'US lon', 'helper']]
-df_display = df_filtered[columns_to_display].copy()
-
+columns_to_display = [
+    'Team', 'League', 'City', 'City Alt.', 'Neighborhood', 'zipcode', 'Intensity Score', 'Fandom Level', 'Race'
+] + income_columns
 st.write("## Filtered Data Table")
-st.dataframe(df_display.reset_index(drop=True))  # Display without row numbers
-
-# Add toggle button for sidebar
-if st.button("☰"):
-    st.session_state.sidebar_visible = not st.session_state.get('sidebar_visible', True)
-
-sidebar_class = "hidden" if not st.session_state.get('sidebar_visible', True) else ""
-st.markdown(
-    f"""
-    <style>
-    .sidebar .sidebar-content {{
-        transform: translateX(0);
-    }}
-    .sidebar .sidebar-content.hidden {{
-        transform: translateX(-100%);
-    }}
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+st.dataframe(df_filtered[columns_to_display].reset_index(drop=True))  # Reset index to remove row numbers
