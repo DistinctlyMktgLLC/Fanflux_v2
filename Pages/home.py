@@ -1,8 +1,10 @@
 import streamlit as st
 
+st.set_page_config(page_title="Fanflux Home", page_icon="🏆", layout="wide")
+
 def app():
-    st.title("🏆 Find Fans")
-    st.write("""
-    Fanflux visualizes Fan data from our Database that shows where fans live, how much they make, and their team and league preferences. 
-    Just click on the widgets below to explore!
-    """)
+    st.markdown("# 🏆 Find Fans")
+    st.markdown("Fanflux visualizes fan data from our database that shows where fans live, how much they make, and their team and league preferences. Just click on the widgets below to explore!")
+
+if __name__ == "__main__":
+    app()
