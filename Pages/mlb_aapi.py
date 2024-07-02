@@ -9,6 +9,9 @@ def load_data():
 def app():
     df = load_data()
 
+    # Print available columns for debugging
+    st.write("Available columns:", df.columns.tolist())
+
     # Sidebar filters
     teams = df['Team'].unique().tolist()
     leagues = df['League'].unique().tolist()
@@ -28,11 +31,18 @@ def app():
 
     # Display data
     st.title("MLB AAPI Fans")
-    st.dataframe(df[['Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level', 'Race',
-                     'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)',
-                     'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)',
-                     'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)',
-                     'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)',
-                     'Middle Class ($45,000 to $49,999)', 'Comfortable ($50,000 to $59,999)',
-                     'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)',
-                     'Wealthy ($100,000 to $149,999)', 'Rich ($150,000 or more)']])
+
+    # Adjust the column selection based on available columns
+    columns_to_display = ['Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level', 'Race',
+                          'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)',
+                          'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)',
+                          'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)',
+                          'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)',
+                          'Middle Class ($45,000 to $49,999)', 'Comfortable ($50,000 to $59,999)',
+                          'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)',
+                          'Wealthy ($100,000 to $149,999)', 'Rich ($150,000 or more)']
+
+    # Only display columns that exist in the DataFrame
+    columns_to_display = [col for col in columns_to_display if col in df.columns]
+
+    st.dataframe(df[columns_to_display])
