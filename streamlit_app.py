@@ -162,4 +162,13 @@ st.write("## Filtered Data Table")
 columns_to_display = [
     'Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level', 'Race'
 ] + income_columns
-st.dataframe(df_filtered[columns_to_display].reset_index(drop=True))  # Reset index to remove row numbers
+# Adding pagination to the table
+page_size = 50
+total_rows = len(df_filtered)
+current_page = st.sidebar.number_input('Page', min_value=1, max_value=(total_rows // page_size) + 1, step=1)
+
+start_index = (current_page - 1) * page_size
+end_index = start_index + page_size
+df_paginated = df_filtered.iloc[start_index:end_index]
+
+st.dataframe(df_paginated[columns_to_display].reset_index(drop=True))  # Reset index to remove row numbers
