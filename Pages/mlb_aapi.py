@@ -34,6 +34,10 @@ def app():
     if df.empty:
         return
 
+    # Format the zipcode column as a 5-digit string
+    if 'zipcode' in df.columns:
+        df['zipcode'] = df['zipcode'].astype(str).str.zfill(5)
+
     # Sidebar filters
     teams = df['Team'].unique().tolist() if 'Team' in df.columns else []
     leagues = df['League'].unique().tolist() if 'League' in df.columns else []
