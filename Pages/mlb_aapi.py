@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
+import leafmap.foliumap as leafmap
 import folium
 from streamlit_folium import st_folium
-import altair as alt
 
 # Load data from Parquet file
 @st.cache_data
@@ -58,40 +58,31 @@ def app():
 
     st.dataframe(df[existing_columns])
 
-    # Create a map
-    st.header("Fan Intensity Map")
-    if 'US lat' in df.columns and 'US lon' in df.columns:
-        m = folium.Map(location=[df['US lat'].mean(), df['US lon'].mean()], zoom_start=5)
-        for idx, row in df.iterrows():
-            folium.Marker([row['US lat'], row['US lon']], 
-                          popup=f"{row['Neighborhood']} - Intensity: {row['Intensity']}").add_to(m)
-        st_folium(m, width=700, height=500)
-    else:
-        st.warning("Latitude and Longitude data not available for map visualization.")
+    # Create an interactive map with options
+    st.title("Mapping AAPI Baseball Fans")
 
-    # Altair chart
-    st.header("Income Distribution Over Zipcodes")
-    income_cols = [
-        'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)',
-        'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)',
-        'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)',
-        'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)',
-        'Middle Class ($45,000 to $49,999)', 'Comfortable ($50,000 to $59,999)',
-        'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)',
-        'Wealthy ($100,000 to $149,999)', 'Rich ($150,000 or more)'
-    ]
+    col1, col2 = st.columns([4, 1])
+    options = list(leafmap.basemaps.keys())
+    index = options.index("OpenTopoMap")
 
-    existing_income_cols = [col for col in income_cols if col in df.columns]
+    with col2:
+        basemap = st.selectbox("Select a basemap:", options, index)
 
-    if existing_income_cols:
-        df_income = df.melt(id_vars=["zipcode"], value_vars=existing_income_cols, 
-                            var_name="Income Level", value_name="Count")
-        chart = alt.Chart(df_income).mark_bar().encode(
-            x=alt.X('zipcode:O', title='Zipcode'),
-            y=alt.Y('Count:Q', title='Number of People'),
-            color='Income Level:N'
-        ).properties(width=700, height=400)
+    with col1:
+        m = leafmap.Map(
+            locate_control=True, latlon_control=True, draw_export=True, minimap_control=True
+        )
+        m.add_basemap(basemap)
 
-        st.altair_chart(chart, use_container_width=True)
-    else:
-        st.warning("Income data columns are not available for chart visualization.")
+        # Add markers from the dataframe
+        if 'US lat' in df.columns and 'US lon' in df.columns:
+            for idx, row in df.iterrows():
+                folium.Marker([row['US lat'], row['US lon']], 
+                              popup=f"{row['Neighborhood']} - Intensity: {row['Intensity']}").add_to(m)
+        else:
+            st.warning("Latitude and Longitude data not available for map visualization.")
+
+        m.to_streamlit(height=700)
+
+if __name__ == "__main__":
+    app()
