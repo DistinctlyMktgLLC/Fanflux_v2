@@ -31,4 +31,15 @@ pytz==2024.1
 referencing==0.35.1
 requests==2.32.3
 rich==13.7.1
-rpds-py==0.
+rpds-py==0.18.1
+six==1.16.0
+smmap==5.0.1
+toml==0.10.2
+toolz==0.12.1
+tornado==6.4.1
+typing-extensions==4.12.2
+tzdata==2024.1
+urllib3==2.2.2
+validators==0.29.0
+watchdog==4.0.1
+zipp==3.19.2
