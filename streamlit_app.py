@@ -8,12 +8,28 @@ from folium.plugins import MarkerCluster, MeasureControl, MousePosition
 # Set page configuration
 st.set_page_config(page_title="Fanflux Intensity Finder", page_icon="🏆", layout="wide")
 
-# Custom CSS to remove row lines from the table
+# Custom CSS to remove row lines from the table and style the sidebar toggle button
 st.markdown(
     """
     <style>
     .dataframe th, .dataframe td {
         border: none !important;
+    }
+    .sidebar .sidebar-content {
+        transition: transform 0.3s ease;
+    }
+    .sidebar .sidebar-content.hidden {
+        transform: translateX(-100%);
+    }
+    .sidebar-toggle {
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 10px;
+        background-color: #f0f0f0;
+        border: none;
+        cursor: pointer;
+        z-index: 1000;
     }
     </style>
     """,
@@ -65,36 +81,31 @@ except Exception as e:
 
 # Sidebar for filters
 st.sidebar.header("Filters")
-expand = st.sidebar.checkbox("Expand/Collapse", value=True)
-if expand:
-    with st.sidebar:
-        teams = st.multiselect(
-            "Teams",
-            intensity_data['Team'].unique(),
-            []
-        )
+teams = st.sidebar.multiselect(
+    "Teams",
+    intensity_data['Team'].unique(),
+    []
+)
 
-        leagues = st.multiselect(
-            "Leagues",
-            intensity_data['League'].unique(),
-            []
-        )
+leagues = st.sidebar.multiselect(
+    "Leagues",
+    intensity_data['League'].unique(),
+    []
+)
 
-        races = st.multiselect(
-            "Race",
-            intensity_data['Race'].unique(),
-            []
-        )
+races = st.sidebar.multiselect(
+    "Race",
+    intensity_data['Race'].unique(),
+    []
+)
 
-        intensity = st.slider("Intensity", 0, 100, (0, 100))
+intensity = st.sidebar.slider("Intensity", 0, 100, (0, 100))
 
-        incomes = st.multiselect(
-            "Income Level",
-            income_columns,
-            []
-        )
-else:
-    teams = leagues = races = intensity = incomes = []
+incomes = st.sidebar.multiselect(
+    "Income Level",
+    income_columns,
+    []
+)
 
 # Filter data based on widget input
 @st.cache_data
@@ -164,4 +175,23 @@ columns_to_display = [col for col in df_filtered.columns if col not in ['dCatego
 df_display = df_filtered[columns_to_display].copy()
 
 st.write("## Filtered Data Table")
-st.dataframe(df_display)  # Display without row numbers
+st.dataframe(df_display.reset_index(drop=True))  # Display without row numbers
+
+# Add toggle button for sidebar
+if st.button("☰"):
+    st.session_state.sidebar_visible = not st.session_state.get('sidebar_visible', True)
+
+sidebar_class = "hidden" if not st.session_state.get('sidebar_visible', True) else ""
+st.markdown(
+    f"""
+    <style>
+    .sidebar .sidebar-content {{
+        transform: translateX(0);
+    }}
+    .sidebar .sidebar-content.hidden {{
+        transform: translateX(-100%);
+    }}
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
