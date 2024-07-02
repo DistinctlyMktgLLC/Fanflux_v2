@@ -4,7 +4,7 @@ import os
 # Define a list of CSV file paths and their corresponding Parquet file paths
 files = [
     ('data/Fanflux_Intensity_MLB_AAPI.csv', 'data/Fanflux_Intensity_MLB_AAPI.parquet'),
-    ('data/Fanflux_Intensity_MLB_American Indian.csv', 'data/Fanflux_Intensity_MLB_American Indian.csv.parquet'),
+    ('data/Fanflux_Intensity_MLB_AmericanIndian.csv', 'data/Fanflux_Intensity_MLB_AmericanIndian.csv.parquet'),
     ('data/Fanflux_Intensity_MLB_Asian.csv', 'data/Fanflux_Intensity_MLB_Asian.parquet'),
     ('data/Fanflux_Intensity_MLB_Black.csv', 'data/Fanflux_Intensity_MLB_Black.parquet'),
     ('data/Fanflux_Intensity_MLB_Hispanic.csv', 'data/Fanflux_Intensity_MLB_Hispanic.parquet'),

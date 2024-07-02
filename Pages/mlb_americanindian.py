@@ -1,28 +1,19 @@
 import streamlit as st
 import pandas as pd
-from streamlit_folium import st_folium
 
-# Load data from Parquet file
+# Set the page configuration
+st.set_page_config(page_title="MLB American Indian Fans", page_icon="⚾️", layout="wide")
+
+# Function to load data
 @st.cache_data
 def load_data():
-    return pd.read_parquet('data/Fanflux_Intensity_MLB_American Indian.csv.parquet')
+    return pd.read_parquet('data/Fanflux_Intensity_MLB_AmericanIndian.csv.parquet')
 
+# Load data
 df = load_data()
 
+# Application logic
 def app():
     st.title("MLB American Indian Fans")
-    st.sidebar.header("Filter Data")
-
-    teams = st.sidebar.multiselect("Select Team(s)", options=df['Team'].unique())
-    leagues = st.sidebar.multiselect("Select League(s)", options=df['League'].unique())
-
-    if teams:
-        df_filtered = df[df['Team'].isin(teams)]
-    if leagues:
-        df_filtered = df[df['League'].isin(leagues)]
-    if not teams and not leagues:
-        df_filtered = df
-
-    st.map(df_filtered)
-    st.dataframe(df_filtered[['Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level', 'Race', 'Income']])
-
+    st.write("This is the MLB American Indian Fans page.")
+    st.dataframe(df)
