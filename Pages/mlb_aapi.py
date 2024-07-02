@@ -16,6 +16,17 @@ def load_data(file_path):
         return pd.DataFrame()
 
 def app():
+    st.markdown(
+        """
+        <style>
+        .main .block-container {
+            background-color: white;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
     df = load_data('data/Fanflux_Intensity_MLB_AAPI.parquet')
 
     if df.empty:
@@ -26,24 +37,7 @@ def app():
     leagues = df['League'].unique().tolist() if 'League' in df.columns else []
     zipcodes = df['zipcode'].unique().tolist() if 'zipcode' in df.columns else []
     fandom_levels = df['Fandom Level'].unique().tolist() if 'Fandom Level' in df.columns else []
-
-    selected_team = st.sidebar.selectbox("Select a Team", ["All"] + teams)
-    selected_league = st.sidebar.selectbox("Select a League", ["All"] + leagues)
-    selected_zipcode = st.sidebar.selectbox("Select a Zipcode", ["All"] + zipcodes)
-    selected_fandom_level = st.sidebar.selectbox("Select a Fandom Level", ["All"] + fandom_levels)
-
-    # Apply filters
-    if selected_team != "All" and 'Team' in df.columns:
-        df = df[df['Team'] == selected_team]
-    if selected_league != "All" and 'League' in df.columns:
-        df = df[df['League'] == selected_league]
-    if selected_zipcode != "All" and 'zipcode' in df.columns:
-        df = df[df['zipcode'] == selected_zipcode]
-    if selected_fandom_level != "All" and 'Fandom Level' in df.columns:
-        df = df[df['Fandom Level'] == selected_fandom_level]
-
-    # Calculate Total Fans
-    income_cols = [
+    income_levels = [
         'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)',
         'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)',
         'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)',
@@ -53,36 +47,52 @@ def app():
         'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)',
         'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)'
     ]
-    existing_income_cols = [col for col in income_cols if col in df.columns]
 
-    if existing_income_cols:
-        df['Total Fans'] = df[existing_income_cols].sum(axis=1)
-    else:
-        df['Total Fans'] = 0
+    selected_teams = st.sidebar.multiselect("Select a Team", teams, default=teams)
+    selected_leagues = st.sidebar.multiselect("Select a League", leagues, default=leagues)
+    selected_income_levels = st.sidebar.multiselect("Select an Income Level", income_levels, default=income_levels)
+    selected_fandom_levels = st.sidebar.multiselect("Select a Fandom Level", fandom_levels, default=fandom_levels)
+
+    # Apply filters
+    if selected_teams:
+        df = df[df['Team'].isin(selected_teams)]
+    if selected_leagues:
+        df = df[df['League'].isin(selected_leagues)]
+    if selected_fandom_levels:
+        df = df[df['Fandom Level'].isin(selected_fandom_levels)]
+
+    # Calculate Total Fans
+    df['Total Fans'] = df[selected_income_levels].sum(axis=1)
 
     # Display data
     st.title("MLB AAPI Fans")
 
     # Scorecards
-    total_fans = df['Total Fans'].sum()
-    avg_intensity = df['Intensity'].mean()
-    num_teams = df['Team'].nunique()
+    avid_fans = df[df['Fandom Level'] == 'Avid']['Total Fans'].sum()
+    casual_fans = df[df['Fandom Level'] == 'Casual']['Total Fans'].sum()
+    not_at_all_fans = df[df['Fandom Level'] == 'Not at all']['Total Fans'].sum()
 
-    col1, col2, col3 = st.columns(3)
-    col1.metric(label="Total Fans", value=f"{total_fans:,}")
-    col2.metric(label="Average Intensity", value=f"{avg_intensity:.2f}")
-    col3.metric(label="Number of Teams", value=num_teams)
+    scorecard_html = f"""
+    <div style="display: flex; justify-content: space-around; margin-bottom: 20px;">
+        <div style="background-color: #e8f4f8; padding: 20px; border-radius: 10px; width: 30%; text-align: center;">
+            <h3 style="color: #007acc;">Avid Fans</h3>
+            <p style="font-size: 24px;">{avid_fans:,}</p>
+        </div>
+        <div style="background-color: #f9f4e8; padding: 20px; border-radius: 10px; width: 30%; text-align: center;">
+            <h3 style="color: #ffac41;">Casual Fans</h3>
+            <p style="font-size: 24px;">{casual_fans:,}</p>
+        </div>
+        <div style="background-color: #f8e8e8; padding: 20px; border-radius: 10px; width: 30%; text-align: center;">
+            <h3 style="color: #e60000;">Not at all Fans</h3>
+            <p style="font-size: 24px;">{not_at_all_fans:,}</p>
+        </div>
+    </div>
+    """
+
+    st.markdown(scorecard_html, unsafe_allow_html=True)
 
     # Ensure the necessary columns are in the dataframe before displaying
-    columns_to_display = ['Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level', 'Race',
-                          'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)',
-                          'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)',
-                          'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)',
-                          'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)',
-                          'Middle Class ($45,000 to $49,999)', 'Comfortable ($50,000 to $59,999)',
-                          'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)',
-                          'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)',
-                          'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)']
+    columns_to_display = ['Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level', 'Race'] + selected_income_levels
 
     existing_columns = [col for col in columns_to_display if col in df.columns]
     missing_columns = set(columns_to_display) - set(existing_columns)
