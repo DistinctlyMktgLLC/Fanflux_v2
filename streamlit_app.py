@@ -8,6 +8,9 @@ import Pages.mlb_black as mlb_black
 import Pages.mlb_hispanic as mlb_hispanic
 import Pages.mlb_white as mlb_white
 
+# Set page configuration
+st.set_page_config(page_title="Fanflux", page_icon="🏆", layout="wide")
+
 app = MultiApp()
 
 # Add all your application here
