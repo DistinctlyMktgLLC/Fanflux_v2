@@ -143,7 +143,6 @@ with col1:
             f"Race: {row['Race']}<br>"
             f"Team: {row['Team']}<br>"
             f"League: {row['League']}<br>"
-            f"Income Level: {row['helper']}<br>"
             f"# of Fans: {row[income_columns].sum()}"
         )
         folium.CircleMarker(
