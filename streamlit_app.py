@@ -99,13 +99,13 @@ races = st.sidebar.multiselect(
     []
 )
 
-intensity = st.sidebar.slider("Intensity", 0, 100, (0, 100))
-
 incomes = st.sidebar.multiselect(
     "Income Level",
     income_columns,
     []
 )
+
+intensity = st.sidebar.slider("Intensity", 0, 100, (0, 100))
 
 # Filter data based on widget input
 @st.cache_data
