@@ -111,9 +111,6 @@ def filter_data(data, teams, leagues, races, fandom_levels, income_levels):
         filtered_data = filtered_data[filtered_data["Race"].isin(races)]
     if fandom_levels:
         filtered_data = filtered_data[filtered_data["Fandom Level"].isin(fandom_levels)]
-    if income_levels:
-        filtered_data = filtered_data.loc[:, income_columns + ['US lat', 'US lon', 'Neighborhood', 'Race', 'Team', 'League']]
-        filtered_data['Total Fans'] = filtered_data[income_levels].sum(axis=1)
     return filtered_data
 
 try:
@@ -147,7 +144,7 @@ with col1:
             f"Team: {row['Team']}<br>"
             f"League: {row['League']}<br>"
             f"Fandom Level: {row['Fandom Level']}<br>"
-            f"# of Fans: {row['Total Fans']}"
+            f"# of Fans: {row[income_columns].sum()}"
         )
         folium.CircleMarker(
             location=[row['US lat'], row['US lon']],
@@ -163,13 +160,6 @@ with col1:
 # Optional: If you want to add a table as well
 st.write("## Filtered Data Table")
 columns_to_display = [
-    'Team', 'League', 'Neighborhood', 'zipcode', 'Intensity',
-    'Fandom Level', 'Race', 'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)', 'Getting By ($15,000 to $19,999)',
-    'Starting Out ($20,000 to $24,999)', 'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)',
-    'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)', 'Middle Class ($45,000 to $49,999)',
-    'Comfortable ($50,000 to $59,999)', 'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)',
-    'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)', 'Wealthy ($150,000 to $199,999)',
-    'Affluent ($200,000 or more)'
-]
-
-st.dataframe(df_filtered[columns_to_display].reset_index(drop=True))
+    'Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level', 'Race'
+] + income_columns
+st.dataframe(df_filtered[columns_to_display].reset_index(drop=True))  # Reset index to remove row numbers
