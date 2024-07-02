@@ -2,8 +2,6 @@ import streamlit as st
 import pandas as pd
 from streamlit_folium import st_folium
 
-st.set_page_config(page_title="MLB AAPI Fans", page_icon="⚾️", layout="wide")
-
 # Load data from Parquet file
 @st.cache_data
 def load_data():
