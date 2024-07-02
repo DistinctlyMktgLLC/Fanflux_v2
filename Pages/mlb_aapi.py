@@ -1,10 +1,10 @@
-def app():
-    import streamlit as st
-    import pandas as pd
-    import folium
-    from folium.plugins import MarkerCluster
-    from streamlit_folium import st_folium
+import streamlit as st
+import pandas as pd
+import folium
+from folium.plugins import MarkerCluster
+from streamlit_folium import st_folium
 
+def app():
     # Set page configuration
     st.set_page_config(page_title="MLB AAPI Fans", page_icon="⚾", layout="wide")
 

@@ -1,3 +1,5 @@
+import streamlit as st
+
 class MultiApp:
     def __init__(self):
         self.apps = []
@@ -12,6 +14,7 @@ class MultiApp:
         app = st.sidebar.radio(
             'Navigation',
             self.apps,
-            format_func=lambda app: app['title'])
+            format_func=lambda app: app['title']
+        )
 
         app['function']()
