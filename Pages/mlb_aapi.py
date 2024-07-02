@@ -21,6 +21,8 @@ def app():
         <style>
         .main .block-container {
             background-color: white;
+            padding: 20px;
+            border-radius: 10px;
         }
         </style>
         """,
@@ -48,10 +50,10 @@ def app():
         'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)'
     ]
 
-    selected_teams = st.sidebar.multiselect("Select a Team", teams, default=teams)
-    selected_leagues = st.sidebar.multiselect("Select a League", leagues, default=leagues)
-    selected_income_levels = st.sidebar.multiselect("Select an Income Level", income_levels, default=income_levels)
-    selected_fandom_levels = st.sidebar.multiselect("Select a Fandom Level", fandom_levels, default=fandom_levels)
+    selected_teams = st.sidebar.multiselect("Select a Team", teams)
+    selected_leagues = st.sidebar.multiselect("Select a League", leagues)
+    selected_income_levels = st.sidebar.multiselect("Select an Income Level", income_levels)
+    selected_fandom_levels = st.sidebar.multiselect("Select a Fandom Level", fandom_levels)
 
     # Apply filters
     if selected_teams:
@@ -62,7 +64,7 @@ def app():
         df = df[df['Fandom Level'].isin(selected_fandom_levels)]
 
     # Calculate Total Fans
-    df['Total Fans'] = df[selected_income_levels].sum(axis=1)
+    df['Total Fans'] = df[selected_income_levels].sum(axis=1) if selected_income_levels else 0
 
     # Display data
     st.title("MLB AAPI Fans")
@@ -74,17 +76,17 @@ def app():
 
     scorecard_html = f"""
     <div style="display: flex; justify-content: space-around; margin-bottom: 20px;">
-        <div style="background-color: #e8f4f8; padding: 20px; border-radius: 10px; width: 30%; text-align: center;">
+        <div style="background-color: white; padding: 20px; border-radius: 10px; width: 30%; text-align: center; border-left: 10px solid #007acc; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
             <h3 style="color: #007acc;">Avid Fans</h3>
-            <p style="font-size: 24px;">{avid_fans:,}</p>
+            <p style="font-size: 24px; color: black;">{avid_fans:,}</p>
         </div>
-        <div style="background-color: #f9f4e8; padding: 20px; border-radius: 10px; width: 30%; text-align: center;">
+        <div style="background-color: white; padding: 20px; border-radius: 10px; width: 30%; text-align: center; border-left: 10px solid #ffac41; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
             <h3 style="color: #ffac41;">Casual Fans</h3>
-            <p style="font-size: 24px;">{casual_fans:,}</p>
+            <p style="font-size: 24px; color: black;">{casual_fans:,}</p>
         </div>
-        <div style="background-color: #f8e8e8; padding: 20px; border-radius: 10px; width: 30%; text-align: center;">
+        <div style="background-color: white; padding: 20px; border-radius: 10px; width: 30%; text-align: center; border-left: 10px solid #e60000; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
             <h3 style="color: #e60000;">Not at all Fans</h3>
-            <p style="font-size: 24px;">{not_at_all_fans:,}</p>
+            <p style="font-size: 24px; color: black;">{not_at_all_fans:,}</p>
         </div>
     </div>
     """
