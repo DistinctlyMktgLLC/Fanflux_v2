@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
 import leafmap.foliumap as leafmap
-import folium
 from streamlit_folium import st_folium
 from st_aggrid import AgGrid, GridOptionsBuilder
+import utils
 
 # Load data from Parquet file
 @st.cache_data
@@ -16,18 +16,7 @@ def load_data(file_path):
         return pd.DataFrame()
 
 def app():
-    st.markdown(
-        """
-        <style>
-        .main .block-container {
-            background-color: black;
-            padding: 20px;
-            border-radius: 10px;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+    utils.apply_common_styles()
 
     df = load_data('data/Fanflux_Intensity_MLB_Hispanic.parquet')
 
@@ -78,24 +67,7 @@ def app():
     casual_fans = df[df['Fandom Level'] == 'Casual']['Total Fans'].sum()
     not_at_all_fans = df[df['Fandom Level'] == 'Not at all']['Total Fans'].sum()
 
-    scorecard_html = f"""
-    <div style="display: flex; justify-content: space-around; margin-bottom: 20px;">
-        <div style="background-color: #e8f4f8; padding: 20px; border-radius: 10px; width: 30%; text-align: center; border-left: 10px solid #005f99; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-            <h3 style="color: #007acc;">Avid Fans</h3>
-            <p style="font-size: 24px; color: black;">{avid_fans:,}</p>
-        </div>
-        <div style="background-color: #fdf0e6; padding: 20px; border-radius: 10px; width: 30%; text-align: center; border-left: 10px solid #e68a00; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-            <h3 style="color: #ffac41;">Casual Fans</h3>
-            <p style="font-size: 24px; color: black;">{casual_fans:,}</p>
-        </div>
-        <div style="background-color: #ffe6e6; padding: 20px; border-radius: 10px; width: 30%; text-align: center; border-left: 10px solid #cc3300; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-            <h3 style="color: #e60000;">Not at all Fans</h3>
-            <p style="font-size: 24px; color: black;">{not_at_all_fans:,}</p>
-        </div>
-    </div>
-    """
-
-    st.markdown(scorecard_html, unsafe_allow_html=True)
+    utils.generate_scorecards(avid_fans, casual_fans, not_at_all_fans)
 
     # Ensure the necessary columns are in the dataframe before displaying
     columns_to_display = ['Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level', 'Race'] + selected_income_levels
@@ -125,7 +97,7 @@ def app():
     AgGrid(df[existing_columns], gridOptions=grid_options, enable_enterprise_modules=True)
 
     # Create an interactive map with options
-    st.title("A Map of Fandom")
+    st.title("Mapping Fandom")
 
     col1, col2 = st.columns([4, 1])
     options = list(leafmap.basemaps.keys())
@@ -141,19 +113,7 @@ def app():
         m.add_basemap(basemap)
 
         # Add markers from the dataframe
-        if 'US lat' in df.columns and 'US lon' in df.columns:
-            for idx, row in df.iterrows():
-                tooltip_text = (f"Neighborhood: {row['Neighborhood']}<br>"
-                                f"Race: {row['Race']}<br>"
-                                f"Team: {row['Team']}<br>"
-                                f"League: {row['League']}<br>"
-                                f"Fandom Level: {row['Fandom Level']}<br>"
-                                f"Total Fans: {row['Total Fans']}")
-                folium.Marker([row['US lat'], row['US lon']], 
-                              popup=tooltip_text).add_to(m)
-        else:
-            st.warning("Latitude and Longitude data not available for map visualization.")
-
+        m = utils.add_markers_to_map(m, df)
         m.to_streamlit(height=700)
 
 if __name__ == "__main__":
