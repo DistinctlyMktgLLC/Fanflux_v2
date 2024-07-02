@@ -20,7 +20,7 @@ def app():
         """
         <style>
         .main .block-container {
-            background-color: white;
+            background-color: black;
             padding: 20px;
             border-radius: 10px;
         }
@@ -76,15 +76,15 @@ def app():
 
     scorecard_html = f"""
     <div style="display: flex; justify-content: space-around; margin-bottom: 20px;">
-        <div style="background-color: white; padding: 20px; border-radius: 10px; width: 30%; text-align: center; border-left: 10px solid #007acc; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <div style="background-color: #e8f4f8; padding: 20px; border-radius: 10px; width: 30%; text-align: center; border-left: 10px solid #005f99; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
             <h3 style="color: #007acc;">Avid Fans</h3>
             <p style="font-size: 24px; color: black;">{avid_fans:,}</p>
         </div>
-        <div style="background-color: white; padding: 20px; border-radius: 10px; width: 30%; text-align: center; border-left: 10px solid #ffac41; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <div style="background-color: #fdf0e6; padding: 20px; border-radius: 10px; width: 30%; text-align: center; border-left: 10px solid #e68a00; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
             <h3 style="color: #ffac41;">Casual Fans</h3>
             <p style="font-size: 24px; color: black;">{casual_fans:,}</p>
         </div>
-        <div style="background-color: white; padding: 20px; border-radius: 10px; width: 30%; text-align: center; border-left: 10px solid #e60000; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <div style="background-color: #ffe6e6; padding: 20px; border-radius: 10px; width: 30%; text-align: center; border-left: 10px solid #cc3300; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
             <h3 style="color: #e60000;">Not at all Fans</h3>
             <p style="font-size: 24px; color: black;">{not_at_all_fans:,}</p>
         </div>
