@@ -71,7 +71,7 @@ def app():
     df['Total Fans'] = df[selected_income_levels].sum(axis=1) if selected_income_levels else 0
 
     # Display data
-    st.title("MLB AAPI Fans")
+    st.title("AAPI Baseball Fans")
 
     # Scorecards
     avid_fans = df[df['Fandom Level'] == 'Avid']['Total Fans'].sum()
@@ -125,7 +125,7 @@ def app():
     AgGrid(df[existing_columns], gridOptions=grid_options, enable_enterprise_modules=True)
 
     # Create an interactive map with options
-    st.title("Interactive Map")
+    st.title("A Map of Fandom")
 
     col1, col2 = st.columns([4, 1])
     options = list(leafmap.basemaps.keys())
