@@ -3,6 +3,7 @@ import pandas as pd
 import leafmap.foliumap as leafmap
 import folium
 from streamlit_folium import st_folium
+from st_aggrid import AgGrid, GridOptionsBuilder
 
 # Load data from Parquet file
 @st.cache_data
@@ -57,19 +58,23 @@ def app():
     if missing_columns:
         st.warning(f"The following columns are missing in the dataset: {', '.join(missing_columns)}")
 
-    # Add custom CSS to hide export buttons
-    st.markdown(
-        """
-        <style>
-        .stDataFrame div[data-testid="stToolbar"] {
-            display: none;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+    # Use AgGrid to display the dataframe
+    gb = GridOptionsBuilder.from_dataframe(df[existing_columns])
+    gb.configure_pagination(paginationPageSize=10)  # Adjust pagination as needed
+    gb.configure_default_column(editable=False, sortable=True, filter=True)
+    gb.configure_grid_options(domLayout='normal', suppressCsvExport=True, suppressExcelExport=True)  # Disable export
+    
+    # Customize grid options further
+    gb.configure_column("Team", header_name="Team", sortable=True, filter=True, editable=False)
+    gb.configure_column("League", header_name="League", sortable=True, filter=True, editable=False)
+    gb.configure_column("Neighborhood", header_name="Neighborhood", sortable=True, filter=True, editable=False)
+    gb.configure_column("zipcode", header_name="Zipcode", sortable=True, filter=True, editable=False)
+    gb.configure_column("Intensity", header_name="Intensity", sortable=True, filter=True, editable=False)
+    gb.configure_column("Fandom Level", header_name="Fandom Level", sortable=True, filter=True, editable=False)
+    gb.configure_column("Race", header_name="Race", sortable=True, filter=True, editable=False)
 
-    st.dataframe(df[existing_columns])
+    grid_options = gb.build()
+    AgGrid(df[existing_columns], gridOptions=grid_options, enable_enterprise_modules=True)
 
     # Calculate Total Fans
     income_cols = [
@@ -120,9 +125,6 @@ def app():
             st.warning("Latitude and Longitude data not available for map visualization.")
 
         m.to_streamlit(height=700)
-
-    # Force table to rerender after map style change
-    st.dataframe(df[existing_columns])
 
 if __name__ == "__main__":
     app()
