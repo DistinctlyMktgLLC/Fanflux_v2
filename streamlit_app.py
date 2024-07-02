@@ -8,46 +8,14 @@ from folium.plugins import MarkerCluster, MeasureControl, MousePosition
 # Set page configuration
 st.set_page_config(page_title="Fanflux Intensity Finder", page_icon="🏆", layout="wide")
 
-# Custom CSS to remove row lines from the table and style the sidebar toggle button
+# Custom CSS to remove row lines from the table
 st.markdown(
     """
     <style>
     .dataframe th, .dataframe td {
         border: none !important;
     }
-    .sidebar .sidebar-content {
-        transition: transform 0.3s ease;
-    }
-    .sidebar .sidebar-content.hidden {
-        transform: translateX(-100%);
-    }
-    .sidebar-toggle {
-        position: fixed;
-        top: 0;
-        left: 0;
-        padding: 10px;
-        background-color: #f0f0f0;
-        border: none;
-        cursor: pointer;
-        z-index: 1000;
-    }
     </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-# JavaScript to toggle the sidebar
-st.markdown(
-    """
-    <script>
-    const toggleButton = document.createElement("button");
-    toggleButton.classList.add("sidebar-toggle");
-    toggleButton.innerHTML = "&#9776;";  // Hamburger menu icon
-    toggleButton.onclick = function() {
-        document.querySelector(".sidebar .sidebar-content").classList.toggle("hidden");
-    };
-    document.body.appendChild(toggleButton);
-    </script>
     """,
     unsafe_allow_html=True,
 )
@@ -90,7 +58,7 @@ def load_data(file_path):
 try:
     intensity_data = load_data('data/Intensity_MLB_ALLRaces.parquet')
     intensity_data["zipcode"] = intensity_data["zipcode"].astype(str).str.zfill(5)
-    intensity_data.rename(columns={"Dispersion Score": "Intensity Score"}, inplace=True)
+    intensity_data.rename(columns={"Dispersion Score": "Intensity"}, inplace=True)
 except Exception as e:
     st.error(f"Error loading data: {e}")
     st.stop()
@@ -115,15 +83,15 @@ races = st.sidebar.multiselect(
     []
 )
 
-fandom_levels = st.sidebar.multiselect(
-    "Fandom Level",
-    intensity_data['Fandom Level'].unique(),
-    []
-)
-
 income_levels = st.sidebar.multiselect(
     "Income Level",
     income_columns,
+    []
+)
+
+fandom_levels = st.sidebar.multiselect(
+    "Fandom Level",
+    intensity_data['Fandom Level'].unique(),
     []
 )
 
@@ -131,9 +99,9 @@ intensity = st.sidebar.slider("Intensity", 0, 100, (0, 100))
 
 # Filter data based on widget input
 @st.cache_data
-def filter_data(data, teams, leagues, races, fandom_levels, income_levels, intensity_range):
+def filter_data(data, teams, leagues, races, income_levels, fandom_levels, intensity_range):
     filtered_data = data[
-        (data["Intensity Score"].between(intensity_range[0], intensity_range[1]))
+        (data["Intensity"].between(intensity_range[0], intensity_range[1]))
     ]
     if teams:
         filtered_data = filtered_data[filtered_data["Team"].isin(teams)]
@@ -141,21 +109,19 @@ def filter_data(data, teams, leagues, races, fandom_levels, income_levels, inten
         filtered_data = filtered_data[filtered_data["League"].isin(leagues)]
     if races:
         filtered_data = filtered_data[filtered_data["Race"].isin(races)]
-    if fandom_levels:
-        filtered_data = filtered_data[filtered_data["Fandom Level"].isin(fandom_levels)]
     if income_levels:
         filtered_data = filtered_data[filtered_data[income_levels].sum(axis=1) > 0]
+    if fandom_levels:
+        filtered_data = filtered_data[filtered_data["Fandom Level"].isin(fandom_levels)]
     return filtered_data
 
 try:
-    df_filtered = filter_data(intensity_data, teams, leagues, races, fandom_levels, income_levels, intensity)
+    df_filtered = filter_data(intensity_data, teams, leagues, races, income_levels, fandom_levels, intensity)
 except Exception as e:
     st.error(f"Error filtering data: {e}")
     st.stop()
 
 # Show the map using leafmap
-st.title("Interactive Map")
-
 col1, col2 = st.columns([4, 1])
 options = list(leafmap.basemaps.keys())
 index = options.index("OpenTopoMap")
@@ -177,6 +143,7 @@ with col1:
             f"Race: {row['Race']}<br>"
             f"Team: {row['Team']}<br>"
             f"League: {row['League']}<br>"
+            f"Income Level: {row['helper']}<br>"
             f"# of Fans: {row[income_columns].sum()}"
         )
         folium.CircleMarker(
@@ -191,8 +158,14 @@ with col1:
     m.to_streamlit(height=700)
 
 # Optional: If you want to add a table as well
-columns_to_display = [
-    'Team', 'League', 'City', 'City Alt.', 'Neighborhood', 'zipcode', 'Intensity Score', 'Fandom Level', 'Race'
-] + income_columns
 st.write("## Filtered Data Table")
+columns_to_display = [
+    'Team', 'League', 'City', 'City Alt.', 'Neighborhood', 'zipcode', 'Intensity', 
+    'Fandom Level', 'Race', 'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)', 
+    'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)', 'Starting Out ($25,000 to $29,999)', 
+    'Starting Out ($30,000 to $34,999)', 'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)', 
+    'Middle Class ($45,000 to $49,999)', 'Comfortable ($50,000 to $59,999)', 'Comfortable ($60,000 to $74,999)', 
+    'Doing Well ($75,000 to $99,999)', 'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)', 
+    'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)'
+]
 st.dataframe(df_filtered[columns_to_display].reset_index(drop=True))  # Reset index to remove row numbers
