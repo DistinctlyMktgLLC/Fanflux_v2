@@ -83,15 +83,15 @@ races = st.sidebar.multiselect(
     []
 )
 
-income_levels = st.sidebar.multiselect(
-    "Income Level",
-    income_columns,
-    []
-)
-
 fandom_levels = st.sidebar.multiselect(
     "Fandom Level",
     intensity_data['Fandom Level'].unique(),
+    []
+)
+
+income_levels = st.sidebar.multiselect(
+    "Income Level",
+    income_columns,
     []
 )
 
@@ -99,7 +99,7 @@ intensity = st.sidebar.slider("Intensity", 0, 100, (0, 100))
 
 # Filter data based on widget input
 @st.cache_data
-def filter_data(data, teams, leagues, races, income_levels, fandom_levels, intensity_range):
+def filter_data(data, teams, leagues, races, fandom_levels, income_levels, intensity_range):
     filtered_data = data[
         (data["Intensity"].between(intensity_range[0], intensity_range[1]))
     ]
@@ -109,28 +109,19 @@ def filter_data(data, teams, leagues, races, income_levels, fandom_levels, inten
         filtered_data = filtered_data[filtered_data["League"].isin(leagues)]
     if races:
         filtered_data = filtered_data[filtered_data["Race"].isin(races)]
-    if income_levels:
-        filtered_data = filtered_data[filtered_data[income_levels].sum(axis=1) > 0]
     if fandom_levels:
         filtered_data = filtered_data[filtered_data["Fandom Level"].isin(fandom_levels)]
+    if income_levels:
+        filtered_data = filtered_data[filtered_data[income_levels].sum(axis=1) > 0]
     return filtered_data
 
 try:
-    df_filtered = filter_data(intensity_data, teams, leagues, races, income_levels, fandom_levels, intensity)
+    df_filtered = filter_data(intensity_data, teams, leagues, races, fandom_levels, income_levels, intensity)
 except Exception as e:
     st.error(f"Error filtering data: {e}")
     st.stop()
 
 # Show the map using leafmap
-st.sidebar.title("About")
-markdown = """
-A Streamlit map template
-<https://github.com/opengeos/streamlit-map-template>
-"""
-st.sidebar.info(markdown)
-logo = "https://i.imgur.com/UbOXYAU.png"
-st.sidebar.image(logo)
-
 st.title("Interactive Map")
 
 col1, col2 = st.columns([4, 1])
@@ -154,6 +145,7 @@ with col1:
             f"Race: {row['Race']}<br>"
             f"Team: {row['Team']}<br>"
             f"League: {row['League']}<br>"
+            f"Fandom Level: {row['helper']}<br>"
             f"# of Fans: {row[income_columns].sum()}"
         )
         folium.CircleMarker(
