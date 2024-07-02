@@ -15,4 +15,12 @@ app = MultiApp()
 
 # Add all your application here
 app.add_app("Home", home.app)
-app
+app.add_app("AAPI Baseball Fans", mlb_aapi.app)
+app.add_app("American Indian Baseball Fans", mlb_americanindian.app)
+app.add_app("Asian Baseball Fans", mlb_asian.app)
+app.add_app("Black Baseball Fans", mlb_black.app)
+app.add_app("Hispanic Baseball Fans", mlb_hispanic.app)
+app.add_app("White Baseball Fans", mlb_white.app)
+
+# The main app
+app.run()

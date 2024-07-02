@@ -11,8 +11,9 @@ class MultiApp:
         })
 
     def run(self):
+        st.title("Fanflux Navigation")
         app = st.selectbox(
-            'Navigation',
+            '',
             self.apps,
             format_func=lambda app: app['title'])
         app['function']()
