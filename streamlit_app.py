@@ -65,29 +65,40 @@ except Exception as e:
 
 # Sidebar for filters
 st.sidebar.header("Filters")
-teams = st.sidebar.multiselect(
-    "Teams",
-    intensity_data['Team'].unique(),
-    []
-)
+expand = st.sidebar.checkbox("Expand/Collapse", value=True)
+if expand:
+    with st.sidebar:
+        teams = st.multiselect(
+            "Teams",
+            intensity_data['Team'].unique(),
+            []
+        )
 
-leagues = st.sidebar.multiselect(
-    "Leagues",
-    intensity_data['League'].unique(),
-    []
-)
+        leagues = st.multiselect(
+            "Leagues",
+            intensity_data['League'].unique(),
+            []
+        )
 
-races = st.sidebar.multiselect(
-    "Race",
-    intensity_data['Race'].unique(),
-    []
-)
+        races = st.multiselect(
+            "Race",
+            intensity_data['Race'].unique(),
+            []
+        )
 
-intensity = st.sidebar.slider("Intensity", 0, 100, (0, 100))
+        intensity = st.slider("Intensity", 0, 100, (0, 100))
+
+        incomes = st.multiselect(
+            "Income Level",
+            income_columns,
+            []
+        )
+else:
+    teams = leagues = races = intensity = incomes = []
 
 # Filter data based on widget input
 @st.cache_data
-def filter_data(data, teams, leagues, races, intensity_range):
+def filter_data(data, teams, leagues, races, intensity_range, incomes):
     filtered_data = data[
         (data["Intensity Score"].between(intensity_range[0], intensity_range[1]))
     ]
@@ -97,10 +108,14 @@ def filter_data(data, teams, leagues, races, intensity_range):
         filtered_data = filtered_data[filtered_data["League"].isin(leagues)]
     if races:
         filtered_data = filtered_data[filtered_data["Race"].isin(races)]
+    if incomes:
+        filtered_data = filtered_data[
+            filtered_data[income_columns].apply(lambda row: any(row.index[row > 0].isin(incomes)), axis=1)
+        ]
     return filtered_data
 
 try:
-    df_filtered = filter_data(intensity_data, teams, leagues, races, intensity)
+    df_filtered = filter_data(intensity_data, teams, leagues, races, intensity, incomes)
 except Exception as e:
     st.error(f"Error filtering data: {e}")
     st.stop()
@@ -129,6 +144,7 @@ with col1:
             f"Race: {row['Race']}<br>"
             f"Team: {row['Team']}<br>"
             f"League: {row['League']}<br>"
+            f"Income Level: {row['helper']}<br>"
             f"# of Fans: {row[income_columns].sum()}"
         )
         folium.CircleMarker(
