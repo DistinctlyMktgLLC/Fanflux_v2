@@ -58,7 +58,7 @@ def load_data(file_path):
 try:
     intensity_data = load_data('data/Intensity_MLB_ALLRaces.parquet')
     intensity_data["zipcode"] = intensity_data["zipcode"].astype(str).str.zfill(5)
-    intensity_data.rename(columns={"Dispersion Score": "Intensity"}, inplace=True)
+    st.write("Columns in intensity_data:", intensity_data.columns.tolist())  # Print column names
 except Exception as e:
     st.error(f"Error loading data: {e}")
     st.stop()
@@ -122,6 +122,17 @@ except Exception as e:
     st.stop()
 
 # Show the map using leafmap
+st.sidebar.title("About")
+markdown = """
+A Streamlit map template
+<https://github.com/opengeos/streamlit-map-template>
+"""
+st.sidebar.info(markdown)
+logo = "https://i.imgur.com/UbOXYAU.png"
+st.sidebar.image(logo)
+
+st.title("Interactive Map")
+
 col1, col2 = st.columns([4, 1])
 options = list(leafmap.basemaps.keys())
 index = options.index("OpenTopoMap")
@@ -159,12 +170,12 @@ with col1:
 # Optional: If you want to add a table as well
 st.write("## Filtered Data Table")
 columns_to_display = [
-    'Team', 'League', 'City', 'City Alt.', 'Neighborhood', 'zipcode', 'Intensity', 
-    'Fandom Level', 'Race', 'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)', 
-    'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)', 'Starting Out ($25,000 to $29,999)', 
-    'Starting Out ($30,000 to $34,999)', 'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)', 
-    'Middle Class ($45,000 to $49,999)', 'Comfortable ($50,000 to $59,999)', 'Comfortable ($60,000 to $74,999)', 
-    'Doing Well ($75,000 to $99,999)', 'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)', 
-    'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)'
+    'Team', 'League', 'City', 'City Alt.', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level', 'Race', 
+    'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)', 'Getting By ($15,000 to $19,999)', 
+    'Starting Out ($20,000 to $24,999)', 'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)', 
+    'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)', 'Middle Class ($45,000 to $49,999)', 
+    'Comfortable ($50,000 to $59,999)', 'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)', 
+    'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)', 'Wealthy ($150,000 to $199,999)', 
+    'Affluent ($200,000 or more)'
 ]
-st.dataframe(df_filtered[columns_to_display].reset_index(drop=True))  # Reset index to remove row numbers
+st.dataframe(df_filtered[columns_to_display].reset_index(drop=True))  # Display selected columns and reset index to remove row numbers
