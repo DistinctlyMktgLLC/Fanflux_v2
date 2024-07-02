@@ -5,7 +5,7 @@ from streamlit_folium import st_folium
 # Load data from Parquet file
 @st.cache_data
 def load_data():
-    return pd.read_parquet('data/Fanflux_Intensity_MLB_AmericanIndian.parquet')
+    return pd.read_parquet('data/Fanflux_Intensity_MLB_American Indian.csv.parquet')
 
 df = load_data()
 
