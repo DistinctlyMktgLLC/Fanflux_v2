@@ -57,6 +57,18 @@ def app():
     if missing_columns:
         st.warning(f"The following columns are missing in the dataset: {', '.join(missing_columns)}")
 
+    # Add custom CSS to hide export buttons
+    st.markdown(
+        """
+        <style>
+        .stDataFrame div[data-testid="stToolbar"] {
+            display: none;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
     st.dataframe(df[existing_columns])
 
     # Calculate Total Fans
