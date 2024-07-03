@@ -35,7 +35,7 @@ def app():
 
         Ready to transform your understanding of the sports fan landscape? Let’s get started!
 
-        For more details, contact us at [email@example.com](mailto:email@example.com).
+        For more details, contact us at [info@distinctlymktg.com](mailto:info@distinctlymktg.com).
         """,
         unsafe_allow_html=True
     )
