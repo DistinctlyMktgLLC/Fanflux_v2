@@ -2,25 +2,26 @@ import streamlit as st
 import utils
 import pandas as pd
 import numpy as np
+from st_aggrid import AgGrid, GridOptionsBuilder
 
 def app():
     # Load data
     file_path = "data/Fanflux_Intensity_MLB_White.parquet"
     df = utils.load_data(file_path)
 
+    # Verify the column names
+    st.write(df.columns.tolist())  # Debug line to verify column names
+
     # Sidebar filters
     st.sidebar.title("Filters")
     team = st.sidebar.selectbox('Select a Team', ['Choose an option'] + sorted(df['Team'].unique()))
     league = st.sidebar.selectbox('Select a League', ['Choose an option'] + sorted(df['League'].unique()))
-    income_level = st.sidebar.selectbox('Select Income Levels', ['Choose an option'] + sorted(df['Income Levels'].unique()))
     fandom_level = st.sidebar.selectbox('Select Fandom Level', ['Choose an option'] + sorted(df['Fandom Level'].unique()))
 
     if team != 'Choose an option':
         df = df[df['Team'] == team]
     if league != 'Choose an option':
         df = df[df['League'] == league]
-    if income_level != 'Choose an option':
-        df = df[df['Income Levels'] == income_level]
     if fandom_level != 'Choose an option':
         df = df[df['Fandom Level'] == fandom_level]
 
