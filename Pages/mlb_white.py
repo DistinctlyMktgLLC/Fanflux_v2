@@ -9,7 +9,7 @@ def app():
     st.title("White Baseball Fans")
 
     # Load the data
-    df = utils.load_data("path/to/your/datafile.parquet")
+    df = utils.load_data("data/Fanflux_Intensity_MLB_White.parquet")
 
     # Debugging: Print the columns of the DataFrame
     st.write("DataFrame Columns:", df.columns.tolist())
