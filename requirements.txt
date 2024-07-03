@@ -2,5 +2,3 @@ streamlit==1.36.0
 pandas==2.2.2
 folium==0.12.1
 streamlit-folium==0.8.0
-leafmap==0.8.6
-streamlit-datatable==1.0.0

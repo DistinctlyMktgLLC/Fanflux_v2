@@ -1,68 +1,67 @@
 import streamlit as st
+import pandas as pd
+from streamlit_folium import st_folium
+import folium
 import utils
 
 def app():
-    utils.apply_common_styles()
-
-    st.sidebar.title("Fanflux Navigation")
-    page = st.sidebar.selectbox("Select a page", ["White Baseball Fans"])
+    st.set_page_config(layout="wide", initial_sidebar_state="expanded")
+    
     st.title("White Baseball Fans")
 
-    # Load the data
-    df = utils.load_data("data/Fanflux_Intensity_MLB_White.parquet")
+    df = utils.load_data("path_to_your_parquet_file")  # Adjust the file path accordingly
 
-    # Debugging: Print the columns of the DataFrame
-    st.write("DataFrame Columns:", df.columns.tolist())
-
-    # Income level columns
-    income_level_columns = [
-        "Struggling (Less than $10,000)",
-        "Getting By ($10,000 to $14,999)",
-        "Getting By ($15,000 to $19,999)",
-        "Starting Out ($20,000 to $24,999)",
-        "Starting Out ($25,000 to $29,999)",
-        "Starting Out ($30,000 to $34,999)",
-        "Middle Class ($35,000 to $39,999)",
-        "Middle Class ($40,000 to $44,999)",
-        "Middle Class ($45,000 to $49,999)",
-        "Comfortable ($50,000 to $59,999)",
-        "Comfortable ($60,000 to $74,999)",
-        "Doing Well ($75,000 to $99,999)",
-        "Prosperous ($100,000 to $124,999)",
-        "Prosperous ($125,000 to $149,999)",
-        "Wealthy ($150,000 to $199,999)",
-        "Affluent ($200,000 or more)"
-    ]
-
-    # Calculate Total Fans
-    df['Total Fans'] = df[income_level_columns].sum(axis=1)
+    if df.empty:
+        st.error("No data available.")
+        return
 
     # Filter options
+    st.sidebar.header("Filters")
     team = st.sidebar.selectbox('Select a Team', ['Choose an option'] + sorted(df['Team'].unique()))
-    income_level = st.sidebar.selectbox('Select Income Levels', ['Choose an option'] + income_level_columns)
+    league = st.sidebar.selectbox('Select a League', ['Choose an option'] + sorted(df['League'].unique()))
+    city = st.sidebar.selectbox('Select a City', ['Choose an option'] + sorted(df['City'].unique()))
+    fandom_level = st.sidebar.selectbox('Select Fandom Level', ['Choose an option'] + sorted(df['Fandom Level'].unique()))
+    income_levels = [col for col in df.columns if 'Income' in col]
 
+    filtered_df = df.copy()
     if team != 'Choose an option':
-        df = df[df['Team'] == team]
+        filtered_df = filtered_df[filtered_df['Team'] == team]
+    if league != 'Choose an option':
+        filtered_df = filtered_df[filtered_df['League'] == league]
+    if city != 'Choose an option':
+        filtered_df = filtered_df[filtered_df['City'] == city]
+    if fandom_level != 'Choose an option':
+        filtered_df = filtered_df[filtered_df['Fandom Level'] == fandom_level]
 
-    if income_level != 'Choose an option':
-        df = df[df[income_level] > 0]
+    # Ensure zipcode is formatted with leading zeros
+    filtered_df['zipcode'] = filtered_df['zipcode'].apply(lambda x: f"{x:05d}")
 
-    # Display the filtered data in a datatable
-    st.subheader('Filtered Data')
-    st.dataframe(df)
+    # Create Total Fans column
+    filtered_df['Total Fans'] = filtered_df[income_levels].sum(axis=1)
 
-    # Create map
-    st.subheader('Fan Opportunity Map')
+    # Define columns to display
+    columns_to_display = [
+        'dCategory', 'Team', 'League', 'City', 'Neighborhood', 
+        'zipcode', 'Intensity', 'Fandom Level', 'Race', 'Total Fans'
+    ]
+
+    # Display the table
+    st.write("### Filtered Data")
+    st.dataframe(
+        filtered_df[columns_to_display].style.hide(axis=0),
+        width=1200, 
+        height=400
+    )
+
+    # Create the map
+    st.write("### Fan Opportunity Map")
     m = utils.create_map()
-
     color_key = {
-        "Avid": "red",
-        "Casual": "blue",
-        "Convertible": "green"
+        'Avid': 'red',
+        'Casual': 'blue',
+        'Convertible': 'green'
     }
-
-    utils.add_map_markers(m, df, 'Fandom Level', color_key)
-
+    utils.add_map_markers(m, filtered_df, 'Fandom Level', color_key)
     st_folium(m, width=700, height=500)
 
 if __name__ == "__main__":
