@@ -1,6 +1,4 @@
-import os
 import streamlit as st
-from streamlit_navigation_bar import st_navbar
 import Pages.home as home
 import Pages.mlb_aapi as aapi
 import Pages.mlb_americanindian as americanindian
@@ -12,49 +10,63 @@ import utils
 
 st.set_page_config(initial_sidebar_state="collapsed")
 
-# Define the pages
-pages = ["Home", "AAPI Baseball Fans", "American Indian Baseball Fans", "Asian Baseball Fans", "Black Baseball Fans", "Hispanic Baseball Fans", "White Baseball Fans"]
-parent_dir = os.path.dirname(os.path.abspath(__file__))
-logo_path = os.path.join(parent_dir, "logo.svg")  # Ensure you have a logo.svg file in the root directory
-urls = {
-    "Home": "#",
-    "AAPI Baseball Fans": "#",
-    "American Indian Baseball Fans": "#",
-    "Asian Baseball Fans": "#",
-    "Black Baseball Fans": "#",
-    "Hispanic Baseball Fans": "#",
-    "White Baseball Fans": "#"
-}
-styles = {
-    "nav": {"background-color": "var(--primary-color)"},
-    "span": {"color": "white"},
-}
-options = {"show_sidebar": False}
+# Function to display navigation bar
+def navigation():
+    st.markdown(
+        """
+        <style>
+        .nav {background-color: #333; overflow: hidden;}
+        .nav a {float: left; display: block; color: white; text-align: center; padding: 14px 16px; text-decoration: none;}
+        .nav a:hover {background-color: #ddd; color: black;}
+        </style>
+        <div class="nav">
+            <a href="#home" id="home-link">Home</a>
+            <a href="#aapi-baseball-fans" id="aapi-link">AAPI Baseball Fans</a>
+            <a href="#american-indian-baseball-fans" id="americanindian-link">American Indian Baseball Fans</a>
+            <a href="#asian-baseball-fans" id="asian-link">Asian Baseball Fans</a>
+            <a href="#black-baseball-fans" id="black-link">Black Baseball Fans</a>
+            <a href="#hispanic-baseball-fans" id="hispanic-link">Hispanic Baseball Fans</a>
+            <a href="#white-baseball-fans" id="white-link">White Baseball Fans</a>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-# Display the navigation bar
-page = st_navbar(
-    pages,
-    logo_path=logo_path,
-    urls=urls,
-    styles=styles,
-    options=options,
+navigation()
+
+# Function to handle page routing
+def router():
+    page = st.experimental_get_query_params().get("page", ["home"])[0]
+
+    if page == "home":
+        home.app()
+    elif page == "aapi-baseball-fans":
+        aapi.app()
+    elif page == "american-indian-baseball-fans":
+        americanindian.app()
+    elif page == "asian-baseball-fans":
+        asian.app()
+    elif page == "black-baseball-fans":
+        black.app()
+    elif page == "hispanic-baseball-fans":
+        hispanic.app()
+    elif page == "white-baseball-fans":
+        white.app()
+
+router()
+
+# JavaScript to handle link clicks and update URL
+st.markdown(
+    """
+    <script>
+    document.getElementById('home-link').onclick = function() {window.location.hash = '';};
+    document.getElementById('aapi-link').onclick = function() {window.location.hash = '#aapi-baseball-fans';};
+    document.getElementById('americanindian-link').onclick = function() {window.location.hash = '#american-indian-baseball-fans';};
+    document.getElementById('asian-link').onclick = function() {window.location.hash = '#asian-baseball-fans';};
+    document.getElementById('black-link').onclick = function() {window.location.hash = '#black-baseball-fans';};
+    document.getElementById('hispanic-link').onclick = function() {window.location.hash = '#hispanic-baseball-fans';};
+    document.getElementById('white-link').onclick = function() {window.location.hash = '#white-baseball-fans';};
+    </script>
+    """,
+    unsafe_allow_html=True,
 )
-
-# Load the selected page
-if page == "Home":
-    home.app()
-elif page == "AAPI Baseball Fans":
-    aapi.app()
-elif page == "American Indian Baseball Fans":
-    americanindian.app()
-elif page == "Asian Baseball Fans":
-    asian.app()
-elif page == "Black Baseball Fans":
-    black.app()
-elif page == "Hispanic Baseball Fans":
-    hispanic.app()
-elif page == "White Baseball Fans":
-    white.app()
-
-with st.sidebar:
-    st.write("The sidebar button will not be shown.")
