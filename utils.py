@@ -41,3 +41,28 @@ def render_aggrid(df, enable_page=False):
     gb.configure_default_column(width=120)
     gridOptions = gb.build()
     AgGrid(df, gridOptions=gridOptions, height=500, width='100%', theme='streamlit', enable_enterprise_modules=True)
+
+def apply_common_styles():
+    st.markdown(
+        """
+        <style>
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .stButton>button {
+            color: #fff;
+            background-color: #007bff;
+            border-color: #007bff;
+            border-radius: 4px;
+        }
+        .stButton>button:hover {
+            color: #fff;
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
