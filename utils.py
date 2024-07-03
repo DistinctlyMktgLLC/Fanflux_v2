@@ -2,11 +2,14 @@ import streamlit as st
 import pandas as pd
 import folium
 from st_aggrid import AgGrid, GridOptionsBuilder
+from folium.plugins import MarkerCluster
 
 def load_data(race):
     file_path = f'data/Fanflux_Intensity_MLB_{race}.parquet'
     try:
-        return pd.read_parquet(file_path)
+        df = pd.read_parquet(file_path)
+        df['zipcode'] = df['zipcode'].apply(lambda x: f"{int(x):05}")  # Ensure zip codes have leading zeros
+        return df
     except FileNotFoundError:
         st.error(f"File not found: {file_path}")
         return pd.DataFrame()
@@ -24,51 +27,14 @@ def add_map_markers(m, df, color_column, color_key):
                 color=color_key.get(row[color_column], 'blue'),
                 fill=True,
                 fill_color=color_key.get(row[color_column], 'blue'),
-                tooltip=folium.Tooltip(
-                    f"Team: {row['Team']}<br>"
-                    f"League: {row['League']}<br>"
-                    f"Neighborhood: {row['Neighborhood']}<br>"
-                    f"Fan Type: {row['Fandom Level']}<br>"
-                    f"Race: {row['Race']}"
-                )
+                tooltip=folium.Tooltip(f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fan Type: {row['Fandom Level']}<br>Race: {row['Race']}", sticky=False)
             ).add_to(m)
         except KeyError as e:
             st.error(f"Column not found: {e}")
 
-def apply_common_styles():
-    st.markdown(
-        """
-        <style>
-        .main-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .stButton>button {
-            color: #fff;
-            background-color: #007bff;
-            border-color: #007bff;
-            border-radius: 4px;
-        }
-        .stButton>button:hover {
-            color: #fff;
-            background-color: #0056b3;
-            border-color: #0056b3;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-def render_aggrid(df):
+def render_aggrid(df, enable_page=False):
     gb = GridOptionsBuilder.from_dataframe(df)
-    gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=25)
-    gb.configure_default_column(hide=True)  # Hide all columns by default
-    gb.configure_column("Team", hide=False)
-    gb.configure_column("League", hide=False)
-    gb.configure_column("Neighborhood", hide=False)
-    gb.configure_column("zipcode", hide=False)
-    gb.configure_column("Intensity", hide=False)
-    gb.configure_column("Fandom Level", hide=False)
-    gb.configure_column("Race", hide=False)
-    return AgGrid(df, gridOptions=gb.build(), height=500)
+    gb.configure_pagination(enabled=enable_page, paginationAutoPageSize=False, paginationPageSize=25)
+    gb.configure_default_column(width=120)
+    gridOptions = gb.build()
+    AgGrid(df, gridOptions=gridOptions, height=500, width='100%', theme='streamlit', enable_enterprise_modules=True)

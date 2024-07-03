@@ -1,9 +1,13 @@
 import streamlit as st
 import utils
 import folium
+from folium.plugins import MarkerCluster
 
 # Load data
 df = utils.load_data('White')
+
+# Format zip code column
+df['zipcode'] = df['zipcode'].apply(lambda x: f"{int(x):05}")
 
 def app():
     st.title("White Baseball Fans")
@@ -82,14 +86,15 @@ def app():
 
     # Render AgGrid
     st.subheader("Fan Opportunity Data")
-    utils.render_aggrid(filtered_df)
+    utils.render_aggrid(filtered_df, enable_page=True)
 
     # Render map
     st.subheader("Fan Opportunity Map")
     basemap = st.sidebar.selectbox("Select a basemap:", options=['OpenStreetMap', 'Stamen Toner', 'Stamen Terrain', 'Stamen Watercolor', 'CartoDB positron', 'CartoDB dark_matter'], index=0)
     m = folium.Map(location=[37.0902, -95.7129], zoom_start=4)
     folium.TileLayer(basemap).add_to(m)
-    utils.add_map_markers(m, filtered_df, 'Fandom Level', {
+    marker_cluster = MarkerCluster().add_to(m)
+    utils.add_map_markers(marker_cluster, filtered_df, 'Fandom Level', {
         'Avid': 'green',
         'Casual': 'blue',
         'Not at all': 'red'
