@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
 import folium
-from streamlit_folium import st_folium
 from folium.plugins import MarkerCluster
+from streamlit_folium import st_folium
 
 def load_data(file_path):
     try:
@@ -19,21 +19,20 @@ def add_map_markers(m, df, color_column, color_key):
     marker_cluster = MarkerCluster().add_to(m)
     for _, row in df.iterrows():
         try:
-            tooltip = f"""
-                Team: {row['Team']}<br>
-                League: {row['League']}<br>
-                Neighborhood: {row['Neighborhood']}<br>
-                Fan Type: {row['Fandom Level']}<br>
-                Race: {row['Race']}<br>
-                Total Fans: {row['Total Fans']}
-            """
             folium.CircleMarker(
                 location=[row['US lat'], row['US lon']],
                 radius=5,
                 color=color_key.get(row[color_column], 'blue'),
                 fill=True,
                 fill_color=color_key.get(row[color_column], 'blue'),
-                tooltip=tooltip
+                tooltip=(
+                    f"Team: {row['Team']}<br>"
+                    f"League: {row['League']}<br>"
+                    f"Neighborhood: {row['Neighborhood']}<br>"
+                    f"Fan Type: {row['Fandom Level']}<br>"
+                    f"Race: {row['Race']}<br>"
+                    f"Total Fans: {row['Total Fans']}"
+                )
             ).add_to(marker_cluster)
         except KeyError as e:
             st.error(f"Column not found: {e}")

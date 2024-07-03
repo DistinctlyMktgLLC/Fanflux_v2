@@ -14,9 +14,6 @@ def app():
     # Debugging: Print the columns of the DataFrame
     st.write("DataFrame Columns:", df.columns.tolist())
 
-    # Filter options
-    team = st.sidebar.selectbox('Select a Team', ['Choose an option'] + sorted(df['Team'].unique()))
-
     # Income level columns
     income_level_columns = [
         "Struggling (Less than $10,000)",
@@ -37,6 +34,11 @@ def app():
         "Affluent ($200,000 or more)"
     ]
 
+    # Calculate Total Fans
+    df['Total Fans'] = df[income_level_columns].sum(axis=1)
+
+    # Filter options
+    team = st.sidebar.selectbox('Select a Team', ['Choose an option'] + sorted(df['Team'].unique()))
     income_level = st.sidebar.selectbox('Select Income Levels', ['Choose an option'] + income_level_columns)
 
     if team != 'Choose an option':
