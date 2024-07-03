@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import st_folium
-from st_aggrid import AgGrid, GridOptionsBuilder
+from streamlit_aggrid import AgGrid, GridOptionsBuilder
 from folium.plugins import MarkerCluster
 import utils
 
