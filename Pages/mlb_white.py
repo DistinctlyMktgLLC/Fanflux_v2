@@ -46,11 +46,39 @@ def app():
     # Update the dataframe to replace "Not at all" with "Convertible Fans"
     df['Fandom Level'] = df['Fandom Level'].replace({'Not at all': 'Convertible Fans'})
 
+    # Calculate counts for scorecards
+    total_avid = df[df['Fandom Level'] == 'Avid']['Fandom Level'].count()
+    total_casual = df[df['Fandom Level'] == 'Casual']['Fandom Level'].count()
+    total_convertible = df[df['Fandom Level'] == 'Convertible Fans']['Fandom Level'].count()
+
+    # Display scorecards
+    st.markdown(
+        """
+        <div style="display: flex; justify-content: space-around;">
+            <div style="border-left: 5px solid red; padding: 10px; background-color: black; color: white;">
+                <h3>Avid Fans</h3>
+                <p>{}</p>
+            </div>
+            <div style="border-left: 5px solid blue; padding: 10px; background-color: black; color: white;">
+                <h3>Casual Fans</h3>
+                <p>{}</p>
+            </div>
+            <div style="border-left: 5px solid green; padding: 10px; background-color: black; color: white;">
+                <h3>Convertible Fans</h3>
+                <p>{}</p>
+            </div>
+        </div>
+        """.format(total_avid, total_casual, total_convertible),
+        unsafe_allow_html=True
+    )
+
     # Display data
     st.title("White Baseball Fans")
     columns_to_display = ['Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level', 'Race'] + selected_income
     st.dataframe(df[columns_to_display])
 
     # Map visualization
+    st.markdown('<div style="height: 600px;">', unsafe_allow_html=True)
     utils.render_map(df)
+    st.markdown('</div>', unsafe_allow_html=True)
 
