@@ -1,6 +1,6 @@
 import os
 import streamlit as st
-from st_theme import st_navbar
+from streamlit_navigation_bar import st_navbar
 import Pages.home as home
 import Pages.mlb_aapi as aapi
 import Pages.mlb_americanindian as americanindian
