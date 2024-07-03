@@ -39,6 +39,11 @@ def app():
         filtered_df = filtered_df[filtered_df[key] == value]
 
     st.subheader("Fan Opportunity Data")
+    
+    # Select columns to display
+    columns_to_display = ['Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level', 'Race', 'Total Fans']
+    filtered_df = filtered_df[columns_to_display]
+
     gb = GridOptionsBuilder.from_dataframe(filtered_df)
     gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=25)
     gb.configure_side_bar()
@@ -53,7 +58,7 @@ def app():
         'Casual': 'green',
         'Convertible': 'red'
     })
-    st_folium(m, width=700, height=500)
+    st.components.v1.html(m._repr_html_(), height=500)
 
 if __name__ == "__main__":
     app()
