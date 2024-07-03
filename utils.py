@@ -27,7 +27,10 @@ def add_map_markers(m, df, color_column, color_key):
                 color=color_key.get(row[color_column], 'blue'),
                 fill=True,
                 fill_color=color_key.get(row[color_column], 'blue'),
-                tooltip=folium.Tooltip(f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fan Type: {row['Fandom Level']}<br>Race: {row['Race']}", sticky=False)
+                tooltip=folium.Tooltip(
+                    f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fan Type: {row['Fandom Level']}<br>Race: {row['Race']}<br>Total Fans: {row['Total Fans']}",
+                    sticky=False
+                )
             ).add_to(m)
         except KeyError as e:
             st.error(f"Column not found: {e}")

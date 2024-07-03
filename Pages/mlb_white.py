@@ -3,11 +3,17 @@ import utils
 import folium
 from folium.plugins import MarkerCluster
 
+st.set_page_config(layout="wide", initial_sidebar_state="expanded")
+
 # Load data
 df = utils.load_data('White')
 
 # Format zip code column
 df['zipcode'] = df['zipcode'].apply(lambda x: f"{int(x):05}")
+
+# Calculate total fans
+income_columns = df.columns[14:].tolist()
+df['Total Fans'] = df[income_columns].sum(axis=1)
 
 def app():
     st.title("White Baseball Fans")
@@ -67,7 +73,7 @@ def app():
     st.sidebar.header("Filters")
     team = st.sidebar.selectbox('Select a Team', ['Choose an option'] + sorted(df['Team'].unique()))
     league = st.sidebar.selectbox('Select a League', ['Choose an option'] + sorted(df['League'].unique()))
-    income_level = st.sidebar.selectbox('Select Income Levels', ['Choose an option'] + df.columns[14:].tolist())
+    income_level = st.sidebar.selectbox('Select Income Levels', ['Choose an option'] + income_columns)
     fandom_level = st.sidebar.selectbox('Select a Fandom Level', ['Choose an option'] + sorted(df['Fandom Level'].unique()))
 
     filtered_df = df.copy()
