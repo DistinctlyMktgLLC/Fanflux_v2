@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import st_folium
-from st_aggrid import AgGrid, GridOptionsBuilder
 from folium.plugins import MarkerCluster
+from st_aggrid import AgGrid, GridOptionsBuilder
 
 def load_data(file_path):
     try:
@@ -26,14 +26,15 @@ def add_map_markers(m, df, color_column, color_key):
                 color=color_key.get(row[color_column], 'blue'),
                 fill=True,
                 fill_color=color_key.get(row[color_column], 'blue'),
-                popup=f"""
-                <b>Team:</b> {row['Team']}<br>
-                <b>League:</b> {row['League']}<br>
-                <b>Neighborhood:</b> {row['Neighborhood']}<br>
-                <b>Fan Type:</b> {row['Fandom Level']}<br>
-                <b>Race:</b> {row['Race']}<br>
-                <b>Total Fans:</b> {sum(row[['Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)', 'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)', 'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)', 'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)', 'Middle Class ($45,000 to $49,999)', 'Comfortable ($50,000 to $59,999)', 'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)', 'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)', 'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)']])}
-                """
+                popup=folium.Popup(
+                    f"<b>Team:</b> {row['Team']}<br>"
+                    f"<b>League:</b> {row['League']}<br>"
+                    f"<b>Neighborhood:</b> {row['Neighborhood']}<br>"
+                    f"<b>Fandom Level:</b> {row['Fandom Level']}<br>"
+                    f"<b>Race:</b> {row['Race']}<br>"
+                    f"<b>Total Fans:</b> {row['Total Fans']}",
+                    max_width=300
+                )
             ).add_to(marker_cluster)
         except KeyError as e:
             st.error(f"Column not found: {e}")
@@ -58,25 +59,27 @@ def apply_common_styles():
             background-color: #0056b3;
             border-color: #0056b3;
         }
-        .ag-theme-streamlit {
-            --ag-header-background-color: #f8f9fa;
-            --ag-odd-row-background-color: #ffffff;
-            --ag-row-hover-color: #e9ecef;
+        .scorecard {
+            background-color: black;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            color: white;
         }
-        .stCard {
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            border-left: 5px solid;
-            padding: 15px;
-            margin: 10px 0;
+        .scorecard .label {
+            padding: 5px;
+            margin: 5px;
+            border-radius: 3px;
         }
-        .avid {
-            border-color: #FF0000;
+        .scorecard .avid {
+            background-color: #FFD700; /* Yellow */
         }
-        .casual {
-            border-color: #00FF00;
+        .scorecard .casual {
+            background-color: #00FF00; /* Green */
         }
-        .convertible {
-            border-color: #0000FF;
+        .scorecard .convertible {
+            background-color: #FF4500; /* Red */
         }
         </style>
         """,
