@@ -1,45 +1,47 @@
 import streamlit as st
 import utils
-import folium
-from streamlit_folium import folium_static
+from st_aggrid import GridOptionsBuilder, AgGrid
+from streamlit_folium import st_folium
 
 def app():
-    st.title('White Baseball Fans')
+    st.title("White Baseball Fans")
 
-    # Filters
-    team_options = st.selectbox('Select a Team', options=['Choose an option'])
-    league_options = st.selectbox('Select a League', options=['Choose an option'])
-    income_levels = st.multiselect('Select Income Levels', options=[
-        'Getting By ($10,000 to $14,999)', 
-        'Getting By ($15,000 to $19,999)', 
-        'Starting Out ($20,000 to $24,999)',
-        'Starting Out ($25,000 to $29,999)',
-        'Starting Out ($30,000 to $34,999)',
-        'Middle Class ($35,000 to $39,999)',
-        'Middle Class ($40,000 to $49,999)',
-        'Comfortable ($50,000 to $59,999)',
-        'Comfortable ($60,000 to $74,999)',
-        'Wealthy ($75,000 to $99,999)',
-        'Wealthy ($100,000 to $124,999)',
-        'Wealthy ($125,000 to $149,999)',
-        'Wealthy ($150,000 and above)'
-    ])
-    fandom_levels = st.selectbox('Select a Fandom Level', options=['Choose an option'])
+    # Sidebar Filters
+    with st.sidebar:
+        st.header("Filters")
+        team = st.selectbox('Select a Team', ['Choose an option'] + sorted(df['Team'].unique()))
+        league = st.selectbox('Select a League', ['Choose an option'] + sorted(df['League'].unique()))
+        income_level = st.selectbox('Select Income Levels', ['Choose an option'] + sorted(df['Income Levels'].unique()))
+        fandom_level = st.selectbox('Select a Fandom Level', ['Choose an option'] + sorted(df['Fandom Level'].unique()))
 
-    # Load and filter data
-    df = utils.load_and_filter_data('data/Fanflux_Intensity_MLB_White.parquet', selected_income_levels=income_levels)
-    
-    # Display the AgGrid table
-    st.write("Fan Data Table")
-    utils.display_aggrid_table(df)
+    # Data Loading
+    df = utils.load_data('data/Fanflux_Intensity_MLB_White.parquet')
+    filtered_df = df[(df['Team'] == team) & (df['League'] == league) & (df['Income Levels'] == income_level) & (df['Fandom Level'] == fandom_level)]
 
-    # Display the map
-    st.write("Map Visualization")
-    m = folium.Map(location=[39.8283, -98.5795], zoom_start=4)
-    color_key = {
+    # Scorecards
+    avid_fans = len(filtered_df[filtered_df['Fandom Level'] == 'Avid'])
+    casual_fans = len(filtered_df[filtered_df['Fandom Level'] == 'Casual'])
+    convertible_fans = len(filtered_df[filtered_df['Fandom Level'] == 'Convertible Fans'])
+
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Avid Fans", avid_fans)
+    col2.metric("Casual Fans", casual_fans)
+    col3.metric("Convertible Fans", convertible_fans)
+
+    # Data Table
+    st.markdown("### White Baseball Fan Opportunity")
+    gb = GridOptionsBuilder.from_dataframe(filtered_df)
+    gb.configure_default_column(editable=True)
+    gb.configure_column("Income Levels", hide=True)  # Hide initially
+    grid_options = gb.build()
+    AgGrid(filtered_df, gridOptions=grid_options, height=300, fit_columns_on_grid_load=True)
+
+    # Map Visualization
+    st.markdown("### Map Visualization")
+    m = utils.create_map()
+    utils.add_map_markers(m, filtered_df, 'Fandom Level', {
         'Avid': 'green',
-        'Casual': 'blue',
+        'Casual': 'yellow',
         'Convertible Fans': 'red'
-    }
-    utils.add_map_markers(m, df, 'Fandom Level', color_key)
-    folium_static(m)
+    })
+    st_folium(m, width=700, height=500)
