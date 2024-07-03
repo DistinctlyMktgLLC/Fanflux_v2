@@ -9,7 +9,7 @@ import Pages.mlb_hispanic as hispanic
 import Pages.mlb_white as white
 import utils
 
-st.set_page_config(layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(layout="wide", initial_sidebar_state="expanded")
 
 # Define the pages
 pages = {
@@ -22,76 +22,40 @@ pages = {
     "White Baseball Fans": white,
 }
 
-# Function to display navigation bar
-def navigation():
-    st.markdown(
-        """
-        <style>
-        .nav {
-            background-color: #333; 
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-        }
-        .nav a {
-            display: block;
-            color: white;
-            text-align: center;
-            padding: 14px 20px;
-            text-decoration: none;
-            font-size: 18px;
-        }
-        .nav a:hover {
-            background-color: #ddd;
-            color: black;
-        }
-        .main-content {
-            max-width: 1200px;
-            margin: auto;
-            padding: 20px;
-        }
-        </style>
-        <div class="nav">
-            <a href="?page=Home" id="home-link">Home</a>
-            <a href="?page=AAPI Baseball Fans" id="aapi-link">AAPI Baseball Fans</a>
-            <a href="?page=American Indian Baseball Fans" id="americanindian-link">American Indian Baseball Fans</a>
-            <a href="?page=Asian Baseball Fans" id="asian-link">Asian Baseball Fans</a>
-            <a href="?page=Black Baseball Fans" id="black-link">Black Baseball Fans</a>
-            <a href="?page=Hispanic Baseball Fans" id="hispanic-link">Hispanic Baseball Fans</a>
-            <a href="?page=White Baseball Fans" id="white-link">White Baseball Fans</a>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-navigation()
+# Sidebar navigation
+st.sidebar.title("Navigation")
+selection = st.sidebar.radio("Go to", list(pages.keys()))
 
 # Function to handle page routing
 def router():
-    query_params = st.experimental_get_query_params()
-    page = query_params.get("page", ["Home"])[0]
-
-    if page in pages:
-        pages[page].app()
+    if selection in pages:
+        pages[selection].app()
     else:
         st.error("Page not found")
+
+# Custom CSS for sidebar
+st.markdown(
+    """
+    <style>
+    .sidebar .sidebar-content {
+        background-color: #2E2E2E;
+        color: white;
+    }
+    .sidebar .sidebar-content a {
+        color: white;
+        text-decoration: none;
+    }
+    .sidebar .sidebar-content a:hover {
+        color: #F39C12;
+    }
+    .sidebar .sidebar-content .stRadio label {
+        font-size: 18px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 st.markdown('<div class="main-content">', unsafe_allow_html=True)
 router()
 st.markdown('</div>', unsafe_allow_html=True)
-
-# JavaScript to handle link clicks and update URL
-st.markdown(
-    """
-    <script>
-    document.getElementById('home-link').onclick = function() {window.location.href = '?page=Home';};
-    document.getElementById('aapi-link').onclick = function() {window.location.href = '?page=AAPI Baseball Fans';};
-    document.getElementById('americanindian-link').onclick = function() {window.location.href = '?page=American Indian Baseball Fans';};
-    document.getElementById('asian-link').onclick = function() {window.location.href = '?page=Asian Baseball Fans';};
-    document.getElementById('black-link').onclick = function() {window.location.href = '?page=Black Baseball Fans';};
-    document.getElementById('hispanic-link').onclick = function() {window.location.href = '?page=Hispanic Baseball Fans';};
-    document.getElementById('white-link').onclick = function() {window.location.href = '?page=White Baseball Fans';};
-    </script>
-    """,
-    unsafe_allow_html=True,
-)
