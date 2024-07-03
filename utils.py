@@ -30,4 +30,35 @@ def add_map_markers(m, df, color_column, color_key):
             folium.CircleMarker(
                 location=[row['US lat'], row['US lon']],
                 radius=5,
-                color=color
+                color=color_key.get(row[color_column], 'blue'),
+                fill=True,
+                fill_color=color_key.get(row[color_column], 'blue'),
+                tooltip=tooltip
+            ).add_to(marker_cluster)
+        except KeyError as e:
+            st.error(f"Column not found: {e}")
+
+def apply_common_styles():
+    st.markdown(
+        """
+        <style>
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .stButton>button {
+            color: #fff;
+            background-color: #007bff;
+            border-color: #007bff;
+            border-radius: 4px;
+        }
+        .stButton>button:hover {
+            color: #fff;
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
