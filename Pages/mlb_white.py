@@ -2,7 +2,6 @@ import streamlit as st
 import utils
 import pandas as pd
 import numpy as np
-from st_aggrid import AgGrid, GridOptionsBuilder
 
 def app():
     # Load data
