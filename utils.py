@@ -1,80 +1,41 @@
+import pandas as pd
+import folium
 import streamlit as st
+from st_aggrid import AgGrid, GridOptionsBuilder
+from streamlit_folium import folium_static
 
 def apply_common_styles():
     st.markdown("""
-        <style>
-        .main {
-            background-color: #000000;
-        }
-        .stButton>button {
-            color: white;
-        }
-        .stButton>button:hover {
-            color: black;
-            background-color: white;
-        }
-        .metric-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 10px;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: #333333;
-            color: white;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        .metric-container p {
-            margin: 0;
-            padding: 0;
-            color: white;
-        }
-        </style>
+    <style>
+        /* Add common styles here */
+    </style>
     """, unsafe_allow_html=True)
 
-def style_aggrid():
-    gridOptions = {
-        "defaultColDef": {
-            "filter": True,
-            "sortable": True,
-            "floatingFilter": True,
-            "resizable": True,
-        },
-        "pagination": True,
-        "paginationPageSize": 25,
-    }
-    return gridOptions
+def load_and_filter_data(file_path: str, selected_income_levels=None):
+    df = pd.read_parquet(file_path)
+    if selected_income_levels:
+        columns_to_show = ['Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level', 'Race'] + selected_income_levels
+    else:
+        columns_to_show = ['Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level', 'Race']
+    
+    filtered_df = df[columns_to_show]
+    return filtered_df
 
-def apply_scorecard_styles():
-    st.markdown("""
-        <style>
-        .scorecard {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            margin-bottom: 10px;
-        }
-        .scorecard .highlight {
-            width: 10px;
-            height: 100%;
-            margin-right: 10px;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
-def create_scorecard(label, value, color):
-    st.markdown(f"""
-        <div class="scorecard" style="background-color: {color};">
-            <div class="highlight" style="background-color: {color};"></div>
-            <div>
-                <p>{label}</p>
-                <p>{value}</p>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
+def display_aggrid_table(df):
+    gb = GridOptionsBuilder.from_dataframe(df)
+    gb.configure_default_column(editable=False, groupable=True)
+    gb.configure_grid_options(domLayout='normal')
+    gridOptions = gb.build()
+    AgGrid(df, gridOptions=gridOptions)
 
 def add_map_markers(m, df, color_column, color_key):
-    for _, row in df.iterrows():
-        m.add_point(row['latitude'], row['longitude'], color=color_key.get(row[color_column], 'blue'))
+    for idx, row in df.iterrows():
+        try:
+            lat = row['US lat']
+            lon = row['US lon']
+            color = color_key.get(row[color_column], 'blue')
+            folium.Marker([lat, lon], icon=folium.Icon(color=color)).add_to(m)
+        except KeyError as e:
+            st.error(f"Column not found: {e}")
+        except Exception as e:
+            st.error(f"Error adding marker: {e}")
