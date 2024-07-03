@@ -1,26 +1,60 @@
+import os
 import streamlit as st
-from multiapp import MultiApp
+from streamlit_navigation_bar import st_navbar
 import Pages.home as home
-import Pages.mlb_aapi as mlb_aapi
-import Pages.mlb_americanindian as mlb_americanindian
-import Pages.mlb_asian as mlb_asian
-import Pages.mlb_black as mlb_black
-import Pages.mlb_hispanic as mlb_hispanic
-import Pages.mlb_white as mlb_white
+import Pages.mlb_aapi as aapi
+import Pages.mlb_americanindian as americanindian
+import Pages.mlb_asian as asian
+import Pages.mlb_black as black
+import Pages.mlb_hispanic as hispanic
+import Pages.mlb_white as white
+import utils
 
-# Set page configuration
-st.set_page_config(page_title="Fanflux", page_icon="🏆", layout="wide")
+st.set_page_config(initial_sidebar_state="collapsed")
 
-app = MultiApp()
+# Define the pages
+pages = ["Home", "AAPI Baseball Fans", "American Indian Baseball Fans", "Asian Baseball Fans", "Black Baseball Fans", "Hispanic Baseball Fans", "White Baseball Fans"]
+parent_dir = os.path.dirname(os.path.abspath(__file__))
+logo_path = os.path.join(parent_dir, "logo.svg")  # Ensure you have a logo.svg file in the root directory
+urls = {
+    "Home": "#",
+    "AAPI Baseball Fans": "#",
+    "American Indian Baseball Fans": "#",
+    "Asian Baseball Fans": "#",
+    "Black Baseball Fans": "#",
+    "Hispanic Baseball Fans": "#",
+    "White Baseball Fans": "#"
+}
+styles = {
+    "nav": {"background-color": "var(--primary-color)"},
+    "span": {"color": "white"},
+}
+options = {"show_sidebar": False}
 
-# Add all your application here
-app.add_app("Home", home.app)
-app.add_app("AAPI Baseball Fans", mlb_aapi.app)
-app.add_app("American Indian Baseball Fans", mlb_americanindian.app)
-app.add_app("Asian Baseball Fans", mlb_asian.app)
-app.add_app("Black Baseball Fans", mlb_black.app)
-app.add_app("Hispanic Baseball Fans", mlb_hispanic.app)
-app.add_app("White Baseball Fans", mlb_white.app)
+# Display the navigation bar
+page = st_navbar(
+    pages,
+    logo_path=logo_path,
+    urls=urls,
+    styles=styles,
+    options=options,
+)
 
-# The main app
-app.run()
+# Load the selected page
+if page == "Home":
+    home.app()
+elif page == "AAPI Baseball Fans":
+    aapi.app()
+elif page == "American Indian Baseball Fans":
+    americanindian.app()
+elif page == "Asian Baseball Fans":
+    asian.app()
+elif page == "Black Baseball Fans":
+    black.app()
+elif page == "Hispanic Baseball Fans":
+    hispanic.app()
+elif page == "White Baseball Fans":
+    white.app()
+
+with st.sidebar:
+    st.write("The sidebar button will not be shown.")
