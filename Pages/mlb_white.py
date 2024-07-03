@@ -1,8 +1,6 @@
 import streamlit as st
 import utils
-import pandas as pd
-
-st.set_page_config(layout="wide", initial_sidebar_state="expanded")
+from st_aggrid import AgGrid, GridOptionsBuilder
 
 def app():
     st.title("White Baseball Fans")
