@@ -1,125 +1,42 @@
-# utils.py
 import streamlit as st
 import folium
+from streamlit_folium import folium_static
 
-def format_tooltip(row):
-    return (f"<div style='white-space: nowrap; text-align: left;'>"
-            f"<b>Neighborhood:</b> {row['Neighborhood']}<br>"
-            f"<b>Race:</b> {row['Race']}<br>"
-            f"<b>Team:</b> {row['Team']}<br>"
-            f"<b>League:</b> {row['League']}<br>"
-            f"<b>Fandom Level:</b> {row['Fandom Level']}<br>"
-            f"<b>Total Fans:</b> {row['Total Fans']:,}</div>")
+def render_map(df):
+    # Define colors for different Fandom Levels
+    fandom_colors = {
+        'Avid': 'red',
+        'Casual': 'blue',
+        'Convertible Fans': 'green'
+    }
 
-def add_markers_to_map(m, df):
-    if 'US lat' in df.columns and 'US lon' in df.columns:
-        for idx, row in df.iterrows():
-            tooltip_text = format_tooltip(row)
-            folium.Marker([row['US lat'], row['US lon']], 
-                          popup=folium.Popup(tooltip_text, max_width=300)).add_to(m)
-    else:
-        st.warning("Latitude and Longitude data not available for map visualization.")
-    return m
+    # Create a Folium map
+    m = folium.Map(location=[37.7749, -122.4194], zoom_start=5)
 
-def apply_common_styles():
-    st.markdown(
-        """
-        <style>
-        .main .block-container {
-            background-color: black;
-            padding: 20px;
-            border-radius: 10px;
-            color: white;
-        }
-        .hero-section {
-            text-align: center;
-            padding: 50px;
-            background-image: url('https://path/to/your/background/image.jpg');
-            background-size: cover;
-        }
-        .hero-section h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-        }
-        .hero-section p {
-            font-size: 24px;
-            margin-bottom: 40px;
-        }
-        .cta-button {
-            display: inline-block;
-            padding: 10px 20px;
-            font-size: 20px;
-            color: white;
-            background-color: #007acc;
-            border-radius: 5px;
-            text-decoration: none;
-        }
-        .cta-button:hover {
-            background-color: #005f99;
-        }
-        .features-section {
-            display: flex;
-            justify-content: space-around;
-            margin: 50px 0;
-        }
-        .feature {
-            width: 30%;
-            text-align: center;
-        }
-        .feature h3 {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        .feature p {
-            font-size: 18px;
-        }
-        .scorecard {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-        .scorecard div {
-            background-color: #333;
-            padding: 20px;
-            border-radius: 10px;
-            width: 30%;
-            text-align: center;
-            border-left: 10px solid #005f99;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .scorecard h3 {
-            color: #007acc;
-        }
-        .scorecard p {
-            font-size: 24px;
-            color: white;
-        }
-        .footer {
-            background-color: #222;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+    for _, row in df.iterrows():
+        # Get the color for the Fandom Level
+        color = fandom_colors.get(row['Fandom Level'], 'gray')
 
-def generate_scorecards(avid_fans, casual_fans, not_at_all_fans):
-    scorecard_html = f"""
-    <div class="scorecard">
-        <div style="border-left-color: #005f99;">
-            <h3>Avid Fans</h3>
-            <p>{avid_fans:,}</p>
-        </div>
-        <div style="border-left-color: #e68a00;">
-            <h3>Casual Fans</h3>
-            <p>{casual_fans:,}</p>
-        </div>
-        <div style="border-left-color: #cc3300;">
-            <h3>Not at all Fans</h3>
-            <p>{not_at_all_fans:,}</p>
-        </div>
-    </div>
-    """
-    st.markdown(scorecard_html, unsafe_allow_html=True)
+        folium.Marker(
+            location=[row['US lat'], row['US lon']],
+            popup=(
+                f"Neighborhood: {row['Neighborhood']}<br>"
+                f"Race: {row['Race']}<br>"
+                f"Team: {row['Team']}<br>"
+                f"League: {row['League']}<br>"
+                f"Fandom Level: {row['Fandom Level']}<br>"
+                f"Total Fans: {row[['Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)',
+                                   'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)',
+                                   'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)',
+                                   'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)',
+                                   'Middle Class ($45,000 to $49,999)', 'Comfortable ($50,000 to $59,999)',
+                                   'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)',
+                                   'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)',
+                                   'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)']].sum()}"
+            ),
+            icon=folium.Icon(color=color)
+        ).add_to(m)
+
+    # Display the map in Streamlit
+    folium_static(m)
+
