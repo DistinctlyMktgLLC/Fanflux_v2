@@ -8,8 +8,7 @@ def app():
         """
         <div class="hero-section">
             <h1>Welcome to Fanflux</h1>
-            <p>Where Data Tells the Story of MLB Fandom</p>
-            <a href="#features" class="cta-button">Get Started</a>
+            <p>Where Data Tells the Story of Fandom</p>
         </div>
 
         <div id="features" class="features-section">
@@ -30,7 +29,7 @@ def app():
         <div class="footer">
             <p>&copy; 2024 Fanflux. All rights reserved.</p>
             <p>In partnership with <strong>DonnLynn Partners</strong></p>
-            <p>Contact us: <a href="mailto:info@fanflux.com">info@fanflux.com</a></p>
+            <p>Contact us: <a href="mailto:info@distinctlymktg.com">info@distinctlymktg.com</a></p>
         </div>
         """,
         unsafe_allow_html=True
