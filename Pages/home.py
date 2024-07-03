@@ -17,5 +17,12 @@ def app():
 
         ## Interactive Visualizations
         Dive into interactive maps and dynamic charts that bring the data to life.
-        """
+
+        <div style="position: fixed; bottom: 0; width: 100%; background-color: #333; color: white; text-align: center; padding: 10px 0;">
+            © 2024 Fanflux. All rights reserved.
+            <br>In partnership with DonnLynn Partners
+            <br>Contact us: <a href="mailto:info@distinctlymktg.com" style="color: #F39C12;">info@distinctlymktg.com</a>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
