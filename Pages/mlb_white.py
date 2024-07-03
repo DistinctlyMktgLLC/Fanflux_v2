@@ -11,6 +11,9 @@ def app():
     file_path = f'data/Fanflux_Intensity_MLB_{race}.parquet'
     df = utils.load_data(file_path)
 
+    # Ensure zipcodes are five digits
+    df['zipcode'] = df['zipcode'].apply(lambda x: f"{int(x):05d}")
+
     # Sidebar Filters
     with st.sidebar:
         st.header("Filters")
@@ -73,7 +76,7 @@ def app():
         'Casual': 'yellow',
         'Convertible Fans': 'red'
     })
-    st_folium(m, width=700, height=500)
+    st_folium(m, width=1200, height=600)  # Adjust width and height for full screen
 
 if __name__ == "__main__":
     app()

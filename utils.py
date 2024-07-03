@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import folium
+from folium.map import Tooltip
 
 def load_data(file_path):
     try:
@@ -16,12 +17,19 @@ def create_map():
 def add_map_markers(m, df, color_column, color_key):
     for _, row in df.iterrows():
         try:
+            tooltip_content = f"""
+            <b>Team:</b> {row['Team']}<br>
+            <b>League:</b> {row['League']}<br>
+            <b>Neighborhood:</b> {row['Neighborhood']}<br>
+            <b>Intensity:</b> {row['Intensity']}
+            """
             folium.CircleMarker(
                 location=[row['US lat'], row['US lon']],
                 radius=5,
                 color=color_key.get(row[color_column], 'blue'),
                 fill=True,
-                fill_color=color_key.get(row[color_column], 'blue')
+                fill_color=color_key.get(row[color_column], 'blue'),
+                tooltip=Tooltip(tooltip_content, sticky=True)
             ).add_to(m)
         except KeyError as e:
             st.error(f"Column not found: {e}")
