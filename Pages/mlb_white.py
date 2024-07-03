@@ -16,27 +16,52 @@ def app():
 
     # Filter options
     team = st.sidebar.selectbox('Select a Team', ['Choose an option'] + sorted(df['Team'].unique()))
-    income_level = st.sidebar.selectbox('Select Income Levels', ['Choose an option'] + sorted(df['Income Levels'].unique()))
 
-    # Filter the DataFrame
-    if team != 'Choose an option' and income_level != 'Choose an option':
-        filtered_df = df[(df['Team'] == team) & (df['Income Levels'] == income_level)]
-    elif team != 'Choose an option':
-        filtered_df = df[df['Team'] == team]
-    elif income_level != 'Choose an option':
-        filtered_df = df[df['Income Levels'] == income_level]
-    else:
-        filtered_df = df
+    # Income level columns
+    income_level_columns = [
+        "Struggling (Less than $10,000)",
+        "Getting By ($10,000 to $14,999)",
+        "Getting By ($15,000 to $19,999)",
+        "Starting Out ($20,000 to $24,999)",
+        "Starting Out ($25,000 to $29,999)",
+        "Starting Out ($30,000 to $34,999)",
+        "Middle Class ($35,000 to $39,999)",
+        "Middle Class ($40,000 to $44,999)",
+        "Middle Class ($45,000 to $49,999)",
+        "Comfortable ($50,000 to $59,999)",
+        "Comfortable ($60,000 to $74,999)",
+        "Doing Well ($75,000 to $99,999)",
+        "Prosperous ($100,000 to $124,999)",
+        "Prosperous ($125,000 to $149,999)",
+        "Wealthy ($150,000 to $199,999)",
+        "Affluent ($200,000 or more)"
+    ]
 
-    # Create and display the table
-    gb = utils.create_grid_options(filtered_df)
-    grid_response = st.datatable(filtered_df, gridOptions=gb, height=500, width='100%', reload_data=True)
+    income_level = st.sidebar.selectbox('Select Income Levels', ['Choose an option'] + income_level_columns)
 
-    # Create and display the map
+    if team != 'Choose an option':
+        df = df[df['Team'] == team]
+
+    if income_level != 'Choose an option':
+        df = df[df[income_level] > 0]
+
+    # Display the filtered data in a datatable
+    st.subheader('Filtered Data')
+    st.dataframe(df)
+
+    # Create map
+    st.subheader('Fan Opportunity Map')
     m = utils.create_map()
-    utils.add_map_markers(m, filtered_df, 'Fandom Level', {
-        'Avid': 'red',
-        'Casual': 'blue',
-        'Convertible': 'green'
-    })
+
+    color_key = {
+        "Avid": "red",
+        "Casual": "blue",
+        "Convertible": "green"
+    }
+
+    utils.add_map_markers(m, df, 'Fandom Level', color_key)
+
     st_folium(m, width=700, height=500)
+
+if __name__ == "__main__":
+    app()
