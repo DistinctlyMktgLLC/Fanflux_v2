@@ -6,6 +6,9 @@ from streamlit_folium import st_folium
 def app():
     st.title("White Baseball Fans")
 
+    # Data Loading
+    df = utils.load_data('data/Fanflux_Intensity_MLB_White.parquet')
+
     # Sidebar Filters
     with st.sidebar:
         st.header("Filters")
@@ -14,8 +17,7 @@ def app():
         income_level = st.selectbox('Select Income Levels', ['Choose an option'] + sorted(df['Income Levels'].unique()))
         fandom_level = st.selectbox('Select a Fandom Level', ['Choose an option'] + sorted(df['Fandom Level'].unique()))
 
-    # Data Loading
-    df = utils.load_data('data/Fanflux_Intensity_MLB_White.parquet')
+    # Filter the dataframe based on selections
     filtered_df = df[(df['Team'] == team) & (df['League'] == league) & (df['Income Levels'] == income_level) & (df['Fandom Level'] == fandom_level)]
 
     # Scorecards
@@ -29,7 +31,7 @@ def app():
     col3.metric("Convertible Fans", convertible_fans)
 
     # Data Table
-    st.markdown("### White Baseball Fan Opportunity")
+    st.markdown("### Fan Data Table")
     gb = GridOptionsBuilder.from_dataframe(filtered_df)
     gb.configure_default_column(editable=True)
     gb.configure_column("Income Levels", hide=True)  # Hide initially
