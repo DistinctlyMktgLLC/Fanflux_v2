@@ -5,8 +5,6 @@ import folium
 from utils import load_data, create_map, add_map_markers, apply_common_styles
 
 def app():
-    st.set_page_config(layout="wide", initial_sidebar_state="expanded")
-    
     st.title("White Baseball Fans")
 
     df = load_data("data/Fanflux_Intensity_MLB_White.parquet")  # Adjust the file path accordingly
