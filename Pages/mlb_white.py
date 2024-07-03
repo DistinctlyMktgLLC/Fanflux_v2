@@ -1,7 +1,7 @@
 import streamlit as st
 import utils
 from st_aggrid import GridOptionsBuilder, AgGrid
-from streamlit_folium import st_folium
+import leafmap.foliumap as leafmap
 
 def app():
     race = "White"  # Set the race dynamically here
@@ -54,7 +54,7 @@ def app():
     col3.metric("Convertible Fans", convertible_fans)
 
     # Data Table
-    st.markdown("### Fan Opportunity Table")
+    st.markdown("### Fan Opportunity Data")
     columns_to_show = [
         'Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level', 'Race'
     ]
@@ -70,13 +70,24 @@ def app():
 
     # Map Visualization
     st.markdown("### Fan Opportunity Map")
-    m = utils.create_map()
-    utils.add_map_markers(m, filtered_df, 'Fandom Level', {
-        'Avid': 'green',
-        'Casual': 'yellow',
-        'Convertible Fans': 'red'
-    })
-    st_folium(m, width=1200, height=600)  # Adjust width and height for full screen
+    col1, col2 = st.columns([4, 1])
+    options = list(leafmap.basemaps.keys())
+    index = options.index("OpenTopoMap")
+
+    with col2:
+        basemap = st.selectbox("Select a basemap:", options, index)
+
+    with col1:
+        m = leafmap.Map(
+            locate_control=True, latlon_control=True, draw_export=True, minimap_control=True
+        )
+        m.add_basemap(basemap)
+        utils.add_map_markers(m, filtered_df, 'Fandom Level', {
+            'Avid': 'green',
+            'Casual': 'yellow',
+            'Convertible Fans': 'red'
+        })
+        m.to_streamlit(height=700)
 
 if __name__ == "__main__":
     app()

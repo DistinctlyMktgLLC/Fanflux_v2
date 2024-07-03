@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
-import folium
-from folium.map import Tooltip
+import leafmap.foliumap as leafmap
 
 def load_data(file_path):
     try:
@@ -11,7 +10,9 @@ def load_data(file_path):
         return pd.DataFrame()
 
 def create_map():
-    m = folium.Map(location=[37.0902, -95.7129], zoom_start=4)
+    m = leafmap.Map(
+        locate_control=True, latlon_control=True, draw_export=True, minimap_control=True
+    )
     return m
 
 def add_map_markers(m, df, color_column, color_key):
@@ -21,16 +22,15 @@ def add_map_markers(m, df, color_column, color_key):
             <b>Team:</b> {row['Team']}<br>
             <b>League:</b> {row['League']}<br>
             <b>Neighborhood:</b> {row['Neighborhood']}<br>
-            <b>Intensity:</b> {row['Intensity']}
+            <b>Fan Type:</b> {row['Fandom Level']}<br>
+            <b>Race:</b> {row['Race']}
             """
-            folium.CircleMarker(
-                location=[row['US lat'], row['US lon']],
-                radius=5,
-                color=color_key.get(row[color_column], 'blue'),
-                fill=True,
-                fill_color=color_key.get(row[color_column], 'blue'),
-                tooltip=Tooltip(tooltip_content, sticky=True)
-            ).add_to(m)
+            m.add_point(
+                lat=row['US lat'],
+                lon=row['US lon'],
+                popup=tooltip_content,
+                color=color_key.get(row[color_column], 'blue')
+            )
         except KeyError as e:
             st.error(f"Column not found: {e}")
 
