@@ -3,7 +3,7 @@ from multiapp import MultiApp
 import Pages.home as home
 import Pages.mlb_black as black
 import Pages.mlb_white as white
-import Pages.mlb_hispanic as hispanic  # Updated to the correct module
+import Pages.mlb_hispanic as hispanic
 import Pages.mlb_aapi as aapi
 import Pages.mlb_americanindian as americanindian
 import Pages.mlb_asian as asian
