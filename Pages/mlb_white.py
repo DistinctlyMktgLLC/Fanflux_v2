@@ -2,10 +2,9 @@ import streamlit as st
 import utils
 import pandas as pd
 import numpy as np
+from st_aggrid import AgGrid, GridOptionsBuilder
 
 def app():
-    st.set_page_config(layout="wide", initial_sidebar_state="expanded")
-
     # Load data
     file_path = "data/Fanflux_Intensity_MLB_White.parquet"
     df = utils.load_data(file_path)
