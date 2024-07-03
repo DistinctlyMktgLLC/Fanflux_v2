@@ -1,3 +1,5 @@
+import streamlit as st
+
 class MultiApp:
     def __init__(self):
         self.apps = []
@@ -9,5 +11,6 @@ class MultiApp:
         app = st.sidebar.selectbox(
             'Fanflux Navigation',
             self.apps,
-            format_func=lambda app: app['title'])
+            format_func=lambda app: app['title']
+        )
         app['function']()
