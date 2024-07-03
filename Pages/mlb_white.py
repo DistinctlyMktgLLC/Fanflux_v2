@@ -3,7 +3,6 @@ import pandas as pd
 import folium
 from streamlit_folium import st_folium
 from streamlit_aggrid import AgGrid, GridOptionsBuilder
-from folium.plugins import MarkerCluster
 import utils
 
 def app():
