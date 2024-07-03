@@ -31,11 +31,11 @@ def app():
 
         ### Partnered with DonnLynn Partners
 
-        We are proud to collaborate with DonnLynn Partners, who brought us this innovative idea. Combined with our data science and technical know-how, we've brought Fanflux to life. Together, we are transforming the way you understand and engage with sports fans. 
+        We are proud to collaborate with DonnLynn Partners, who brought us this innovative idea. Combined with our data and tech expertise, has brought Fanflux to life. Together, we are transforming the way you understand and engage with sports fans. 
 
         Ready to transform your understanding of the sports fan landscape? Let’s get started!
 
-        For more details, contact us at [info@distinctlymktg.com](mailto:info@distinctlymktg.com).
+        For more details, contact us at [email@example.com](mailto:email@example.com).
         """,
         unsafe_allow_html=True
     )

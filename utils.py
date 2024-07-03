@@ -4,12 +4,9 @@ import folium
 from st_aggrid import AgGrid, GridOptionsBuilder
 from folium.plugins import MarkerCluster
 
-def load_data(race):
-    file_path = f'data/Fanflux_Intensity_MLB_{race}.parquet'
+def load_data(file_path):
     try:
-        df = pd.read_parquet(file_path)
-        df['zipcode'] = df['zipcode'].apply(lambda x: f"{int(x):05}")  # Ensure zip codes have leading zeros
-        return df
+        return pd.read_parquet(file_path)
     except FileNotFoundError:
         st.error(f"File not found: {file_path}")
         return pd.DataFrame()
@@ -19,6 +16,7 @@ def create_map():
     return m
 
 def add_map_markers(m, df, color_column, color_key):
+    marker_cluster = MarkerCluster().add_to(m)
     for _, row in df.iterrows():
         try:
             folium.CircleMarker(
@@ -27,20 +25,17 @@ def add_map_markers(m, df, color_column, color_key):
                 color=color_key.get(row[color_column], 'blue'),
                 fill=True,
                 fill_color=color_key.get(row[color_column], 'blue'),
-                tooltip=folium.Tooltip(
-                    f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fan Type: {row['Fandom Level']}<br>Race: {row['Race']}<br>Total Fans: {row['Total Fans']}",
-                    sticky=False
-                )
-            ).add_to(m)
+                popup=f"""
+                <b>Team:</b> {row['Team']}<br>
+                <b>League:</b> {row['League']}<br>
+                <b>Neighborhood:</b> {row['Neighborhood']}<br>
+                <b>Fan Type:</b> {row['Fandom Level']}<br>
+                <b>Race:</b> {row['Race']}<br>
+                <b>Total Fans:</b> {sum(row[['Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)', 'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)', 'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)', 'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)', 'Middle Class ($45,000 to $49,999)', 'Comfortable ($50,000 to $59,999)', 'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)', 'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)', 'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)']])}
+                """
+            ).add_to(marker_cluster)
         except KeyError as e:
             st.error(f"Column not found: {e}")
-
-def render_aggrid(df, enable_page=False):
-    gb = GridOptionsBuilder.from_dataframe(df)
-    gb.configure_pagination(enabled=enable_page, paginationAutoPageSize=False, paginationPageSize=25)
-    gb.configure_default_column(width=120)
-    gridOptions = gb.build()
-    AgGrid(df, gridOptions=gridOptions, height=500, width='100%', theme='streamlit', enable_enterprise_modules=True)
 
 def apply_common_styles():
     st.markdown(
@@ -61,6 +56,26 @@ def apply_common_styles():
             color: #fff;
             background-color: #0056b3;
             border-color: #0056b3;
+        }
+        .ag-theme-streamlit {
+            --ag-header-background-color: #f8f9fa;
+            --ag-odd-row-background-color: #ffffff;
+            --ag-row-hover-color: #e9ecef;
+        }
+        .stCard {
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .avid {
+            border-color: #FF0000;
+        }
+        .casual {
+            border-color: #00FF00;
+        }
+        .convertible {
+            border-color: #0000FF;
         }
         </style>
         """,
