@@ -56,15 +56,15 @@ def app():
     st.markdown(
         """
         <div style="display: flex; justify-content: space-around;">
-            <div style="border-left: 5px solid red; padding: 10px; background-color: black; color: white;">
+            <div class="scorecard">
                 <h3>Avid Fans</h3>
                 <p>{}</p>
             </div>
-            <div style="border-left: 5px solid blue; padding: 10px; background-color: black; color: white;">
+            <div class="scorecard">
                 <h3>Casual Fans</h3>
                 <p>{}</p>
             </div>
-            <div style="border-left: 5px solid green; padding: 10px; background-color: black; color: white;">
+            <div class="scorecard">
                 <h3>Convertible Fans</h3>
                 <p>{}</p>
             </div>
@@ -75,18 +75,4 @@ def app():
 
     # Display data using AgGrid
     st.title("White Baseball Fans")
-    columns_to_display = ['Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level', 'Race'] + selected_income
-    
-    gb = GridOptionsBuilder.from_dataframe(df[columns_to_display])
-    gb.configure_pagination(paginationAutoPageSize=True)  # Enable pagination
-    gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, editable=False)
-    gb.configure_side_bar()  # Add a sidebar to the grid
-    gridOptions = gb.build()
-
-    AgGrid(df[columns_to_display], gridOptions=gridOptions, enable_enterprise_modules=True)
-
-    # Map visualization
-    st.markdown('<div style="height: 600px; width: 100%;">', unsafe_allow_html=True)
-    utils.render_map(df)
-    st.markdown('</div>', unsafe_allow_html=True)
-
+    columns_to_display = ['Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', '
