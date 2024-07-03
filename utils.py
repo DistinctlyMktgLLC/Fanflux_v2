@@ -2,6 +2,29 @@ import streamlit as st
 import folium
 from streamlit_folium import folium_static
 
+def apply_common_styles():
+    st.markdown(
+        """
+        <style>
+        .sidebar .sidebar-content {
+            background-color: #2E2E2E;
+            color: white;
+        }
+        .sidebar .sidebar-content a {
+            color: white;
+            text-decoration: none;
+        }
+        .sidebar .sidebar-content a:hover {
+            color: #F39C12;
+        }
+        .sidebar .sidebar-content .stRadio label {
+            font-size: 18px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
 def render_map(df):
     # Define colors for different Fandom Levels
     fandom_colors = {
