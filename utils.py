@@ -2,8 +2,8 @@ import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import st_folium
-from streamlit_aggrid import AgGrid, GridOptionsBuilder
 from folium.plugins import MarkerCluster
+import streamlit.components.v1 as components
 
 def load_data(file_path):
     try:
@@ -38,6 +38,10 @@ def add_map_markers(m, df, color_column, color_key):
         except KeyError as e:
             st.error(f"Column not found: {e}")
 
+def create_table(df):
+    html = df.to_html(classes='table table-striped')
+    components.html(html, height=600, scrolling=True)
+
 def apply_common_styles():
     st.markdown(
         """
@@ -58,15 +62,29 @@ def apply_common_styles():
             background-color: #0056b3;
             border-color: #0056b3;
         }
-        .stAgGrid-main {
-            height: 500px;
+        .table {
+            width: 100%;
+            margin-bottom: 1rem;
+            color: #212529;
         }
-        .ag-theme-dark {
-            --ag-background-color: #2E2E2E;
-            --ag-border-color: #000;
-            --ag-row-hover-color: #444;
-            --ag-header-background-color: #555;
-            --ag-font-color: #fff;
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+        }
+        .table thead th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .table tbody + tbody {
+            border-top: 2px solid #dee2e6;
+        }
+        .table .table {
+            background-color: #fff;
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.05);
         }
         </style>
         """,
