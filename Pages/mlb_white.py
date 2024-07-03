@@ -2,10 +2,14 @@ import streamlit as st
 import utils
 from st_aggrid import AgGrid, GridOptionsBuilder
 
+st.set_page_config(layout="wide", initial_sidebar_state="expanded")
+
 def app():
     st.title("White Baseball Fans")
 
     df = utils.load_data('data/Fanflux_Intensity_MLB_White.parquet')
+
+    st.write(df.columns.tolist())  # Print column names to verify
 
     # Calculate Total Fans
     df['Total Fans'] = df[
