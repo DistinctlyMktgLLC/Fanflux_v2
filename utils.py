@@ -32,7 +32,7 @@ def add_map_markers(m, df, color_column, color_key):
                     f"Neighborhood: {row['Neighborhood']}<br>"
                     f"Fan Type: {row['Fandom Level']}<br>"
                     f"Race: {row['Race']}<br>"
-                    f"Total Fans: {row['total_fans']}"
+                    f"Total Fans: {sum([row[col] for col in df.columns if '$' in col])}"
                 )
             ).add_to(marker_cluster)
         except KeyError as e:
