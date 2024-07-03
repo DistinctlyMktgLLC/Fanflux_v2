@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import folium
+from streamlit_folium import st_folium
+from st_aggrid import AgGrid, GridOptionsBuilder
 from folium.plugins import MarkerCluster
 
 def load_data(file_path):
@@ -24,14 +26,14 @@ def add_map_markers(m, df, color_column, color_key):
                 color=color_key.get(row[color_column], 'blue'),
                 fill=True,
                 fill_color=color_key.get(row[color_column], 'blue'),
-                tooltip=f"""
-                    <strong>Team:</strong> {row['Team']}<br>
-                    <strong>League:</strong> {row['League']}<br>
-                    <strong>Neighborhood:</strong> {row['Neighborhood']}<br>
-                    <strong>Fan Type:</strong> {row['Fandom Level']}<br>
-                    <strong>Race:</strong> {row['Race']}<br>
-                    <strong>Total Fans:</strong> {row['Total Fans']}
-                """
+                tooltip=(
+                    f"Team: {row['Team']}<br>"
+                    f"League: {row['League']}<br>"
+                    f"Neighborhood: {row['Neighborhood']}<br>"
+                    f"Fan Type: {row['Fandom Level']}<br>"
+                    f"Race: {row['Race']}<br>"
+                    f"Total Fans: {row['total_fans']}"
+                )
             ).add_to(marker_cluster)
         except KeyError as e:
             st.error(f"Column not found: {e}")
@@ -55,6 +57,16 @@ def apply_common_styles():
             color: #fff;
             background-color: #0056b3;
             border-color: #0056b3;
+        }
+        .stAgGrid-main {
+            height: 500px;
+        }
+        .ag-theme-dark {
+            --ag-background-color: #2E2E2E;
+            --ag-border-color: #000;
+            --ag-row-hover-color: #444;
+            --ag-header-background-color: #555;
+            --ag-font-color: #fff;
         }
         </style>
         """,

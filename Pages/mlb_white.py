@@ -1,68 +1,59 @@
 import streamlit as st
-import utils
+import pandas as pd
+import folium
+from streamlit_folium import st_folium
 from st_aggrid import AgGrid, GridOptionsBuilder
-
-st.set_page_config(layout="wide", initial_sidebar_state="expanded")
+from folium.plugins import MarkerCluster
+import utils
 
 def app():
-    st.title("White Baseball Fans")
+    st.set_page_config(layout="wide", initial_sidebar_state="expanded")
 
     df = utils.load_data('data/Fanflux_Intensity_MLB_White.parquet')
-
-    st.write(df.columns.tolist())  # Print column names to verify
-
-    # Calculate Total Fans
-    df['Total Fans'] = df[
-        [
-            'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)',
-            'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)',
-            'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)',
-            'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)',
-            'Middle Class ($45,000 to $49,999)', 'Comfortable ($50,000 to $59,999)',
-            'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)',
-            'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)',
-            'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)'
-        ]
-    ].sum(axis=1)
-
-    st.sidebar.title("Filters")
+    
+    st.sidebar.header("Filters")
     team = st.sidebar.selectbox('Select a Team', ['Choose an option'] + sorted(df['Team'].unique()))
     league = st.sidebar.selectbox('Select a League', ['Choose an option'] + sorted(df['League'].unique()))
     fandom_level = st.sidebar.selectbox('Select Fandom Level', ['Choose an option'] + sorted(df['Fandom Level'].unique()))
 
-    filters = {}
+    filtered_df = df
     if team != 'Choose an option':
-        filters['Team'] = team
+        filtered_df = filtered_df[filtered_df['Team'] == team]
     if league != 'Choose an option':
-        filters['League'] = league
+        filtered_df = filtered_df[filtered_df['League'] == league]
     if fandom_level != 'Choose an option':
-        filters['Fandom Level'] = fandom_level
+        filtered_df = filtered_df[filtered_df['Fandom Level'] == fandom_level]
 
-    filtered_df = df.copy()
-    for key, value in filters.items():
-        filtered_df = filtered_df[filtered_df[key] == value]
+    st.title("White Baseball Fans")
+    avid_fans = filtered_df[filtered_df['Fandom Level'] == 'Avid'].shape[0]
+    casual_fans = filtered_df[filtered_df['Fandom Level'] == 'Casual'].shape[0]
+    convertible_fans = filtered_df[filtered_df['Fandom Level'] == 'Convertible'].shape[0]
 
-    st.subheader("Fan Opportunity Data")
-    
-    # Select columns to display
-    columns_to_display = ['Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level', 'Race', 'Total Fans']
-    filtered_df = filtered_df[columns_to_display]
+    st.metric("Avid Fans", avid_fans)
+    st.metric("Casual Fans", casual_fans)
+    st.metric("Convertible Fans", convertible_fans)
 
     gb = GridOptionsBuilder.from_dataframe(filtered_df)
     gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=25)
     gb.configure_side_bar()
-    gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc='sum', editable=True)
+    gb.configure_default_column(editable=True, groupable=True)
+
     gridOptions = gb.build()
-    AgGrid(filtered_df, gridOptions=gridOptions, enable_enterprise_modules=True, theme='alpine')
 
-    st.subheader("Fan Opportunity Map")
+    st.header("Fan Opportunity Data")
+    AgGrid(filtered_df, gridOptions=gridOptions, height=400, theme='dark')
+
+    st.header("Fan Opportunity Map")
     m = utils.create_map()
-    utils.add_map_markers(m, filtered_df, 'Fandom Level', {
-        'Avid': 'yellow',
-        'Casual': 'green',
-        'Convertible': 'red'
-    })
-    st.components.v1.html(m._repr_html_(), height=500)
 
-if __name__ == "__main__":
-    app()
+    color_key = {
+        'Avid': 'green',
+        'Casual': 'yellow',
+        'Convertible': 'red'
+    }
+
+    utils.add_map_markers(m, filtered_df, 'Fandom Level', color_key)
+
+    st_folium(m, width=1200, height=600)
+
+    utils.apply_common_styles()
