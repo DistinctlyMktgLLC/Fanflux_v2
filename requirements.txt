@@ -3,4 +3,3 @@ pandas==2.2.2
 folium==0.12.1
 streamlit-folium==0.8.0
 leafmap==0.8.6
-altair==4.2.2
