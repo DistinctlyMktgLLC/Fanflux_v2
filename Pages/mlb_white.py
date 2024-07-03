@@ -1,78 +1,82 @@
 import streamlit as st
-import pandas as pd
-import utils
 from st_aggrid import AgGrid, GridOptionsBuilder
+import leafmap.foliumap as leafmap
+import utils
 
-@st.cache_data
-def load_data():
-    return pd.read_parquet('data/Fanflux_Intensity_MLB_White.parquet')
+# Load data dynamically based on the page name
+df = utils.load_data("White")
 
 def app():
     utils.apply_common_styles()
+
+    st.title("White Baseball Fans")
     
-    df = load_data()
+    # Filters
+    teams = st.multiselect('Select a Team', options=df['Team'].unique())
+    leagues = st.multiselect('Select a League', options=df['League'].unique())
+    income_levels = st.multiselect('Select Income Levels', options=df.columns[6:])
+    fandom_levels = st.multiselect('Select a Fandom Level', options=df['Fandom Level'].unique())
 
-    # Sidebar filters
-    teams = df['Team'].unique().tolist()
-    leagues = df['League'].unique().tolist()
-    zipcodes = df['zipcode'].unique().tolist()
-    fandom_levels = df['Fandom Level'].replace({'Not at all': 'Convertible Fans'}).unique().tolist()
-    income_levels = [
-        'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)',
-        'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)',
-        'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)',
-        'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)',
-        'Middle Class ($45,000 to $49,999)', 'Comfortable ($50,000 to $59,999)',
-        'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)',
-        'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)',
-        'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)'
-    ]
+    filtered_df = df
+    if teams:
+        filtered_df = filtered_df[filtered_df['Team'].isin(teams)]
+    if leagues:
+        filtered_df = filtered_df[filtered_df['League'].isin(leagues)]
+    if fandom_levels:
+        filtered_df = filtered_df[filtered_df['Fandom Level'].isin(fandom_levels)]
+    
+    if income_levels:
+        filtered_df = filtered_df[['Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level', 'Race'] + income_levels]
 
-    selected_team = st.sidebar.multiselect("Select a Team", teams)
-    selected_league = st.sidebar.multiselect("Select a League", leagues)
-    selected_zipcode = st.sidebar.multiselect("Select a Zipcode", zipcodes)
-    selected_fandom = st.sidebar.multiselect("Select a Fandom Level", fandom_levels)
-    selected_income = st.sidebar.multiselect("Select Income Levels to Display", income_levels)
-
-    # Apply filters
-    if selected_team:
-        df = df[df['Team'].isin(selected_team)]
-    if selected_league:
-        df = df[df['League'].isin(selected_league)]
-    if selected_zipcode:
-        df = df[df['zipcode'].isin(selected_zipcode)]
-    if selected_fandom:
-        df = df[df['Fandom Level'].replace({'Not at all': 'Convertible Fans'}).isin(selected_fandom)]
-
-    # Update the dataframe to replace "Not at all" with "Convertible Fans"
-    df['Fandom Level'] = df['Fandom Level'].replace({'Not at all': 'Convertible Fans'})
-
-    # Calculate counts for scorecards
-    total_avid = df[df['Fandom Level'] == 'Avid']['Fandom Level'].count()
-    total_casual = df[df['Fandom Level'] == 'Casual']['Fandom Level'].count()
-    total_convertible = df[df['Fandom Level'] == 'Convertible Fans']['Fandom Level'].count()
-
-    # Display scorecards
+    # Scorecards
+    avid_fans = len(filtered_df[filtered_df['Fandom Level'] == 'Avid'])
+    casual_fans = len(filtered_df[filtered_df['Fandom Level'] == 'Casual'])
+    convertible_fans = len(filtered_df[filtered_df['Fandom Level'] == 'Convertible Fans'])
+    
     st.markdown(
-        """
-        <div style="display: flex; justify-content: space-around;">
-            <div class="scorecard">
+        f"""
+        <div style="display: flex; justify-content: space-around; margin-bottom: 20px;">
+            <div style="background: #FFD700; padding: 10px; border-radius: 5px;">
                 <h3>Avid Fans</h3>
-                <p>{}</p>
+                <p>{avid_fans}</p>
             </div>
-            <div class="scorecard">
+            <div style="background: #ADFF2F; padding: 10px; border-radius: 5px;">
                 <h3>Casual Fans</h3>
-                <p>{}</p>
+                <p>{casual_fans}</p>
             </div>
-            <div class="scorecard">
+            <div style="background: #FF6347; padding: 10px; border-radius: 5px;">
                 <h3>Convertible Fans</h3>
-                <p>{}</p>
+                <p>{convertible_fans}</p>
             </div>
         </div>
-        """.format(total_avid, total_casual, total_convertible),
-        unsafe_allow_html=True
+        """, unsafe_allow_html=True)
+
+    # AgGrid table
+    gb = GridOptionsBuilder.from_dataframe(filtered_df)
+    gb.configure_pagination()
+    gb.configure_column('zipcode', type=['numericColumn', 'numberColumnFilter', 'customNumericFormat'], precision=0)
+    gb.configure_columns(list(filtered_df.columns[7:]), hide=True)
+    grid_options = gb.build()
+    
+    AgGrid(filtered_df, grid_options=grid_options, enable_enterprise_modules=True)
+
+    # Map
+    st.markdown("<h3 style='margin-top: 20px;'>Interactive Map</h3>", unsafe_allow_html=True)
+    m = leafmap.Map(
+        locate_control=True, latlon_control=True, draw_export=False, minimap_control=True
     )
 
-    # Display data using AgGrid
-    st.title("White Baseball Fans")
-    columns_to_display = ['Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', '
+    # Add color-coded markers
+    for _, row in filtered_df.iterrows():
+        color = 'green' if row['Fandom Level'] == 'Avid' else 'blue' if row['Fandom Level'] == 'Casual' else 'red'
+        tooltip = (
+            f"Neighborhood: {row['Neighborhood']}<br>"
+            f"Race: {row['Race']}<br>"
+            f"Team: {row['Team']}<br>"
+            f"League: {row['League']}<br>"
+            f"Fandom Level: {row['Fandom Level']}<br>"
+            f"Total Fans: {row[['Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)', 'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)', 'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)', 'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)', 'Middle Class ($45,000 to $49,999)', 'Comfortable ($50,000 to $59,999)', 'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)', 'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)', 'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)']].sum()}"
+        )
+        m.add_marker(location=[row['US lat'], row['US lon']], popup=tooltip, icon="info-sign", color=color)
+
+    m.to_streamlit(height=600)
