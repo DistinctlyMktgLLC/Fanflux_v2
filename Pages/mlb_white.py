@@ -1,5 +1,6 @@
 import streamlit as st
 import utils
+import folium
 
 # Load data
 df = utils.load_data('White')
@@ -11,10 +12,52 @@ def app():
     casual_fans = df[df['Fandom Level'] == 'Casual'].shape[0]
     convertible_fans = df[df['Fandom Level'] == 'Not at all'].shape[0]
 
+    scorecard_style = """
+    <style>
+    .scorecard {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: black;
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+    .scorecard .highlight {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 10px;
+        border-radius: 10px 0 0 10px;
+    }
+    </style>
+    """
+
+    st.markdown(scorecard_style, unsafe_allow_html=True)
+
+    def render_scorecard(color, title, value):
+        card_html = f"""
+        <div class="scorecard">
+            <div class="highlight" style="background-color: {color};"></div>
+            <div>
+                <h2>{title}</h2>
+                <p style="font-size: 24px;">{value}</p>
+            </div>
+        </div>
+        """
+        st.markdown(card_html, unsafe_allow_html=True)
+
     col1, col2, col3 = st.columns(3)
-    col1.metric("Avid Fans", avid_fans)
-    col2.metric("Casual Fans", casual_fans)
-    col3.metric("Convertible Fans", convertible_fans)
+    with col1:
+        render_scorecard('green', 'Avid Fans', avid_fans)
+    with col2:
+        render_scorecard('blue', 'Casual Fans', casual_fans)
+    with col3:
+        render_scorecard('red', 'Convertible Fans', convertible_fans)
 
     # Sidebar filters
     st.sidebar.header("Filters")
@@ -51,4 +94,6 @@ def app():
         'Casual': 'blue',
         'Not at all': 'red'
     })
-    st.markdown(m._repr_html_(), unsafe_allow_html=True)
+    st.components.v1.html(m._repr_html_(), height=700)
+
+app()
