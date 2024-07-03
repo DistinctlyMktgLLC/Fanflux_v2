@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import utils
+from st_aggrid import AgGrid, GridOptionsBuilder
 
 @st.cache_data
 def load_data():
@@ -72,13 +73,20 @@ def app():
         unsafe_allow_html=True
     )
 
-    # Display data
+    # Display data using AgGrid
     st.title("White Baseball Fans")
     columns_to_display = ['Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level', 'Race'] + selected_income
-    st.dataframe(df[columns_to_display])
+    
+    gb = GridOptionsBuilder.from_dataframe(df[columns_to_display])
+    gb.configure_pagination(paginationAutoPageSize=True)  # Enable pagination
+    gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, editable=False)
+    gb.configure_side_bar()  # Add a sidebar to the grid
+    gridOptions = gb.build()
+
+    AgGrid(df[columns_to_display], gridOptions=gridOptions, enable_enterprise_modules=True)
 
     # Map visualization
-    st.markdown('<div style="height: 600px;">', unsafe_allow_html=True)
+    st.markdown('<div style="height: 600px; width: 100%;">', unsafe_allow_html=True)
     utils.render_map(df)
     st.markdown('</div>', unsafe_allow_html=True)
 
