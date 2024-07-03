@@ -2,14 +2,14 @@ import streamlit as st
 import pandas as pd
 from streamlit_folium import st_folium
 import folium
-import utils
+from utils import load_data, create_map, add_map_markers, apply_common_styles
 
 def app():
     st.set_page_config(layout="wide", initial_sidebar_state="expanded")
     
     st.title("White Baseball Fans")
 
-    df = utils.load_data("path_to_your_parquet_file")  # Adjust the file path accordingly
+    df = load_data("data/Fanflux_Intensity_MLB_White.parquet")  # Adjust the file path accordingly
 
     if df.empty:
         st.error("No data available.")
@@ -48,20 +48,20 @@ def app():
     # Display the table
     st.write("### Filtered Data")
     st.dataframe(
-        filtered_df[columns_to_display].style.hide(axis=0),
+        filtered_df[columns_to_display],
         width=1200, 
         height=400
     )
 
     # Create the map
     st.write("### Fan Opportunity Map")
-    m = utils.create_map()
+    m = create_map()
     color_key = {
         'Avid': 'red',
         'Casual': 'blue',
         'Convertible': 'green'
     }
-    utils.add_map_markers(m, filtered_df, 'Fandom Level', color_key)
+    add_map_markers(m, filtered_df, 'Fandom Level', color_key)
     st_folium(m, width=700, height=500)
 
 if __name__ == "__main__":
