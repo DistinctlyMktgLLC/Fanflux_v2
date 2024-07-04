@@ -37,11 +37,11 @@ def display_scorecards(df, income_levels):
             box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
             margin: 10px;
             text-align: center;
-            position: relative.
+            position: relative;
         }
         .scorecard-casual::before {
             content: "";
-            position: absolute.
+            position: absolute;
             top: 0;
             left: 0;
             width: 10px;
@@ -54,21 +54,21 @@ def display_scorecards(df, income_levels):
             background-color: #000000;
             color: #ffffff;
             padding: 20px;
-            border-radius: 10px.
+            border-radius: 10px;
             box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
             margin: 10px;
             text-align: center;
-            position: relative.
+            position: relative;
         }
         .scorecard-convertible::before {
             content: "";
-            position: absolute.
+            position: absolute;
             top: 0;
             left: 0;
             width: 10px;
             height: 100%;
             background-color: #3498db;
-            border-radius: 10px 0 0 10px.
+            border-radius: 10px 0 0 10px;
         }
         </style>
         """,
@@ -89,7 +89,18 @@ def display_scorecards(df, income_levels):
         st.markdown(f'<div class="scorecard-convertible"><h3>Convertible Fans</h3><div class="value">{income_sum_convertible}</div></div>', unsafe_allow_html=True)
 
 def display_table(df):
-    df_to_show = df.drop(columns=['City', 'City Alt.', 'US lat', 'US lon', 'helper', 'match'])
+    columns_to_show = [
+        'dCategory', 'Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level',
+        'Race', 'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)',
+        'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)',
+        'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)',
+        'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)',
+        'Middle Class ($45,000 to $49,999)', 'Comfortable ($50,000 to $59,999)',
+        'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)',
+        'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)',
+        'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)'
+    ]
+    df_to_show = df[columns_to_show]
     st.dataframe(df_to_show.reset_index(drop=True))
 
 def interactive_map(df):
@@ -128,7 +139,7 @@ def interactive_map(df):
                 tooltip_text = (
                     f"Team: {row['Team']}<br>"
                     f"League: {row['League']}<br>"
-                    f"City: {row['City']}<br>"
+                    f"City: {row['Neighborhood']}<br>"
                     f"Fandom Level: {row['Fandom Level']}<br>"
                     f"Income Levels:<br>{income_levels}"
                 )
