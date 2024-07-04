@@ -8,6 +8,7 @@ import Pages.mlb_black as black
 import Pages.mlb_hispanic as hispanic
 import Pages.mlb_white as white
 
+# Ensure this is the first Streamlit command
 st.set_page_config(layout="wide", initial_sidebar_state="expanded")
 
 app = MultiApp()
