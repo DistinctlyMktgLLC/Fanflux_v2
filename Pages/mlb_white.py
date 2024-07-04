@@ -128,4 +128,58 @@ def interactive_map(df):
                     f"Team: {row['Team']}<br>"
                     f"League: {row['League']}<br>"
                     f"City: {row['City']}<br>"
-                    f"Fandom
+                    f"Fandom Level: {row['Fandom Level']}<br>"
+                    f"Income Levels:<br>{income_levels}"
+                )
+                
+                folium.Marker(
+                    location=[lat, lon],
+                    tooltip=tooltip_text,
+                    icon=folium.Icon(color=color)
+                ).add_to(marker_cluster)
+        
+        m.to_streamlit(height=700)
+
+def app():
+    st.title("White Baseball Fans")
+
+    # Load data
+    df = pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
+    
+    if df.empty:
+        st.error("No data available.")
+        return
+
+    # Update "Not at all" to "Convertible Fans"
+    df['Fandom Level'] = df['Fandom Level'].replace('Not at all', 'Convertible Fans')
+
+    # Filters
+    fandom_levels = df['Fandom Level'].unique().tolist()
+    races = df['Race'].unique().tolist()
+    income_levels = [col for col in df.columns if col.startswith(('Struggling', 'Getting', 'Starting', 'Middle', 'Comfortable', 'Doing', 'Prosperous', 'Wealthy', 'Affluent'))]
+    teams = df['Team'].unique().tolist()
+
+    selected_fandom_levels = st.sidebar.multiselect('Select Fandom Level', fandom_levels)
+    selected_races = st.sidebar.multiselect('Select Race', races)
+    selected_income_levels = st.sidebar.multiselect('Select Income Levels', income_levels)
+    selected_teams = st.sidebar.multiselect('Select Teams', teams)
+
+    # Filter dataframe based on selections
+    filtered_df = df[
+        (df['Fandom Level'].isin(selected_fandom_levels) if selected_fandom_levels else df['Fandom Level'].notnull()) &
+        (df['Race'].isin(selected_races) if selected_races else df['Race'].notnull()) &
+        (df[selected_income_levels].sum(axis=1) > 0 if selected_income_levels else df['Fandom Level'].notnull()) &
+        (df['Team'].isin(selected_teams) if selected_teams else df['Team'].notnull())
+    ]
+
+    # Display scorecards
+    display_scorecards(filtered_df, income_levels)
+
+    # Display table
+    display_table(filtered_df)
+
+    # Display interactive map
+    interactive_map(filtered_df)
+
+if __name__ == "__main__":
+    app()
