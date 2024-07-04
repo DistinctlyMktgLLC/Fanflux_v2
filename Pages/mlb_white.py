@@ -38,7 +38,7 @@ def display_scorecards(df, total_df):
             box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
             margin: 10px;
             text-align: center;
-            position: relative.
+            position: relative;
         }
         .scorecard-casual::before {
             content: "";
@@ -54,8 +54,8 @@ def display_scorecards(df, total_df):
         .scorecard-convertible {
             background-color: #000000;
             color: #ffffff;
-            padding: 20px.
-            border-radius: 10px.
+            padding: 20px;
+            border-radius: 10px;
             box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
             margin: 10px;
             text-align: center;
@@ -66,7 +66,7 @@ def display_scorecards(df, total_df):
             position: absolute;
             top: 0;
             left: 0;
-            width: 10px.
+            width: 10px;
             height: 100%;
             background-color: #3498db;
             border-radius: 10px 0 0 10px;
