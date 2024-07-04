@@ -1,5 +1,5 @@
 import streamlit as st
 
 def app():
-    st.title("Welcome to Fanflux")
-    st.write("Navigate through the sidebar to explore fan data for different demographics and leagues.")
+    st.title("Fanflux Navigation")
+    st.markdown("Welcome to the Fanflux app. Use the navigation on the left to explore different pages.")
