@@ -1,3 +1,6 @@
 streamlit
-pandas
 leafmap
+geopandas
+owslib
+pandas
+streamlit_folium
