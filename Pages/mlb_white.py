@@ -132,7 +132,7 @@ def interactive_map(df):
                 else:
                     color = 'blue'
                 
-                income_levels = ', '.join(
+                income_levels = '<br>'.join(
                     [f'{col}: {row[col]}' for col in row.index 
                      if col.startswith(('Struggling', 'Getting', 'Starting', 'Middle', 'Comfortable', 'Doing', 'Prosperous', 'Wealthy', 'Affluent')) 
                      and row[col] > 0]
@@ -143,7 +143,7 @@ def interactive_map(df):
                     f"League: {row['League']}<br>"
                     f"City: {row['City']}<br>"
                     f"Fandom Level: {row['Fandom Level']}<br>"
-                    f"Income Levels: {income_levels}"
+                    f"Income Levels:<br>{income_levels}"
                 )
                 
                 folium.Marker(
