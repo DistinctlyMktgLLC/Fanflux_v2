@@ -186,10 +186,6 @@ def app():
         (df['Team'].isin(selected_teams) if selected_teams else df['Team'].notnull())
     ]
 
-    # Debugging: Check shape of filtered data and its contents
-    st.write("Filtered Data Shape:", filtered_df.shape)
-    st.write("Filtered Data Head:", filtered_df.head())
-
     # Display scorecards
     display_scorecards(filtered_df)
 
