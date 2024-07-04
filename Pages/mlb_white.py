@@ -48,15 +48,19 @@ create_scorecard("Casual Fans", casual_total, "#FFC300")
 create_scorecard("Convertible Fans", convertible_total, "#3498DB")
 
 # Create the map
+unique_fandom_levels = df['Fandom Level'].unique()
+colors = ["#FF5733", "#FFC300", "#3498DB"][:len(unique_fandom_levels)]
+
 m = leafmap.Map(center=[40, -100], zoom=4)
 m.add_points_from_xy(
     df,
     x="US lon",
     y="US lat",
     color_column="Fandom Level",
-    icon_names=["gear", "map", "leaf", "globe"],
+    icon_names=["gear", "map", "leaf"],
     spin=True,
     add_legend=True,
+    colors=colors
 )
 
 m.to_streamlit(height=700)
