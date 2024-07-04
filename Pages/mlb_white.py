@@ -5,7 +5,7 @@ import leafmap.foliumap as leafmap
 import folium
 from folium.plugins import MarkerCluster
 
-def display_scorecards(df):
+def display_scorecards(df, total_df):
     st.markdown(
         """
         <style>
@@ -38,7 +38,7 @@ def display_scorecards(df):
             box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
             margin: 10px;
             text-align: center;
-            position: relative;
+            position: relative.
         }
         .scorecard-casual::before {
             content: "";
@@ -54,8 +54,8 @@ def display_scorecards(df):
         .scorecard-convertible {
             background-color: #000000;
             color: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
+            padding: 20px.
+            border-radius: 10px.
             box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
             margin: 10px;
             text-align: center;
@@ -66,7 +66,7 @@ def display_scorecards(df):
             position: absolute;
             top: 0;
             left: 0;
-            width: 10px;
+            width: 10px.
             height: 100%;
             background-color: #3498db;
             border-radius: 10px 0 0 10px;
@@ -76,17 +76,23 @@ def display_scorecards(df):
         unsafe_allow_html=True
     )
 
+    # Total counts from the unfiltered dataframe
+    total_avid_count = total_df[total_df['Fandom Level'] == 'Avid'].shape[0]
+    total_casual_count = total_df[total_df['Fandom Level'] == 'Casual'].shape[0]
+    total_convertible_count = total_df[total_df['Fandom Level'] == 'Convertible Fans'].shape[0]
+
+    # Filtered counts
     avid_count = df[df['Fandom Level'] == 'Avid'].shape[0]
     casual_count = df[df['Fandom Level'] == 'Casual'].shape[0]
     convertible_count = df[df['Fandom Level'] == 'Convertible Fans'].shape[0]
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.markdown(f'<div class="scorecard-avid"><h3>Avid Fans</h3><div class="value">{avid_count}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="scorecard-avid"><h3>Avid Fans</h3><div class="value">{avid_count} / {total_avid_count}</div></div>', unsafe_allow_html=True)
     with col2:
-        st.markdown(f'<div class="scorecard-casual"><h3>Casual Fans</h3><div class="value">{casual_count}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="scorecard-casual"><h3>Casual Fans</h3><div class="value">{casual_count} / {total_casual_count}</div></div>', unsafe_allow_html=True)
     with col3:
-        st.markdown(f'<div class="scorecard-convertible"><h3>Convertible Fans</h3><div class="value">{convertible_count}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="scorecard-convertible"><h3>Convertible Fans</h3><div class="value">{convertible_count} / {total_convertible_count}</div></div>', unsafe_allow_html=True)
 
 def display_table(df):
     if not df.empty:
@@ -100,6 +106,8 @@ def display_table(df):
             'domLayout': 'autoHeight',
             'pagination': False,
         }
+        st.write("Displaying table with data:")
+        st.write(df.head())  # Display the first few rows for debugging
         AgGrid(df, gridOptions=grid_options, height=400, width='100%', theme='streamlit', fit_columns_on_grid_load=True)
     else:
         st.warning("No data available to display.")
@@ -145,9 +153,6 @@ def app():
     # Load data
     df = pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
     
-    # Debugging: Check if data is loaded
-    st.write("Data loaded:", df.shape)
-
     if df.empty:
         st.error("No data available.")
         return
@@ -155,8 +160,8 @@ def app():
     # Update "Not at all" to "Convertible Fans"
     df['Fandom Level'] = df['Fandom Level'].replace('Not at all', 'Convertible Fans')
 
-    # Debugging: Check unique values of Fandom Level after replacement
-    st.write("Unique Fandom Levels:", df['Fandom Level'].unique())
+    # Unfiltered dataframe for total counts
+    total_df = df.copy()
 
     # Filters
     fandom_levels = df['Fandom Level'].unique().tolist()
@@ -164,30 +169,25 @@ def app():
     income_levels = [col for col in df.columns if col.startswith(('Struggling', 'Getting', 'Starting', 'Middle', 'Comfortable', 'Doing', 'Prosperous', 'Wealthy', 'Affluent'))]
     teams = df['Team'].unique().tolist()
 
-    selected_fandom_levels = st.sidebar.multiselect('Select Fandom Level', fandom_levels, default=fandom_levels)
-    selected_races = st.sidebar.multiselect('Select Race', races, default=races)
-    selected_income_levels = st.sidebar.multiselect('Select Income Levels', income_levels, default=income_levels)
-    selected_teams = st.sidebar.multiselect('Select Teams', teams, default=teams)
-
-    # Debugging: Check selected filter values
-    st.write("Selected Fandom Levels:", selected_fandom_levels)
-    st.write("Selected Races:", selected_races)
-    st.write("Selected Income Levels:", selected_income_levels)
-    st.write("Selected Teams:", selected_teams)
+    selected_fandom_levels = st.sidebar.multiselect('Select Fandom Level', fandom_levels)
+    selected_races = st.sidebar.multiselect('Select Race', races)
+    selected_income_levels = st.sidebar.multiselect('Select Income Levels', income_levels)
+    selected_teams = st.sidebar.multiselect('Select Teams', teams)
 
     # Filter dataframe based on selections
     filtered_df = df[
-        (df['Fandom Level'].isin(selected_fandom_levels)) &
-        (df['Race'].isin(selected_races)) &
-        (df[selected_income_levels].sum(axis=1) > 0) &
-        (df['Team'].isin(selected_teams))
+        (df['Fandom Level'].isin(selected_fandom_levels) if selected_fandom_levels else df['Fandom Level'].notnull()) &
+        (df['Race'].isin(selected_races) if selected_races else df['Race'].notnull()) &
+        (df[selected_income_levels].sum(axis=1) > 0 if selected_income_levels else df['Fandom Level'].notnull()) &
+        (df['Team'].isin(selected_teams) if selected_teams else df['Team'].notnull())
     ]
 
-    # Debugging: Check shape of filtered data
+    # Debugging: Check shape of filtered data and its contents
     st.write("Filtered Data Shape:", filtered_df.shape)
+    st.write("Filtered Data Head:", filtered_df.head())
 
     # Display scorecards
-    display_scorecards(filtered_df)
+    display_scorecards(filtered_df, total_df)
 
     # Display table
     display_table(filtered_df)
