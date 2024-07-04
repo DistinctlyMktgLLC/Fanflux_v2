@@ -144,6 +144,9 @@ def app():
 
     # Load data
     df = pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
+    
+    # Debugging: Check if data is loaded
+    st.write("Data loaded:", df.shape)
 
     if df.empty:
         st.error("No data available.")
@@ -151,6 +154,9 @@ def app():
 
     # Update "Not at all" to "Convertible Fans"
     df['Fandom Level'] = df['Fandom Level'].replace('Not at all', 'Convertible Fans')
+
+    # Debugging: Check unique values of Fandom Level after replacement
+    st.write("Unique Fandom Levels:", df['Fandom Level'].unique())
 
     # Filters
     fandom_levels = df['Fandom Level'].unique().tolist()
@@ -163,6 +169,12 @@ def app():
     selected_income_levels = st.sidebar.multiselect('Select Income Levels', income_levels, default=income_levels)
     selected_teams = st.sidebar.multiselect('Select Teams', teams, default=teams)
 
+    # Debugging: Check selected filter values
+    st.write("Selected Fandom Levels:", selected_fandom_levels)
+    st.write("Selected Races:", selected_races)
+    st.write("Selected Income Levels:", selected_income_levels)
+    st.write("Selected Teams:", selected_teams)
+
     # Filter dataframe based on selections
     filtered_df = df[
         (df['Fandom Level'].isin(selected_fandom_levels)) &
@@ -170,6 +182,9 @@ def app():
         (df[selected_income_levels].sum(axis=1) > 0) &
         (df['Team'].isin(selected_teams))
     ]
+
+    # Debugging: Check shape of filtered data
+    st.write("Filtered Data Shape:", filtered_df.shape)
 
     # Display scorecards
     display_scorecards(filtered_df)
