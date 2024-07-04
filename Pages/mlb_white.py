@@ -131,10 +131,21 @@ def interactive_map(df):
                     color = 'orange'
                 else:
                     color = 'blue'
-                tooltip_text = (
-                    f"Team: {row['Team']}, League: {row['League']}, City: {row['City']}, "
-                    f"Fandom Level: {row['Fandom Level']}, Income Levels: {', '.join([f'{col}: {row[col]}' for col in row.index if col.startswith(('Struggling', 'Getting', 'Starting', 'Middle', 'Comfortable', 'Doing', 'Prosperous', 'Wealthy', 'Affluent')) and row[col] > 0])}"
+                
+                income_levels = ', '.join(
+                    [f'{col}: {row[col]}' for col in row.index 
+                     if col.startswith(('Struggling', 'Getting', 'Starting', 'Middle', 'Comfortable', 'Doing', 'Prosperous', 'Wealthy', 'Affluent')) 
+                     and row[col] > 0]
                 )
+                
+                tooltip_text = (
+                    f"Team: {row['Team']}<br>"
+                    f"League: {row['League']}<br>"
+                    f"City: {row['City']}<br>"
+                    f"Fandom Level: {row['Fandom Level']}<br>"
+                    f"Income Levels: {income_levels}"
+                )
+                
                 folium.Marker(
                     location=[lat, lon],
                     tooltip=tooltip_text,
