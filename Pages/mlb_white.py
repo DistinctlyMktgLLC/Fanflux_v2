@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 import leafmap.foliumap as leafmap
 
 def display_scorecards(df):
@@ -17,8 +16,7 @@ def display_scorecards(df):
         st.markdown(f"<div class='scorecard' style='background-color:#1E90FF;'><h2>Convertible Fans</h2><h1>{total_convertible}</h1></div>", unsafe_allow_html=True)
 
 def display_table(df):
-    styled_df = df.style.set_properties(**{'text-align': 'center'}).hide_index()
-    st.dataframe(styled_df)
+    st.dataframe(df)  # Simplified display without styling
 
 def display_map(df):
     m = leafmap.Map(center=[40, -100], zoom=4)
@@ -44,6 +42,16 @@ def app():
     selected_income_levels = st.sidebar.multiselect("Select Income Levels", income_levels)
     selected_teams = st.sidebar.multiselect("Select Teams", df['Team'].unique())
 
+    # Ensure the selected filters are valid
+    if not selected_fandom_levels:
+        selected_fandom_levels = fandom_levels
+    if not selected_races:
+        selected_races = races
+    if not selected_income_levels:
+        selected_income_levels = income_levels
+    if not selected_teams:
+        selected_teams = df['Team'].unique()
+
     filtered_df = df[
         (df['Fandom Level'].isin(selected_fandom_levels)) &
         (df['Race'].isin(selected_races)) &
@@ -54,3 +62,6 @@ def app():
     display_scorecards(filtered_df)
     display_table(filtered_df)
     display_map(filtered_df)
+
+if __name__ == "__main__":
+    app()
