@@ -1,6 +1,6 @@
 import streamlit as st
 from multiapp import MultiApp
-import Pages._1_home as home
+import Pages.home as home
 import Pages.mlb_aapi as aapi
 import Pages.mlb_americanindian as americanindian
 import Pages.mlb_asian as asian
