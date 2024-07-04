@@ -84,11 +84,17 @@ def interactive_map(df):
         )
         m.add_basemap(basemap)
         
-        # Clustering with correct column names
+        # Clustering with correct column names and tooltips
         if 'US lat' in df.columns and 'US lon' in df.columns:
             marker_cluster = MarkerCluster().add_to(m)
-            for lat, lon in zip(df['US lat'], df['US lon']):
-                folium.Marker(location=[lat, lon]).add_to(marker_cluster)
+            for _, row in df.iterrows():
+                lat = row['US lat']
+                lon = row['US lon']
+                tooltip_text = f"Team: {row['Team']}, League: {row['League']}, City: {row['City']}, Fandom Level: {row['Fandom Level']}"
+                folium.Marker(
+                    location=[lat, lon],
+                    tooltip=tooltip_text
+                ).add_to(marker_cluster)
         
         m.to_streamlit(height=700)
 
