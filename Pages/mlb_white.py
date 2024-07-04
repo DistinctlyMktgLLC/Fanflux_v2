@@ -6,12 +6,79 @@ import folium
 from folium.plugins import MarkerCluster
 
 def display_scorecards(df):
-    # Link to the external CSS file
-    st.markdown('<link href="style.css" rel="stylesheet">', unsafe_allow_html=True)
+    st.markdown(
+        """
+        <style>
+        .scorecard-avid {
+            background-color: #000000;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+            margin: 10px;
+            text-align: center;
+            position: relative;
+        }
+        .scorecard-avid::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 10px;
+            height: 100%;
+            background-color: #e74c3c;
+            border-radius: 10px 0 0 10px;
+        }
+
+        .scorecard-casual {
+            background-color: #000000;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+            margin: 10px;
+            text-align: center;
+            position: relative;
+        }
+        .scorecard-casual::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 10px;
+            height: 100%;
+            background-color: #f39c12;
+            border-radius: 10px 0 0 10px;
+        }
+
+        .scorecard-convertible {
+            background-color: #000000;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+            margin: 10px;
+            text-align: center;
+            position: relative;
+        }
+        .scorecard-convertible::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 10px;
+            height: 100%;
+            background-color: #3498db;
+            border-radius: 10px 0 0 10px;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
     avid_count = df[df['Fandom Level'] == 'Avid'].shape[0]
     casual_count = df[df['Fandom Level'] == 'Casual'].shape[0]
-    convertible_count = df[df['Fandom Level'] == 'Convertible'].shape[0]
+    convertible_count = df[df['Fandom Level'] == 'Convertible Fans'].shape[0]
 
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -22,17 +89,20 @@ def display_scorecards(df):
         st.markdown(f'<div class="scorecard-convertible"><h3>Convertible Fans</h3><div class="value">{convertible_count}</div></div>', unsafe_allow_html=True)
 
 def display_table(df):
-    grid_options = {
-        'defaultColDef': {
-            'sortable': True,
-            'filter': True,
-            'resizable': True,
-            'floatingFilter': True,
-        },
-        'domLayout': 'autoHeight',
-        'pagination': False,
-    }
-    AgGrid(df, gridOptions=grid_options, height=400, width='100%', theme='streamlit', fit_columns_on_grid_load=True)
+    if not df.empty:
+        grid_options = {
+            'defaultColDef': {
+                'sortable': True,
+                'filter': True,
+                'resizable': True,
+                'floatingFilter': True,
+            },
+            'domLayout': 'autoHeight',
+            'pagination': False,
+        }
+        AgGrid(df, gridOptions=grid_options, height=400, width='100%', theme='streamlit', fit_columns_on_grid_load=True)
+    else:
+        st.warning("No data available to display.")
 
 def interactive_map(df):
     col1, col2 = st.columns([4, 1])
@@ -78,6 +148,9 @@ def app():
     if df.empty:
         st.error("No data available.")
         return
+
+    # Update "Not at all" to "Convertible Fans"
+    df['Fandom Level'] = df['Fandom Level'].replace('Not at all', 'Convertible Fans')
 
     # Filters
     fandom_levels = df['Fandom Level'].unique().tolist()
