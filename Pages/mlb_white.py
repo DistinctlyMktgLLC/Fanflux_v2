@@ -1,66 +1,56 @@
 import streamlit as st
 import pandas as pd
-from streamlit_folium import st_folium
-import folium
-from utils import load_data, create_map, add_map_markers, apply_common_styles
+from st_aggrid import AgGrid
+import leafmap.foliumap as leafmap
+
+def display_scorecards(df):
+    avid_count = df[df['Fandom Level'] == 'Avid'].shape[0]
+    casual_count = df[df['Fandom Level'] == 'Casual'].shape[0]
+    convertible_count = df[df['Fandom Level'] == 'Convertible'].shape[0]
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Avid Fans", avid_count)
+    with col2:
+        st.metric("Casual Fans", casual_count)
+    with col3:
+        st.metric("Convertible Fans", convertible_count)
+
+def display_table(df):
+    AgGrid(df, height=400, width='100%', theme='streamlit', fit_columns_on_grid_load=True)
+
+def interactive_map():
+    col1, col2 = st.columns([4, 1])
+    options = list(leafmap.basemaps.keys())
+    index = options.index("OpenTopoMap")
+
+    with col2:
+        basemap = st.selectbox("Select a basemap:", options, index)
+    with col1:
+        m = leafmap.Map(
+            locate_control=True, latlon_control=True, draw_export=True, minimap_control=True
+        )
+        m.add_basemap(basemap)
+        m.to_streamlit(height=700)
 
 def app():
     st.title("White Baseball Fans")
 
-    df = load_data("data/Fanflux_Intensity_MLB_White.parquet")  # Adjust the file path accordingly
+    # Load data
+    df = pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
 
     if df.empty:
         st.error("No data available.")
         return
 
-    # Filter options
-    st.sidebar.header("Filters")
-    team = st.sidebar.selectbox('Select a Team', ['Choose an option'] + sorted(df['Team'].unique()))
-    league = st.sidebar.selectbox('Select a League', ['Choose an option'] + sorted(df['League'].unique()))
-    city = st.sidebar.selectbox('Select a City', ['Choose an option'] + sorted(df['City'].unique()))
-    fandom_level = st.sidebar.selectbox('Select Fandom Level', ['Choose an option'] + sorted(df['Fandom Level'].unique()))
-    income_levels = [col for col in df.columns if 'Income' in col]
+    # Display scorecards
+    display_scorecards(df)
 
-    filtered_df = df.copy()
-    if team != 'Choose an option':
-        filtered_df = filtered_df[filtered_df['Team'] == team]
-    if league != 'Choose an option':
-        filtered_df = filtered_df[filtered_df['League'] == league]
-    if city != 'Choose an option':
-        filtered_df = filtered_df[filtered_df['City'] == city]
-    if fandom_level != 'Choose an option':
-        filtered_df = filtered_df[filtered_df['Fandom Level'] == fandom_level]
+    # Display table
+    display_table(df)
 
-    # Ensure zipcode is formatted with leading zeros
-    filtered_df['zipcode'] = filtered_df['zipcode'].apply(lambda x: f"{x:05d}")
-
-    # Create Total Fans column
-    filtered_df['Total Fans'] = filtered_df[income_levels].sum(axis=1)
-
-    # Define columns to display
-    columns_to_display = [
-        'dCategory', 'Team', 'League', 'City', 'Neighborhood', 
-        'zipcode', 'Intensity', 'Fandom Level', 'Race', 'Total Fans'
-    ]
-
-    # Display the table
-    st.write("### Filtered Data")
-    st.dataframe(
-        filtered_df[columns_to_display],
-        width=1200, 
-        height=400
-    )
-
-    # Create the map
-    st.write("### Fan Opportunity Map")
-    m = create_map()
-    color_key = {
-        'Avid': 'red',
-        'Casual': 'blue',
-        'Convertible': 'green'
-    }
-    add_map_markers(m, filtered_df, 'Fandom Level', color_key)
-    st_folium(m, width=700, height=500)
+    # Display interactive map
+    interactive_map()
 
 if __name__ == "__main__":
     app()
