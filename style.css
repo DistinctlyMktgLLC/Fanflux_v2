@@ -1,6 +1,4 @@
-/* style.css */
-
-.scorecard {
+.scorecard-avid {
     background-color: #000000; /* Black background */
     color: #ffffff; /* White font color */
     padding: 20px;
@@ -8,27 +6,57 @@
     box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
     margin: 10px;
     text-align: center;
-    position: relative; /* For the left highlight */
+    position: relative;
 }
-
-.scorecard h3 {
-    margin: 0;
-    font-size: 24px;
-    color: #ffffff; /* White font color for the title */
-}
-
-.scorecard .value {
-    font-size: 48px;
-    color: #ffffff; /* White font color for the numbers */
-}
-
-.scorecard::before {
+.scorecard-avid::before {
     content: "";
     position: absolute;
     top: 0;
     left: 0;
     width: 10px;
     height: 100%;
-    background-color: #3498db; /* Pop of color on the left side */
-    border-radius: 10px 0 0 10px; /* Rounded left side */
+    background-color: #e74c3c;
+    border-radius: 10px 0 0 10px;
+}
+
+.scorecard-casual {
+    background-color: #000000; /* Black background */
+    color: #ffffff; /* White font color */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+    margin: 10px;
+    text-align: center;
+    position: relative;
+}
+.scorecard-casual::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 10px;
+    height: 100%;
+    background-color: #f39c12;
+    border-radius: 10px 0 0 10px;
+}
+
+.scorecard-convertible {
+    background-color: #000000; /* Black background */
+    color: #ffffff; /* White font color */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+    margin: 10px;
+    text-align: center;
+    position: relative;
+}
+.scorecard-convertible::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 10px;
+    height: 100%;
+    background-color: #3498db;
+    border-radius: 10px 0 0 10px;
 }

@@ -6,42 +6,8 @@ import folium
 from folium.plugins import MarkerCluster
 
 def display_scorecards(df):
-    st.markdown(
-        """
-        <style>
-        .scorecard {
-            background-color: #000000; /* Black background */
-            color: #ffffff; /* White font color */
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
-            margin: 10px;
-            text-align: center;
-            position: relative; /* For the left highlight */
-        }
-        .scorecard h3 {
-            margin: 0;
-            font-size: 24px;
-            color: #ffffff; /* White font color for the title */
-        }
-        .scorecard .value {
-            font-size: 48px;
-            color: #ffffff; /* White font color for the numbers */
-        }
-        .scorecard::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 10px;
-            height: 100%;
-            background-color: #3498db; /* Pop of color on the left side */
-            border-radius: 10px 0 0 10px; /* Rounded left side */
-        }
-        </style>
-        """, 
-        unsafe_allow_html=True
-    )
+    # Link to the external CSS file
+    st.markdown('<link href="style.css" rel="stylesheet">', unsafe_allow_html=True)
 
     avid_count = df[df['Fandom Level'] == 'Avid'].shape[0]
     casual_count = df[df['Fandom Level'] == 'Casual'].shape[0]
@@ -49,15 +15,13 @@ def display_scorecards(df):
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.markdown(f'<div class="scorecard"><h3>Avid Fans</h3><div class="value">{avid_count}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="scorecard-avid"><h3>Avid Fans</h3><div class="value">{avid_count}</div></div>', unsafe_allow_html=True)
     with col2:
-        st.markdown(f'<div class="scorecard"><h3>Casual Fans</h3><div class="value">{casual_count}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="scorecard-casual"><h3>Casual Fans</h3><div class="value">{casual_count}</div></div>', unsafe_allow_html=True)
     with col3:
-        st.markdown(f'<div class="scorecard"><h3>Convertible Fans</h3><div class="value">{convertible_count}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="scorecard-convertible"><h3>Convertible Fans</h3><div class="value">{convertible_count}</div></div>', unsafe_allow_html=True)
 
-def display_table(df, page, page_size):
-    start = page * page_size
-    end = start + page_size
+def display_table(df):
     grid_options = {
         'defaultColDef': {
             'sortable': True,
@@ -66,10 +30,9 @@ def display_table(df, page, page_size):
             'floatingFilter': True,
         },
         'domLayout': 'autoHeight',
-        'pagination': True,
-        'paginationPageSize': page_size,
+        'pagination': False,
     }
-    AgGrid(df.iloc[start:end], gridOptions=grid_options, height=400, width='100%', theme='streamlit', fit_columns_on_grid_load=True)
+    AgGrid(df, gridOptions=grid_options, height=400, width='100%', theme='streamlit', fit_columns_on_grid_load=True)
 
 def interactive_map(df):
     col1, col2 = st.columns([4, 1])
@@ -90,10 +53,18 @@ def interactive_map(df):
             for _, row in df.iterrows():
                 lat = row['US lat']
                 lon = row['US lon']
+                fandom_level = row['Fandom Level']
+                if fandom_level == 'Avid':
+                    color = 'red'
+                elif fandom_level == 'Casual':
+                    color = 'orange'
+                else:
+                    color = 'blue'
                 tooltip_text = f"Team: {row['Team']}, League: {row['League']}, City: {row['City']}, Fandom Level: {row['Fandom Level']}"
                 folium.Marker(
                     location=[lat, lon],
-                    tooltip=tooltip_text
+                    tooltip=tooltip_text,
+                    icon=folium.Icon(color=color)
                 ).add_to(marker_cluster)
         
         m.to_streamlit(height=700)
@@ -108,20 +79,33 @@ def app():
         st.error("No data available.")
         return
 
+    # Filters
+    fandom_levels = df['Fandom Level'].unique().tolist()
+    races = df['Race'].unique().tolist()
+    income_levels = [col for col in df.columns if col.startswith(('Struggling', 'Getting', 'Starting', 'Middle', 'Comfortable', 'Doing', 'Prosperous', 'Wealthy', 'Affluent'))]
+    teams = df['Team'].unique().tolist()
+
+    selected_fandom_levels = st.sidebar.multiselect('Select Fandom Level', fandom_levels, default=fandom_levels)
+    selected_races = st.sidebar.multiselect('Select Race', races, default=races)
+    selected_income_levels = st.sidebar.multiselect('Select Income Levels', income_levels, default=income_levels)
+    selected_teams = st.sidebar.multiselect('Select Teams', teams, default=teams)
+
+    # Filter dataframe based on selections
+    filtered_df = df[
+        (df['Fandom Level'].isin(selected_fandom_levels)) &
+        (df['Race'].isin(selected_races)) &
+        (df[selected_income_levels].sum(axis=1) > 0) &
+        (df['Team'].isin(selected_teams))
+    ]
+
     # Display scorecards
-    display_scorecards(df)
+    display_scorecards(filtered_df)
 
-    # Pagination controls
-    total_records = df.shape[0]
-    page_size = 50  # Number of records per page
-    total_pages = (total_records // page_size) + 1
-    page = st.slider('Page', 0, total_pages - 1, 0)
-
-    # Display table with pagination
-    display_table(df, page, page_size)
+    # Display table
+    display_table(filtered_df)
 
     # Display interactive map
-    interactive_map(df)
+    interactive_map(filtered_df)
 
 if __name__ == "__main__":
     app()
