@@ -113,7 +113,7 @@ def interactive_map(df):
         basemap = st.selectbox("Select a basemap:", options, index)
     with col1:
         m = leafmap.Map(
-            locate_control=True, latlon_control=True, draw_export=True, minimap_control=True
+            locate_control=True, latlon_control=True, draw_export=False, minimap_control=True  # Set draw_export to False
         )
         m.add_basemap(basemap)
         
@@ -181,18 +181,11 @@ def app():
     filtered_df = df[
         (df['Fandom Level'].isin(selected_fandom_levels) if selected_fandom_levels else df['Fandom Level'].notnull()) &
         (df['Race'].isin(selected_races) if selected_races else df['Race'].notnull()) &
-        (df[selected_income_levels].sum(axis=1) > 0 if selected_income_levels else df['Fandom Level'].notnull()) &
+        (df[selected_income_levels].sum(axis=1) > 0 if selected_income_levels else df.index.notnull()) &
         (df['Team'].isin(selected_teams) if selected_teams else df['Team'].notnull())
     ]
 
-    # Display scorecards
+    # Display data
     display_scorecards(filtered_df, income_levels)
-
-    # Display table
     display_table(filtered_df)
-
-    # Display interactive map
     interactive_map(filtered_df)
-
-if __name__ == "__main__":
-    app()
