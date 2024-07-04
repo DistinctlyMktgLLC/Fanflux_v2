@@ -5,7 +5,7 @@ import leafmap.foliumap as leafmap
 import folium
 from folium.plugins import MarkerCluster
 
-def display_scorecards(df, total_df):
+def display_scorecards(df):
     st.markdown(
         """
         <style>
@@ -76,11 +76,6 @@ def display_scorecards(df, total_df):
         unsafe_allow_html=True
     )
 
-    # Total counts from the unfiltered dataframe
-    total_avid_count = total_df[total_df['Fandom Level'] == 'Avid'].shape[0]
-    total_casual_count = total_df[total_df['Fandom Level'] == 'Casual'].shape[0]
-    total_convertible_count = total_df[total_df['Fandom Level'] == 'Convertible Fans'].shape[0]
-
     # Filtered counts
     avid_count = df[df['Fandom Level'] == 'Avid'].shape[0]
     casual_count = df[df['Fandom Level'] == 'Casual'].shape[0]
@@ -88,11 +83,11 @@ def display_scorecards(df, total_df):
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.markdown(f'<div class="scorecard-avid"><h3>Avid Fans</h3><div class="value">{avid_count} / {total_avid_count}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="scorecard-avid"><h3>Avid Fans</h3><div class="value">{avid_count}</div></div>', unsafe_allow_html=True)
     with col2:
-        st.markdown(f'<div class="scorecard-casual"><h3>Casual Fans</h3><div class="value">{casual_count} / {total_casual_count}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="scorecard-casual"><h3>Casual Fans</h3><div class="value">{casual_count}</div></div>', unsafe_allow_html=True)
     with col3:
-        st.markdown(f'<div class="scorecard-convertible"><h3>Convertible Fans</h3><div class="value">{convertible_count} / {total_convertible_count}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="scorecard-convertible"><h3>Convertible Fans</h3><div class="value">{convertible_count}</div></div>', unsafe_allow_html=True)
 
 def display_table(df):
     if not df.empty:
@@ -106,9 +101,16 @@ def display_table(df):
             'domLayout': 'autoHeight',
             'pagination': False,
         }
-        st.write("Displaying table with data:")
-        st.write(df.head())  # Display the first few rows for debugging
-        AgGrid(df, gridOptions=grid_options, height=400, width='100%', theme='streamlit', fit_columns_on_grid_load=True)
+        # Format the DataFrame for display
+        formatted_df = df.style.format({
+            'zipcode': '{:,.0f}',
+            'US lat': '{:.4f}',
+            'US lon': '{:.4f}',
+            'Intensity': '{:.0f}',
+        }).set_properties(**{'text-align': 'center'}).hide_index()
+        
+        # Display the table
+        st.write(formatted_df.to_html(), unsafe_allow_html=True)
     else:
         st.warning("No data available to display.")
 
@@ -160,9 +162,6 @@ def app():
     # Update "Not at all" to "Convertible Fans"
     df['Fandom Level'] = df['Fandom Level'].replace('Not at all', 'Convertible Fans')
 
-    # Unfiltered dataframe for total counts
-    total_df = df.copy()
-
     # Filters
     fandom_levels = df['Fandom Level'].unique().tolist()
     races = df['Race'].unique().tolist()
@@ -187,7 +186,7 @@ def app():
     st.write("Filtered Data Head:", filtered_df.head())
 
     # Display scorecards
-    display_scorecards(filtered_df, total_df)
+    display_scorecards(filtered_df)
 
     # Display table
     display_table(filtered_df)
