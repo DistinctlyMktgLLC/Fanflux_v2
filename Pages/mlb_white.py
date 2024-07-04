@@ -65,3 +65,6 @@ def app():
     )
 
     m.to_streamlit(height=700)
+
+# Call the app function
+app()
