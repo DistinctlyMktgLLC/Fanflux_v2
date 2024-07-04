@@ -101,16 +101,7 @@ def display_table(df):
             'domLayout': 'autoHeight',
             'pagination': False,
         }
-        # Format the DataFrame for display
-        formatted_df = df.style.format({
-            'zipcode': '{:,.0f}',
-            'US lat': '{:.4f}',
-            'US lon': '{:.4f}',
-            'Intensity': '{:.0f}',
-        }).set_properties(**{'text-align': 'center'}).hide_index()
-        
-        # Display the table
-        st.write(formatted_df.to_html(), unsafe_allow_html=True)
+        AgGrid(df, gridOptions=grid_options, height=400, width='100%', theme='streamlit', fit_columns_on_grid_load=True)
     else:
         st.warning("No data available to display.")
 
@@ -140,7 +131,10 @@ def interactive_map(df):
                     color = 'orange'
                 else:
                     color = 'blue'
-                tooltip_text = f"Team: {row['Team']}, League: {row['League']}, City: {row['City']}, Fandom Level: {row['Fandom Level']}"
+                tooltip_text = (
+                    f"Team: {row['Team']}, League: {row['League']}, City: {row['City']}, "
+                    f"Fandom Level: {row['Fandom Level']}, Income Levels: {', '.join([f'{col}: {row[col]}' for col in row.index if col.startswith(('Struggling', 'Getting', 'Starting', 'Middle', 'Comfortable', 'Doing', 'Prosperous', 'Wealthy', 'Affluent')) and row[col] > 0])}"
+                )
                 folium.Marker(
                     location=[lat, lon],
                     tooltip=tooltip_text,
