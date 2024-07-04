@@ -37,10 +37,7 @@ income_levels = [
 
 # Calculate totals for scorecards
 def calculate_total(df, fandom_level):
-    if fandom_level:
-        filtered = df[df['Fandom Level'] == fandom_level]
-    else:
-        filtered = df
+    filtered = df[df['Fandom Level'] == fandom_level]
     numeric_df = filtered[income_levels]
     return numeric_df.sum().sum()
 
@@ -52,10 +49,12 @@ convertible_total = calculate_total(filtered_df, 'Convertible Fans')
 def create_scorecard(title, value, color):
     st.markdown(
         f"""
-        <div style="background-color:black; padding:20px; border-radius:10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5); margin-bottom: 20px;">
-            <div style="background-color:{color}; height:100%; width:10px; float:left; margin-right:10px;"></div>
-            <h2 style="color:white;">{title}</h2>
-            <p style="color:white; font-size:24px;">{value}</p>
+        <div style="background-color:black; padding:20px; border-radius:10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5); margin-bottom: 20px; position: relative;">
+            <div style="background-color:{color}; height:100%; width:10px; position: absolute; left: 0; top: 0; bottom: 0; border-top-left-radius: 10px; border-bottom-left-radius: 10px;"></div>
+            <div style="margin-left: 20px;">
+                <h2 style="color:white;">{title}</h2>
+                <p style="color:white; font-size:24px;">{value}</p>
+            </div>
         </div>
         """,
         unsafe_allow_html=True
