@@ -1,11 +1,10 @@
 import streamlit as st
 import pandas as pd
-from st_aggrid import AgGrid
 import leafmap.foliumap as leafmap
 import folium
 from folium.plugins import MarkerCluster
 
-def display_scorecards(df):
+def display_scorecards(df, income_levels):
     st.markdown(
         """
         <style>
@@ -76,34 +75,21 @@ def display_scorecards(df):
         unsafe_allow_html=True
     )
 
-    # Filtered counts
-    avid_count = df[df['Fandom Level'] == 'Avid'].shape[0]
-    casual_count = df[df['Fandom Level'] == 'Casual'].shape[0]
-    convertible_count = df[df['Fandom Level'] == 'Convertible Fans'].shape[0]
+    # Calculate the sum of income columns for each fandom level
+    income_sum_avid = df[df['Fandom Level'] == 'Avid'][income_levels].sum().sum()
+    income_sum_casual = df[df['Fandom Level'] == 'Casual'][income_levels].sum().sum()
+    income_sum_convertible = df[df['Fandom Level'] == 'Convertible Fans'][income_levels].sum().sum()
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.markdown(f'<div class="scorecard-avid"><h3>Avid Fans</h3><div class="value">{avid_count}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="scorecard-avid"><h3>Avid Fans</h3><div class="value">{income_sum_avid}</div></div>', unsafe_allow_html=True)
     with col2:
-        st.markdown(f'<div class="scorecard-casual"><h3>Casual Fans</h3><div class="value">{casual_count}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="scorecard-casual"><h3>Casual Fans</h3><div class="value">{income_sum_casual}</div></div>', unsafe_allow_html=True)
     with col3:
-        st.markdown(f'<div class="scorecard-convertible"><h3>Convertible Fans</h3><div class="value">{convertible_count}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="scorecard-convertible"><h3>Convertible Fans</h3><div class="value">{income_sum_convertible}</div></div>', unsafe_allow_html=True)
 
 def display_table(df):
-    if not df.empty:
-        grid_options = {
-            'defaultColDef': {
-                'sortable': True,
-                'filter': True,
-                'resizable': True,
-                'floatingFilter': True,
-            },
-            'domLayout': 'autoHeight',
-            'pagination': False,
-        }
-        AgGrid(df, gridOptions=grid_options, height=400, width='100%', theme='streamlit', fit_columns_on_grid_load=True)
-    else:
-        st.warning("No data available to display.")
+    st.dataframe(df)
 
 def interactive_map(df):
     col1, col2 = st.columns([4, 1])
@@ -142,58 +128,4 @@ def interactive_map(df):
                     f"Team: {row['Team']}<br>"
                     f"League: {row['League']}<br>"
                     f"City: {row['City']}<br>"
-                    f"Fandom Level: {row['Fandom Level']}<br>"
-                    f"Income Levels:<br>{income_levels}"
-                )
-                
-                folium.Marker(
-                    location=[lat, lon],
-                    tooltip=tooltip_text,
-                    icon=folium.Icon(color=color)
-                ).add_to(marker_cluster)
-        
-        m.to_streamlit(height=700)
-
-def app():
-    st.title("White Baseball Fans")
-
-    # Load data
-    df = pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
-    
-    if df.empty:
-        st.error("No data available.")
-        return
-
-    # Update "Not at all" to "Convertible Fans"
-    df['Fandom Level'] = df['Fandom Level'].replace('Not at all', 'Convertible Fans')
-
-    # Filters
-    fandom_levels = df['Fandom Level'].unique().tolist()
-    races = df['Race'].unique().tolist()
-    income_levels = [col for col in df.columns if col.startswith(('Struggling', 'Getting', 'Starting', 'Middle', 'Comfortable', 'Doing', 'Prosperous', 'Wealthy', 'Affluent'))]
-    teams = df['Team'].unique().tolist()
-
-    selected_fandom_levels = st.sidebar.multiselect('Select Fandom Level', fandom_levels)
-    selected_races = st.sidebar.multiselect('Select Race', races)
-    selected_income_levels = st.sidebar.multiselect('Select Income Levels', income_levels)
-    selected_teams = st.sidebar.multiselect('Select Teams', teams)
-
-    # Filter dataframe based on selections
-    filtered_df = df[
-        (df['Fandom Level'].isin(selected_fandom_levels) if selected_fandom_levels else df['Fandom Level'].notnull()) &
-        (df['Race'].isin(selected_races) if selected_races else df['Race'].notnull()) &
-        (df[selected_income_levels].sum(axis=1) > 0 if selected_income_levels else df['Fandom Level'].notnull()) &
-        (df['Team'].isin(selected_teams) if selected_teams else df['Team'].notnull())
-    ]
-
-    # Display scorecards
-    display_scorecards(filtered_df)
-
-    # Display table
-    display_table(filtered_df)
-
-    # Display interactive map
-    interactive_map(filtered_df)
-
-if __name__ == "__main__":
-    app()
+                    f"Fandom
