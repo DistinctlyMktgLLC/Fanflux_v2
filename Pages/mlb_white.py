@@ -37,7 +37,7 @@ def display_scorecards(df, income_levels):
             box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
             margin: 10px;
             text-align: center;
-            position: relative;
+            position: relative.
         }
         .scorecard-casual::before {
             content: "";
@@ -53,11 +53,11 @@ def display_scorecards(df, income_levels):
         .scorecard-convertible {
             background-color: #000000;
             color: #ffffff;
-            padding: 20px;
+            padding: 20px.
             border-radius: 10px;
             box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
             margin: 10px;
-            text-align: center;
+            text-align: center.
             position: relative;
         }
         .scorecard-convertible::before {
@@ -90,7 +90,7 @@ def display_scorecards(df, income_levels):
 
 def display_table(df):
     columns_to_show = [
-        'dCategory', 'Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level',
+        'Team', 'League', 'Neighborhood', 'zipcode', 'Intensity', 'Fandom Level',
         'Race', 'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)',
         'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)',
         'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)',
