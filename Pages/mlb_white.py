@@ -74,8 +74,9 @@ m.add_points_from_xy(
     x="US lon",
     y="US lat",
     color_column="Fandom Level",
-    icon_names=["circle", "info-sign", "star", "ok-sign"],
+    colors=["red", "orange", "blue"],  # Only provide colors for the unique values in the 'Fandom Level' column
+    icon_names=["circle", "info-sign", "star"],
     spin=True,
     add_legend=True,
 )
-m.to_streamlit(height=700)
+m.to_streamlit()
