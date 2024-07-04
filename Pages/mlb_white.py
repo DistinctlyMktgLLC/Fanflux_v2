@@ -100,8 +100,9 @@ def display_table(df):
         'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)',
         'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)'
     ]
+    df['zipcode'] = df['zipcode'].astype(str).str.zfill(5)
     df_to_show = df[columns_to_show]
-    st.dataframe(df_to_show.reset_index(drop=True))
+    st.dataframe(df_to_show)
 
 def interactive_map(df):
     col1, col2 = st.columns([4, 1])
