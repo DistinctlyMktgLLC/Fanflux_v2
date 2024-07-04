@@ -37,11 +37,11 @@ def display_scorecards(df, income_levels):
             box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
             margin: 10px;
             text-align: center;
-            position: relative;
+            position: relative.
         }
         .scorecard-casual::before {
             content: "";
-            position: absolute;
+            position: absolute.
             top: 0;
             left: 0;
             width: 10px;
@@ -54,21 +54,21 @@ def display_scorecards(df, income_levels):
             background-color: #000000;
             color: #ffffff;
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 10px.
             box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
             margin: 10px;
             text-align: center;
-            position: relative;
+            position: relative.
         }
         .scorecard-convertible::before {
             content: "";
-            position: absolute;
+            position: absolute.
             top: 0;
             left: 0;
             width: 10px;
             height: 100%;
             background-color: #3498db;
-            border-radius: 10px 0 0 10px;
+            border-radius: 10px 0 0 10px.
         }
         </style>
         """,
@@ -89,7 +89,8 @@ def display_scorecards(df, income_levels):
         st.markdown(f'<div class="scorecard-convertible"><h3>Convertible Fans</h3><div class="value">{income_sum_convertible}</div></div>', unsafe_allow_html=True)
 
 def display_table(df):
-    st.dataframe(df)
+    df_to_show = df.drop(columns=['City', 'City Alt.', 'US lat', 'US lon', 'helper', 'match'])
+    st.dataframe(df_to_show.reset_index(drop=True))
 
 def interactive_map(df):
     col1, col2 = st.columns([4, 1])
