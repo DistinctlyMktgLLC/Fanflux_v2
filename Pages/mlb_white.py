@@ -2,24 +2,63 @@ import streamlit as st
 import pandas as pd
 from st_aggrid import AgGrid
 import leafmap.foliumap as leafmap
+import folium
+from folium.plugins import MarkerCluster
 
 def display_scorecards(df):
+    st.markdown(
+        """
+        <style>
+        .scorecard {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+            margin: 10px;
+            text-align: center;
+        }
+        .scorecard h3 {
+            margin: 0;
+            font-size: 24px;
+            color: #3498db;
+        }
+        .scorecard .value {
+            font-size: 48px;
+            color: #e74c3c;
+        }
+        </style>
+        """, 
+        unsafe_allow_html=True
+    )
+
     avid_count = df[df['Fandom Level'] == 'Avid'].shape[0]
     casual_count = df[df['Fandom Level'] == 'Casual'].shape[0]
     convertible_count = df[df['Fandom Level'] == 'Convertible'].shape[0]
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric("Avid Fans", avid_count)
+        st.markdown(f'<div class="scorecard"><h3>Avid Fans</h3><div class="value">{avid_count}</div></div>', unsafe_allow_html=True)
     with col2:
-        st.metric("Casual Fans", casual_count)
+        st.markdown(f'<div class="scorecard"><h3>Casual Fans</h3><div class="value">{casual_count}</div></div>', unsafe_allow_html=True)
     with col3:
-        st.metric("Convertible Fans", convertible_count)
+        st.markdown(f'<div class="scorecard"><h3>Convertible Fans</h3><div class="value">{convertible_count}</div></div>', unsafe_allow_html=True)
 
 def display_table(df):
-    AgGrid(df, height=400, width='100%', theme='streamlit', fit_columns_on_grid_load=True)
+    grid_options = {
+        'defaultColDef': {
+            'sortable': True,
+            'filter': True,
+            'resizable': True,
+            'floatingFilter': True,
+        },
+        'domLayout': 'autoHeight',
+        'pagination': True,
+        'paginationPageSize': 10,
+    }
+    AgGrid(df, gridOptions=grid_options, height=400, width='100%', theme='streamlit', fit_columns_on_grid_load=True)
 
-def interactive_map():
+def interactive_map(df):
     col1, col2 = st.columns([4, 1])
     options = list(leafmap.basemaps.keys())
     index = options.index("OpenTopoMap")
@@ -31,6 +70,13 @@ def interactive_map():
             locate_control=True, latlon_control=True, draw_export=True, minimap_control=True
         )
         m.add_basemap(basemap)
+        
+        # Clustering with correct column names
+        if 'US lat' in df.columns and 'US lon' in df.columns:
+            marker_cluster = MarkerCluster().add_to(m)
+            for lat, lon in zip(df['US lat'], df['US lon']):
+                folium.Marker(location=[lat, lon]).add_to(marker_cluster)
+        
         m.to_streamlit(height=700)
 
 def app():
@@ -50,7 +96,7 @@ def app():
     display_table(df)
 
     # Display interactive map
-    interactive_map()
+    interactive_map(df)
 
 if __name__ == "__main__":
     app()

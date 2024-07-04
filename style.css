@@ -1,66 +1,22 @@
-/* General Styling */
-body {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    background-color: #f8f9fa;
-}
+/* style.css */
 
-/* Title Styling */
-.stApp .stMarkdown h1 {
-    color: #343a40;
+.scorecard {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+    margin: 10px;
     text-align: center;
-    font-weight: bold;
-    margin-bottom: 30px;
 }
 
-/* Sidebar Styling */
-.stSidebar {
-    background-color: #343a40;
+.scorecard h3 {
+    margin: 0;
+    font-size: 24px;
+    color: #3498db;
 }
 
-.stSidebar h2, .stSidebar .stHeader, .stSidebar .stCaption {
-    color: #ffffff;
-}
-
-.stSidebar .stRadio, .stSidebar .stSelectbox, .stSidebar .stSlider {
-    background-color: #ffffff;
-    color: #000000;
-}
-
-/* Button Styling */
-.stButton button {
-    background-color: #007bff;
-    color: #ffffff;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-}
-
-.stButton button:hover {
-    background-color: #0056b3;
-}
-
-/* Table Styling */
-.dataframe th, .dataframe td {
-    border: none !important;
-}
-
-/* Sidebar Toggle Styling */
-.sidebar .sidebar-content {
-    background-color: #343a40;
-    color: #ffffff;
-}
-
-.sidebar .sidebar-toggle {
-    color: #ffffff;
-    font-size: 18px;
-    cursor: pointer;
-}
-
-/* Tooltip Styling */
-.tooltip {
-    background-color: rgba(0, 0, 0, 0.8);
-    color: #ffffff;
-    font-size: 14px;
-    padding: 5px;
-    border-radius: 5px;
+.scorecard .value {
+    font-size: 48px;
+    color: #e74c3c;
 }
