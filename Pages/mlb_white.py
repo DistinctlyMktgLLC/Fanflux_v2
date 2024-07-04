@@ -65,4 +65,3 @@ def app():
     )
 
     m.to_streamlit(height=700)
-
