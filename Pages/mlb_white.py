@@ -3,7 +3,7 @@ import pandas as pd
 import folium
 from streamlit_folium import st_folium
 
-# Function to hide export buttons in Streamlit
+# Hide export buttons
 hide_export_buttons = """
     <style>
     .stActionButton {display: none;}
@@ -28,7 +28,7 @@ def app():
     income_levels = st.sidebar.multiselect('Select Income Levels', df.columns[8:])  # Assuming income levels start from the 9th column
     teams = st.sidebar.multiselect('Select Teams', df['Team'].unique())
 
-    # Display Scorecards
+    # Calculate totals for scorecards
     total_avid = df[df['Fandom Level'] == 'Avid'][income_levels].sum().sum() if not df[df['Fandom Level'] == 'Avid'][income_levels].empty else 0
     total_casual = df[df['Fandom Level'] == 'Casual'][income_levels].sum().sum() if not df[df['Fandom Level'] == 'Casual'][income_levels].empty else 0
     total_convertible = df[df['Fandom Level'] == 'Convertible Fans'][income_levels].sum().sum() if not df[df['Fandom Level'] == 'Convertible Fans'][income_levels].empty else 0
