@@ -3,7 +3,7 @@ import pandas as pd
 import leafmap.foliumap as leafmap
 
 # Load data
-@st.cache
+@st.cache_data
 def load_data():
     df = pd.read_parquet('data/Fanflux_Intensity_MLB_White.parquet')
     return df
@@ -14,7 +14,6 @@ df = load_data()
 st.sidebar.title("Fanflux Navigation")
 selected_fandom = st.sidebar.multiselect("Select Fandom Level", df["Fandom Level"].unique())
 selected_race = st.sidebar.multiselect("Select Race", df["Race"].unique())
-selected_income = st.sidebar.multiselect("Select Income Levels", df.columns[7:15])
 selected_team = st.sidebar.multiselect("Select Teams", df["Team"].unique())
 
 # Filter data based on selections
@@ -23,36 +22,52 @@ if selected_fandom:
     filtered_df = filtered_df[filtered_df['Fandom Level'].isin(selected_fandom)]
 if selected_race:
     filtered_df = filtered_df[filtered_df['Race'].isin(selected_race)]
-if selected_income:
-    filtered_df = filtered_df.loc[:, ['Team', 'League', 'Neighborhood', 'zipcode', 'Fandom Level', 'Race'] + selected_income]
 if selected_team:
     filtered_df = filtered_df[filtered_df['Team'].isin(selected_team)]
 
+# Columns representing income levels
+income_levels = [
+    'Struggling (Less than $10,000)',
+    'Getting By ($10,000 to $14,999)',
+    'Getting By ($15,000 to $19,999)',
+    'Starting Out ($20,000 to $24,999)',
+    'Starting Out ($25,000 to $29,999)',
+    'Steady ($30,000 to $34,999)',
+    'Steady ($35,000 to $39,999)',
+    'Stable ($40,000 to $44,999)'
+]
+
+# Function to calculate the sum of income levels for a specific fandom level
+def calculate_total(df, fandom_level):
+    numeric_df = df[income_levels]
+    total = numeric_df[df['Fandom Level'] == fandom_level].sum().sum()
+    return total
+
 # Calculate totals for scorecards
-avid_total = filtered_df[filtered_df['Fandom Level'] == 'Avid'].iloc[:, 7:15].sum().sum()
-casual_total = filtered_df[filtered_df['Fandom Level'] == 'Casual'].iloc[:, 7:15].sum().sum()
-convertible_total = filtered_df[filtered_df['Fandom Level'] == 'Convertible Fans'].iloc[:, 7:15].sum().sum()
+avid_total = calculate_total(filtered_df, 'Avid')
+casual_total = calculate_total(filtered_df, 'Casual')
+convertible_total = calculate_total(filtered_df, 'Convertible Fans')
 
 # Function to create styled scorecards
 def create_scorecard(label, value, color):
-    return f"""
-    <div style="background-color:{color};padding:10px;border-radius:10px;margin:10px;box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);">
-        <h3 style="color:white;text-align:center;">{label}</h3>
-        <h1 style="color:white;text-align:center;">{value}</h1>
+    card_html = f"""
+    <div style="background-color: black; border-radius: 10px; padding: 20px; box-shadow: 5px 5px 10px #000; margin: 10px 0; position: relative;">
+        <div style="width: 10px; height: 100%; background-color: {color}; position: absolute; left: 0; top: 0; bottom: 0; border-top-left-radius: 10px; border-bottom-left-radius: 10px;"></div>
+        <div style="margin-left: 20px;">
+            <h2 style="color: white;">{label}</h2>
+            <p style="font-size: 24px; color: white;">{value}</p>
+        </div>
     </div>
     """
+    return card_html
 
 # Display scorecards
-st.markdown(f"""
-<div style="display:flex;justify-content:space-between;">
-    {create_scorecard('Avid Fans', avid_total, '#FF5733')}
-    {create_scorecard('Casual Fans', casual_total, '#FFC300')}
-    {create_scorecard('Convertible Fans', convertible_total, '#3498DB')}
-</div>
-""", unsafe_allow_html=True)
+st.markdown(create_scorecard('Avid Fans', avid_total, 'red'), unsafe_allow_html=True)
+st.markdown(create_scorecard('Casual Fans', casual_total, 'orange'), unsafe_allow_html=True)
+st.markdown(create_scorecard('Convertible Fans', convertible_total, 'blue'), unsafe_allow_html=True)
 
-# Map
-st.title("Map of Fans")
+# Create and display the map
 m = leafmap.Map(center=[40, -100], zoom=4)
-m.add_points_from_xy(filtered_df, x="US lon", y="US lat", color_column="Fandom Level", icon_names=["gear", "map", "leaf", "globe"], spin=True, add_legend=True)
+m.add_points_from_xy(filtered_df, x="US lon", y="US lat", color_column="Fandom Level")
+
 m.to_streamlit(height=700)
