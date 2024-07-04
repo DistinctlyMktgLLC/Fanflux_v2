@@ -55,7 +55,9 @@ def display_scorecards(df):
     with col3:
         st.markdown(f'<div class="scorecard"><h3>Convertible Fans</h3><div class="value">{convertible_count}</div></div>', unsafe_allow_html=True)
 
-def display_table(df):
+def display_table(df, page, page_size):
+    start = page * page_size
+    end = start + page_size
     grid_options = {
         'defaultColDef': {
             'sortable': True,
@@ -65,9 +67,9 @@ def display_table(df):
         },
         'domLayout': 'autoHeight',
         'pagination': True,
-        'paginationPageSize': 10,
+        'paginationPageSize': page_size,
     }
-    AgGrid(df, gridOptions=grid_options, height=400, width='100%', theme='streamlit', fit_columns_on_grid_load=True)
+    AgGrid(df.iloc[start:end], gridOptions=grid_options, height=400, width='100%', theme='streamlit', fit_columns_on_grid_load=True)
 
 def interactive_map(df):
     col1, col2 = st.columns([4, 1])
@@ -103,8 +105,14 @@ def app():
     # Display scorecards
     display_scorecards(df)
 
-    # Display table
-    display_table(df)
+    # Pagination controls
+    total_records = df.shape[0]
+    page_size = 50  # Number of records per page
+    total_pages = (total_records // page_size) + 1
+    page = st.slider('Page', 0, total_pages - 1, 0)
+
+    # Display table with pagination
+    display_table(df, page, page_size)
 
     # Display interactive map
     interactive_map(df)
