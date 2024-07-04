@@ -1,8 +1,9 @@
 import streamlit as st
 import pandas as pd
-import folium
-from folium.plugins import MarkerCluster
+import leafmap.foliumap as leafmap
 from streamlit_folium import st_folium
+
+# Add your utility functions here
 
 def load_data(file_path):
     try:
