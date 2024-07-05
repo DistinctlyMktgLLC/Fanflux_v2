@@ -9,6 +9,7 @@ import Pages.mlb_black as black
 import Pages.mlb_hispanic as hispanic
 import Pages.mlb_white as white
 
+# Set page configuration once at the top
 st.set_page_config(layout="wide", initial_sidebar_state="expanded")
 
 app = MultiApp()
