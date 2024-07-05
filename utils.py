@@ -5,7 +5,6 @@ import folium
 from streamlit_folium import st_folium
 from folium.plugins import MarkerCluster
 
-# Add your utility functions here
 def load_data(file_path):
     try:
         return pd.read_parquet(file_path)
@@ -13,11 +12,8 @@ def load_data(file_path):
         st.error(f"File not found: {file_path}")
         return pd.DataFrame()
 
-def create_map():
+def create_map(df, color_column, color_key):
     m = folium.Map(location=[37.0902, -95.7129], zoom_start=4)
-    return m
-
-def add_map_markers(m, df, color_column, color_key):
     marker_cluster = MarkerCluster().add_to(m)
     for _, row in df.iterrows():
         try:
@@ -39,6 +35,7 @@ def add_map_markers(m, df, color_column, color_key):
             ).add_to(marker_cluster)
         except KeyError as e:
             st.error(f"Column not found: {e}")
+    return m
 
 def apply_common_styles():
     st.markdown(
