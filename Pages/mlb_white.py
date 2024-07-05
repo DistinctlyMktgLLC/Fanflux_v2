@@ -1,7 +1,6 @@
 # Pages/mlb_white.py
 import streamlit as st
 import utils
-import leafmap.foliumap as leafmap
 import folium
 from streamlit_folium import folium_static
 
@@ -20,15 +19,33 @@ def app():
 
     # Sidebar Filters
     st.sidebar.header("Filters")
-    teams = st.sidebar.multiselect("Select a Team", options=df['Team'].unique(), default=df['Team'].unique())
-    leagues = st.sidebar.multiselect("Select a League", options=df['League'].unique(), default=df['League'].unique())
-    fandom_levels = st.sidebar.multiselect("Select Fandom Level", options=df['Fandom Level'].unique(), default=df['Fandom Level'].unique())
+    teams = st.sidebar.multiselect("Select a Team", options=df['Team'].unique(), default=[])
+    leagues = st.sidebar.multiselect("Select a League", options=df['League'].unique(), default=[])
+    fandom_levels = st.sidebar.multiselect("Select Fandom Level", options=df['Fandom Level'].unique(), default=[])
+    income_levels = st.sidebar.multiselect("Select Income Level", options=[
+        'Struggling (Less than $10,000)',
+        'Getting By ($10,000 to $14,999)',
+        'Getting By ($15,000 to $19,999)',
+        'Starting Out ($20,000 to $24,999)',
+        'Starting Out ($25,000 to $29,999)',
+        'Starting Out ($30,000 to $34,999)',
+        'Middle Class ($35,000 to $39,999)',
+        'Middle Class ($40,000 to $44,999)',
+        'Middle Class ($45,000 to $49,999)',
+        'Comfortable ($50,000 to $59,999)',
+        'Comfortable ($60,000 to $74,999)',
+        'Doing Well ($75,000 to $99,999)',
+        'Prosperous ($100,000 to $124,999)',
+        'Prosperous ($125,000 to $149,999)',
+        'Wealthy ($150,000 to $199,999)',
+        'Affluent ($200,000 or more)'
+    ], default=[])
 
     # Filter DataFrame
     filtered_df = df[
-        (df['Team'].isin(teams)) &
-        (df['League'].isin(leagues)) &
-        (df['Fandom Level'].isin(fandom_levels))
+        (df['Team'].isin(teams) if teams else True) &
+        (df['League'].isin(leagues) if leagues else True) &
+        (df['Fandom Level'].isin(fandom_levels) if fandom_levels else True)
     ]
 
     # Define the income columns
@@ -50,6 +67,9 @@ def app():
         'Wealthy ($150,000 to $199,999)',
         'Affluent ($200,000 or more)'
     ]
+
+    if income_levels:
+        income_columns = [col for col in income_columns if col in income_levels]
 
     # Calculate totals for each fan category by summing the income columns
     total_avid_fans = filtered_df[filtered_df['Fandom Level'] == 'Avid'][income_columns].sum().sum()
