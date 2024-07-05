@@ -26,7 +26,7 @@ def app():
         
         ### Partnered with DonnLynn Partners
         
-        We are proud to collaborate with DonnLynn Partners, who brought us this innovative idea. Combined with our data and tech expertise, we have brought Fanflux to life. Our shared vision transforms the way you understand and engage with sports fans.
+        We are proud to collaborate with DonnLynn Partners, who brought us this innovative idea. Combined with our data and tech expertise, we have brought Fanflux to life. Together, we are transforming the way you understand and engage with sports fans.
         
         Ready to transform your understanding of the sports fan landscape? Let’s get started!
         """,
