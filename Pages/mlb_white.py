@@ -2,6 +2,7 @@
 import streamlit as st
 import utils
 from streamlit_folium import st_folium
+import leafmap.foliumap as leafmap
 
 def app():
     st.title("White Baseball Fans Analysis")
@@ -52,12 +53,20 @@ def app():
     st.write("### Filtered Data")
     st.dataframe(df, width=1200, height=400)
 
-    # Create the map
+    # Create the map using leafmap
     st.write("### Fan Opportunity Map")
-    color_key = {
-        'Avid': 'red',
-        'Casual': 'blue',
-        'Convertible': 'green'
-    }
-    m = utils.create_map(df, 'Fandom Level', color_key)
-    st_folium(m, width=700, height=500)
+
+    m = leafmap.Map(center=[37.0902, -95.7129], zoom=4)
+    for _, row in df.iterrows():
+        total_fans = row[income_columns].sum()
+        popup_content = (
+            f"Team: {row['Team']}<br>"
+            f"League: {row['League']}<br>"
+            f"Neighborhood: {row['Neighborhood']}<br>"
+            f"Fandom Level: {row['Fandom Level']}<br>"
+            f"Race: {row['Race']}<br>"
+            f"Total Fans: {total_fans}"
+        )
+        m.add_marker(location=[row['US lat'], row['US lon']], popup=popup_content)
+    
+    m.to_streamlit(height=700)
