@@ -15,8 +15,30 @@ def load_data(file_path):
 def create_map(df, color_column, color_key):
     m = folium.Map(location=[37.0902, -95.7129], zoom_start=4)
     marker_cluster = MarkerCluster().add_to(m)
+    
+    # Define the income columns
+    income_columns = [
+        'Struggling (Less than $10,000)',
+        'Getting By ($10,000 to $14,999)',
+        'Getting By ($15,000 to $19,999)',
+        'Starting Out ($20,000 to $24,999)',
+        'Starting Out ($25,000 to $29,999)',
+        'Starting Out ($30,000 to $34,999)',
+        'Middle Class ($35,000 to $39,999)',
+        'Middle Class ($40,000 to $44,999)',
+        'Middle Class ($45,000 to $49,999)',
+        'Comfortable ($50,000 to $59,999)',
+        'Comfortable ($60,000 to $74,999)',
+        'Doing Well ($75,000 to $99,999)',
+        'Prosperous ($100,000 to $124,999)',
+        'Prosperous ($125,000 to $149,999)',
+        'Wealthy ($150,000 to $199,999)',
+        'Affluent ($200,000 or more)'
+    ]
+
     for _, row in df.iterrows():
         try:
+            total_fans = row[income_columns].sum()
             folium.CircleMarker(
                 location=[row['US lat'], row['US lon']],
                 radius=5,
@@ -30,7 +52,7 @@ def create_map(df, color_column, color_key):
                     f"Neighborhood: {row['Neighborhood']}<br>"
                     f"Fandom Level: {row['Fandom Level']}<br>"
                     f"Race: {row['Race']}<br>"
-                    f"Total Fans: {row['Total Fans']}"
+                    f"Total Fans: {total_fans}"
                 )
             ).add_to(marker_cluster)
         except KeyError as e:

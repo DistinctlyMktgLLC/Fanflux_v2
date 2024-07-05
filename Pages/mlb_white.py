@@ -13,6 +13,9 @@ def app():
         st.error("No data available.")
         return
 
+    # Rename 'Not at all' to 'Convertible' in the 'Fandom Level' column
+    df['Fandom Level'] = df['Fandom Level'].replace('Not at all', 'Convertible')
+
     # Define the income columns
     income_columns = [
         'Struggling (Less than $10,000)',
