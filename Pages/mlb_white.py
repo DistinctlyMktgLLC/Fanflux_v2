@@ -3,7 +3,7 @@ import streamlit as st
 import utils
 
 def app():
-    st.set_page_config(layout="wide", initial_sidebar_state="expanded")
+    # Remove the st.set_page_config() call from here
     st.title("White Baseball Fans Analysis")
     utils.apply_common_styles()
 
