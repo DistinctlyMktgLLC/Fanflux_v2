@@ -1,9 +1,9 @@
 # Pages/mlb_white.py
 import streamlit as st
 import utils
+from streamlit_folium import st_folium  # Add this import
 
 def app():
-    # Remove the st.set_page_config() call from here
     st.title("White Baseball Fans Analysis")
     utils.apply_common_styles()
 
@@ -56,4 +56,4 @@ def app():
         'Convertible': 'green'
     }
     utils.add_map_markers(m, filtered_df, 'Fandom Level', color_key)
-    st_folium(m, width=700, height=500)
+    st_folium(m, width=700, height=500)  # Ensure st_folium is imported
