@@ -18,6 +18,19 @@ def app():
     # Rename 'Not at all' to 'Convertible' in the 'Fandom Level' column
     df['Fandom Level'] = df['Fandom Level'].replace('Not at all', 'Convertible')
 
+    # Sidebar Filters
+    st.sidebar.header("Filters")
+    teams = st.sidebar.multiselect("Select a Team", options=df['Team'].unique(), default=df['Team'].unique())
+    leagues = st.sidebar.multiselect("Select a League", options=df['League'].unique(), default=df['League'].unique())
+    fandom_levels = st.sidebar.multiselect("Select Fandom Level", options=df['Fandom Level'].unique(), default=df['Fandom Level'].unique())
+
+    # Filter DataFrame
+    filtered_df = df[
+        (df['Team'].isin(teams)) &
+        (df['League'].isin(leagues)) &
+        (df['Fandom Level'].isin(fandom_levels))
+    ]
+
     # Define the income columns
     income_columns = [
         'Struggling (Less than $10,000)',
@@ -39,9 +52,9 @@ def app():
     ]
 
     # Calculate totals for each fan category by summing the income columns
-    total_avid_fans = df[df['Fandom Level'] == 'Avid'][income_columns].sum().sum()
-    total_casual_fans = df[df['Fandom Level'] == 'Casual'][income_columns].sum().sum()
-    total_convertible_fans = df[df['Fandom Level'] == 'Convertible'][income_columns].sum().sum()
+    total_avid_fans = filtered_df[filtered_df['Fandom Level'] == 'Avid'][income_columns].sum().sum()
+    total_casual_fans = filtered_df[filtered_df['Fandom Level'] == 'Casual'][income_columns].sum().sum()
+    total_convertible_fans = filtered_df[filtered_df['Fandom Level'] == 'Convertible'][income_columns].sum().sum()
 
     # Define colors for each Fandom Level
     colors = {
@@ -81,15 +94,11 @@ def app():
             """, unsafe_allow_html=True
         )
 
-    # Display the table
-    st.write("### Filtered Data")
-    st.dataframe(df, width=1200, height=400)
-
     # Create the map using folium
     st.write("### Fan Opportunity Map")
 
     m = folium.Map(location=[37.0902, -95.7129], zoom_start=4)
-    for _, row in df.iterrows():
+    for _, row in filtered_df.iterrows():
         total_fans = row[income_columns].sum()
         popup_content = (
             f"Team: {row['Team']}<br>"
