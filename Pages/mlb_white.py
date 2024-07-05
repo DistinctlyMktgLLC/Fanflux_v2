@@ -3,6 +3,7 @@ import streamlit as st
 import utils
 import leafmap.foliumap as leafmap
 import folium
+from streamlit_folium import folium_static
 
 def app():
     st.title("White Baseball Fans Analysis")
@@ -84,12 +85,10 @@ def app():
     st.write("### Filtered Data")
     st.dataframe(df, width=1200, height=400)
 
-    # Create the map using leafmap and folium
+    # Create the map using folium
     st.write("### Fan Opportunity Map")
 
-    m = leafmap.Map(center=[37.0902, -95.7129], zoom=4)
-    folium_map = m.to_streamlit(height=700)
-
+    m = folium.Map(location=[37.0902, -95.7129], zoom_start=4)
     for _, row in df.iterrows():
         total_fans = row[income_columns].sum()
         popup_content = (
@@ -109,6 +108,6 @@ def app():
             fill_color=color,
             fill_opacity=0.6,
             popup=popup_content
-        ).add_to(folium_map)
+        ).add_to(m)
 
-    folium_static(folium_map)
+    folium_static(m)
