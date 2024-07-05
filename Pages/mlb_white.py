@@ -42,15 +42,14 @@ def app():
     ], default=[])
 
     # Filter DataFrame
-    try:
-        filtered_df = df[
-            (df['Team'].isin(teams) if teams else True) &
-            (df['League'].isin(leagues) if leagues else True) &
-            (df['Fandom Level'].isin(fandom_levels) if fandom_levels else True)
-        ]
-    except KeyError as e:
-        st.error(f"Filter key error: {e}")
-        return
+    filtered_df = df.copy()
+
+    if teams:
+        filtered_df = filtered_df[filtered_df['Team'].isin(teams)]
+    if leagues:
+        filtered_df = filtered_df[filtered_df['League'].isin(leagues)]
+    if fandom_levels:
+        filtered_df = filtered_df[filtered_df['Fandom Level'].isin(fandom_levels)]
 
     # Define the income columns
     income_columns = [
