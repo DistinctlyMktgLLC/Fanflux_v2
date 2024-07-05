@@ -1,7 +1,6 @@
 # Pages/mlb_white.py
 import streamlit as st
 import utils
-from streamlit_folium import st_folium
 import leafmap.foliumap as leafmap
 
 def app():
@@ -42,12 +41,43 @@ def app():
     total_casual_fans = df[df['Fandom Level'] == 'Casual'][income_columns].sum().sum()
     total_convertible_fans = df[df['Fandom Level'] == 'Convertible'][income_columns].sum().sum()
 
+    # Define colors for each Fandom Level
+    colors = {
+        'Avid': '#FF5733',         # Red
+        'Casual': '#33CFFF',       # Blue
+        'Convertible': '#33FF57'   # Green
+    }
+
     # Scorecards
     st.write("### Fan Demographics")
     col1, col2, col3 = st.columns(3)
-    col1.metric("Total Avid Fans", total_avid_fans)
-    col2.metric("Total Casual Fans", total_casual_fans)
-    col3.metric("Total Convertible Fans", total_convertible_fans)
+    with col1:
+        st.markdown(
+            f"""
+            <div class="stMetric" style="--highlight-color: {colors['Avid']}">
+                <h3>Total Avid Fans</h3>
+                <p>{total_avid_fans}</p>
+            </div>
+            """, unsafe_allow_html=True
+        )
+    with col2:
+        st.markdown(
+            f"""
+            <div class="stMetric" style="--highlight-color: {colors['Casual']}">
+                <h3>Total Casual Fans</h3>
+                <p>{total_casual_fans}</p>
+            </div>
+            """, unsafe_allow_html=True
+        )
+    with col3:
+        st.markdown(
+            f"""
+            <div class="stMetric" style="--highlight-color: {colors['Convertible']}">
+                <h3>Total Convertible Fans</h3>
+                <p>{total_convertible_fans}</p>
+            </div>
+            """, unsafe_allow_html=True
+        )
 
     # Display the table
     st.write("### Filtered Data")
@@ -67,6 +97,7 @@ def app():
             f"Race: {row['Race']}<br>"
             f"Total Fans: {total_fans}"
         )
-        m.add_marker(location=[row['US lat'], row['US lon']], popup=popup_content)
+        color = colors.get(row['Fandom Level'], '#000000')
+        m.add_circle_marker(location=[row['US lat'], row['US lon']], popup=popup_content, color=color)
     
     m.to_streamlit(height=700)

@@ -1,8 +1,12 @@
 /* style.css */
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+
 /* General Styling */
 body {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Roboto Mono', monospace;
     background-color: #f8f9fa;
+    color: #333;
 }
 
 /* Title Styling */
@@ -10,4 +14,45 @@ body {
     color: #343a40;
     text-align: center;
     font-weight: bold;
-    margin-bottom: 
+    margin-bottom: 30px;
+}
+
+/* Sidebar Styling */
+.stSidebar {
+    background-color: #f8f9fa;
+    border-right: 1px solid #ddd;
+}
+
+/* Scorecards */
+.stMetric {
+    text-align: center;
+    background-color: #000;
+    color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.stMetric::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 10px;
+    height: 100%;
+    background-color: var(--highlight-color, #000);
+    border-radius: 10px 0 0 10px;
+}
+
+/* DataFrame */
+.stDataFrame {
+    overflow-x: auto;
+    margin: 20px 0;
+}
+
+/* Map */
+#map {
+    margin: 20px 0;
+}
