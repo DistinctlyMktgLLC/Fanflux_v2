@@ -147,4 +147,4 @@ def app():
             popup=popup_content
         ).add_to(m)
 
-    folium_static(m)
+    folium_static(m, width=1300, height=700)
