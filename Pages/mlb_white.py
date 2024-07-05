@@ -42,11 +42,15 @@ def app():
     ], default=[])
 
     # Filter DataFrame
-    filtered_df = df[
-        (df['Team'].isin(teams) if teams else True) &
-        (df['League'].isin(leagues) if leagues else True) &
-        (df['Fandom Level'].isin(fandom_levels) if fandom_levels else True)
-    ]
+    try:
+        filtered_df = df[
+            (df['Team'].isin(teams) if teams else True) &
+            (df['League'].isin(leagues) if leagues else True) &
+            (df['Fandom Level'].isin(fandom_levels) if fandom_levels else True)
+        ]
+    except KeyError as e:
+        st.error(f"Filter key error: {e}")
+        return
 
     # Define the income columns
     income_columns = [
@@ -70,6 +74,11 @@ def app():
 
     if income_levels:
         income_columns = [col for col in income_columns if col in income_levels]
+
+    # Check if filtered dataframe is empty
+    if filtered_df.empty:
+        st.error("No data available after applying filters.")
+        return
 
     # Calculate totals for each fan category by summing the income columns
     total_avid_fans = filtered_df[filtered_df['Fandom Level'] == 'Avid'][income_columns].sum().sum()
@@ -117,7 +126,7 @@ def app():
     # Create the map using folium
     st.write("### Fan Opportunity Map")
 
-    m = folium.Map(location=[37.0902, -95.7129], zoom_start=4)
+    m = folium.Map(location=[37.0902, -95.7129], zoom_start=4, width='100%')
     for _, row in filtered_df.iterrows():
         total_fans = row[income_columns].sum()
         popup_content = (
