@@ -1,10 +1,11 @@
+# utils.py
 import streamlit as st
 import pandas as pd
-import leafmap.foliumap as leafmap
+import folium
 from streamlit_folium import st_folium
+from folium.plugins import MarkerCluster
 
 # Add your utility functions here
-
 def load_data(file_path):
     try:
         return pd.read_parquet(file_path)

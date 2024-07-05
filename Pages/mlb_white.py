@@ -1,70 +1,59 @@
+# Pages/mlb_white.py
 import streamlit as st
-import pandas as pd
-import leafmap.foliumap as leafmap
-
-# Load the data
-@st.cache_data
-def load_data():
-    df = pd.read_parquet('data/Fanflux_Intensity_MLB_White.parquet')
-    return df
-
-df = load_data()
-
-# Calculate totals for scorecards
-def calculate_total(df, fandom_level):
-    filtered_df = df[df['Fandom Level'] == fandom_level]
-    income_levels = [
-        'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)',
-        'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)',
-        'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)',
-        'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)',
-        'Middle Class ($45,000 to $49,999)', 'Comfortable ($50,000 to $59,999)',
-        'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)',
-        'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)',
-        'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)'
-    ]
-    numeric_df = filtered_df[income_levels]
-    return numeric_df.sum().sum()
-
-def create_scorecard(title, value, color):
-    st.markdown(
-        f"""
-        <div style="background-color:#333333; padding:10px; border-radius:10px; box-shadow: 2px 2px 2px #000;">
-            <h2 style="color:{color};">{title}</h2>
-            <h1 style="color:white;">{value:,}</h1>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
+import utils
 
 def app():
-    df = load_data()
-    
-    avid_total = calculate_total(df, 'Avid')
-    casual_total = calculate_total(df, 'Casual')
-    convertible_total = calculate_total(df, 'Convertible Fans')
+    st.set_page_config(layout="wide", initial_sidebar_state="expanded")
+    st.title("White Baseball Fans Analysis")
+    utils.apply_common_styles()
 
-    st.title("White Baseball Fans")
-    create_scorecard("Avid Fans", avid_total, "#FF5733")
-    create_scorecard("Casual Fans", casual_total, "#FFC300")
-    create_scorecard("Convertible Fans", convertible_total, "#3498DB")
+    df = utils.load_data("data/Fanflux_Intensity_MLB_White.parquet")
 
-    unique_fandom_levels = df['Fandom Level'].unique()
-    colors = ["#FF5733", "#FFC300", "#3498DB"][:len(unique_fandom_levels)]
+    if df.empty:
+        st.error("No data available.")
+        return
 
-    m = leafmap.Map(center=[40, -100], zoom=4)
-    m.add_points_from_xy(
-        df,
-        x="US lon",
-        y="US lat",
-        color_column="Fandom Level",
-        icon_names=["gear", "map", "leaf"],
-        spin=True,
-        add_legend=True,
-        colors=colors
-    )
+    # Filter options
+    st.sidebar.header("Filters")
+    team = st.sidebar.selectbox('Select a Team', ['Choose an option'] + sorted(df['Team'].unique()))
+    league = st.sidebar.selectbox('Select a League', ['Choose an option'] + sorted(df['League'].unique()))
+    city = st.sidebar.selectbox('Select a City', ['Choose an option'] + sorted(df['City'].unique()))
+    fandom_level = st.sidebar.selectbox('Select Fandom Level', ['Choose an option'] + sorted(df['Fandom Level'].unique()))
+    income_levels = [col for col in df.columns if 'Income' in col]
 
-    m.to_streamlit(height=700)
+    filtered_df = df.copy()
+    if team != 'Choose an option':
+        filtered_df = filtered_df[filtered_df['Team'] == team]
+    if league != 'Choose an option':
+        filtered_df = filtered_df[filtered_df['League'] == league]
+    if city != 'Choose an option':
+        filtered_df = filtered_df[filtered_df['City'] == city]
+    if fandom_level != 'Choose an option':
+        filtered_df = filtered_df[filtered_df['Fandom Level'] == fandom_level]
 
-# Call the app function
-app()
+    # Ensure zipcode is formatted with leading zeros
+    filtered_df['zipcode'] = filtered_df['zipcode'].apply(lambda x: f"{x:05d}")
+
+    # Create Total Fans column
+    filtered_df['Total Fans'] = filtered_df[income_levels].sum(axis=1)
+
+    # Define columns to display
+    columns_to_display = [
+        'dCategory', 'Team', 'League', 'City', 'Neighborhood',
+        'zipcode', 'Intensity', 'Fandom Level', 'Race', 'Total Fans'
+    ]
+
+    # Display the table
+    st.write("### Filtered Data")
+    st.dataframe(filtered_df[columns_to_display], width=1200, height=400)
+
+    # Create the map
+    st.write("### Fan Opportunity Map")
+    m = utils.create_map()
+    color_key = {
+        'Avid': 'red',
+        'Casual': 'blue',
+        'Convertible': 'green'
+    }
+    utils.add_map_markers(m, filtered_df, 'Fandom Level', color_key)
+    st_folium(m, width=700, height=500)

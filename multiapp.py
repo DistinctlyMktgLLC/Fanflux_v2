@@ -1,3 +1,4 @@
+# multiapp.py
 import streamlit as st
 
 class MultiApp:
@@ -15,5 +16,4 @@ class MultiApp:
             'Navigation',
             self.apps,
             format_func=lambda app: app['title'])
-
         app['function']()

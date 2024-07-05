@@ -1,3 +1,4 @@
+# streamlit_app.py
 import streamlit as st
 from multiapp import MultiApp
 import Pages.home as home
