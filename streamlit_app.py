@@ -27,4 +27,5 @@ app.add_app("MLB - White", mlb_white.app)
 
 # Run the selected app
 selected_app = sidebar_menu()
-selected_app()
+if selected_app:
+    selected_app()

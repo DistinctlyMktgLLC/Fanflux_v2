@@ -55,19 +55,5 @@ def sidebar_menu():
         home.app()
     elif selected in submenu_items:
         submenu_selected = st.selectbox("Select Category", list(submenu_items[selected].keys()))
-        submenu_items[selected][submenu_selected]()
-
-# Initialize the MultiApp
-app = MultiApp()
-
-# Add all your applications here
-app.add_app("Home", home.app)
-app.add_app("MLB - AAPI", mlb_aapi.app)
-app.add_app("MLB - American Indian", mlb_americanindian.app)
-app.add_app("MLB - Asian", mlb_asian.app)
-app.add_app("MLB - Black", mlb_black.app)
-app.add_app("MLB - Hispanic", mlb_hispanic.app)
-app.add_app("MLB - White", mlb_white.app)
-
-# Run the selected app
-sidebar_menu()
+        return submenu_items[selected][submenu_selected]
+    return None
