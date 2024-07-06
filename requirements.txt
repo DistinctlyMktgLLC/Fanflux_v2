@@ -404,6 +404,7 @@ streamlit==1.36.0
     #   -r requirements.in
     #   streamlit-aggrid
     #   streamlit-folium
+streamlit-option-menu
 streamlit-aggrid==1.0.5
     # via -r requirements.in
 streamlit-folium==0.9.0
