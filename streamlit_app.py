@@ -26,4 +26,5 @@ app.add_app("MLB - Hispanic", mlb_hispanic.app)
 app.add_app("MLB - White", mlb_white.app)
 
 # Run the selected app
-sidebar_menu()
+selected_app = sidebar_menu()
+selected_app()
