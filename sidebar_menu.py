@@ -10,56 +10,46 @@ import Pages.mlb_hispanic as mlb_hispanic
 import Pages.mlb_white as mlb_white
 
 # Custom CSS for Sidebar Menu
-st.markdown(
-    """
+st.markdown("""
     <style>
     .sidebar .sidebar-content {
-        background-color: #1d1d1d;
+        width: 300px;
     }
     </style>
-    """,
-    unsafe_allow_html=True,
-)
+""", unsafe_allow_html=True)
 
 def sidebar_menu():
+    submenu_items = {
+        "MLB": {
+            "AAPI": mlb_aapi.app,
+            "American Indian": mlb_americanindian.app,
+            "Asian": mlb_asian.app,
+            "Black": mlb_black.app,
+            "Hispanic": mlb_hispanic.app,
+            "White": mlb_white.app
+        }
+        # Add other leagues and their respective pages here
+    }
+
     with st.sidebar:
         selected = option_menu(
-            menu_title="Sports Analysis",
-            options=["Home", "MLB", "NBA", "NFL", "NHL", "MLS"],
-            icons=["house", "bar-chart", "bar-chart", "bar-chart", "bar-chart", "bar-chart"],
-            menu_icon="cast",
+            "Sports Analysis",
+            ["Home", "MLB", "NBA", "NFL", "NHL", "MLS"],
+            icons=["house", "bar-chart-line", "bar-chart-line", "bar-chart-line", "bar-chart-line", "bar-chart-line"],
+            menu_icon="menu-app-fill",
             default_index=0,
             styles={
-                "container": {"padding": "5!important", "background-color": "#1d1d1d"},
-                "icon": {"color": "white", "font-size": "25px"}, 
-                "nav-link": {"font-size": "16px", "text-align": "left", "margin": "0px", "--hover-color": "#343a40"},
+                "container": {"padding": "5px", "background-color": "#343a40"},
+                "icon": {"color": "white", "font-size": "25px"},
+                "nav-link": {"color": "white", "font-size": "20px", "text-align": "left", "margin": "0px", "--hover-color": "#06c"},
                 "nav-link-selected": {"background-color": "#02ab21"},
             }
         )
-        
-        submenu_items = {
-            "MLB": {
-                "AAPI": mlb_aapi.app,
-                "American Indian": mlb_americanindian.app,
-                "Asian": mlb_asian.app,
-                "Black": mlb_black.app,
-                "Hispanic": mlb_hispanic.app,
-                "White": mlb_white.app,
-            },
-            "NBA": {},
-            "NFL": {},
-            "NHL": {},
-            "MLS": {}
-        }
-        
-        if selected == "Home":
-            return home.app
-        elif selected in submenu_items:
-            if submenu_items[selected]:
-                submenu_selected = st.selectbox("Select Category", list(submenu_items[selected].keys()))
-                return submenu_items[selected].get(submenu_selected, lambda: st.error("No page selected"))
-            else:
-                st.error("No subpages available for the selected league.")
-                return None
-        else:
-            return lambda: st.error("Page not implemented yet.")
+
+    if selected == "Home":
+        home.app()
+    elif selected in submenu_items:
+        submenu_selected = st.selectbox("Select Category", list(submenu_items[selected].keys()))
+        return submenu_items[selected][submenu_selected]
+
+    return None

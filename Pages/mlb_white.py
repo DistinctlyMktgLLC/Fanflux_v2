@@ -4,7 +4,6 @@ import folium
 from streamlit_folium import folium_static
 
 def app():
-    st.set_page_config(layout="wide", initial_sidebar_state="expanded")
     st.title("White Baseball Fans Analysis")
 
     # Load your data
@@ -121,4 +120,3 @@ def app():
 
     # Display the map in Streamlit
     folium_static(folium_map, width=1100)
-
