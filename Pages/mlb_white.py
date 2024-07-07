@@ -4,7 +4,7 @@ import folium
 from streamlit_folium import folium_static
 
 # Load your data
-df = pd.read_csv("data/Fanflux_Intensity_MLB_White.parquet")
+df = pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
 
 # Colors for each fandom level
 colors = {
