@@ -1,86 +1,48 @@
-# mlb_white.py
+# Pages/mlb_white.py
 import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import folium_static
-
-# Set the page config at the top
-st.set_page_config(layout="wide", initial_sidebar_state="expanded")
 
 # Load your data
 df = pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
 
 # Colors for each fandom level
 colors = {
-    'Avid': 'red',
-    'Casual': 'blue',
-    'Convertible': 'green'
+    "Avid": "red",
+    "Casual": "blue",
+    "Convertible": "green"
 }
 
-# Define the income columns
-income_columns = [col for col in df.columns if 'Income' in col]
+def app():
+    st.title("White Baseball Fans Analysis")
+    st.header("Fan Demographics")
 
-# Calculate the total fans
-total_avid_fans = df[df['Fandom Level'] == 'Avid'][income_columns].sum().sum()
-total_casual_fans = df[df['Fandom Level'] == 'Casual'][income_columns].sum().sum()
-total_convertible_fans = df[df['Fandom Level'] == 'Convertible'][income_columns].sum().sum()
+    # Calculate metrics
+    total_avid_fans = df[df['Fandom Level'] == 'Avid']['Total Fans'].sum()
+    total_casual_fans = df[df['Fandom Level'] == 'Casual']['Total Fans'].sum()
+    total_convertible_fans = df[df['Fandom Level'] == 'Convertible']['Total Fans'].sum()
 
-# Display the scorecards with color coding and styling
-st.markdown("""
-<style>
-    .scorecard {
-        padding: 10px;
-        margin: 10px;
-        border-radius: 10px;
-        background-color: black;
-        color: white;
-        font-size: 25px;
-        text-align: center;
-        font-family: 'Roboto Mono', monospace;
-        position: relative;
-    }
-    .scorecard::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 10px;
-        border-radius: 10px 0 0 10px;
-    }
-    .scorecard.avid::before {
-        background-color: red;
-    }
-    .scorecard.casual::before {
-        background-color: blue;
-    }
-    .scorecard.convertible::before {
-        background-color: green;
-    }
-</style>
-""", unsafe_allow_html=True)
+    # Display metrics in scorecards
+    st.metric(label="Total Avid Fans", value=total_avid_fans)
+    st.metric(label="Total Casual Fans", value=total_casual_fans)
+    st.metric(label="Total Convertible Fans", value=total_convertible_fans)
 
-st.markdown(f"""
-<div class="scorecard avid">Total Avid Fans<br>{int(total_avid_fans):,}</div>
-<div class="scorecard casual">Total Casual Fans<br>{int(total_casual_fans):,}</div>
-<div class="scorecard convertible">Total Convertible Fans<br>{int(total_convertible_fans):,}</div>
-""", unsafe_allow_html=True)
+    st.header("Fan Opportunity Map")
 
-# Create the map
-folium_map = folium.Map(location=[37.0902, -95.7129], zoom_start=4)
+    # Create a map
+    folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4)
 
-# Add markers to the map
-for _, row in df.iterrows():
-    popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {row['Fandom Level']}<br>Race: {row['Race']}<br>Total Fans: {row[income_columns].sum()}"
-    color = colors.get(row['Fandom Level'], 'black')
-    folium.CircleMarker(
-        location=[row['US lat'], row['US lon']],
-        radius=5,
-        popup=popup_content,
-        color=color,
-        fill=True,
-        fill_color=color
-    ).add_to(folium_map)
+    for _, row in df.iterrows():
+        popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {row['Fandom Level']}<br>Race: {row['Race']}<br>Total Fans: {row['Total Fans']}"
+        color = colors.get(row['Fandom Level'], 'black')
+        folium.CircleMarker(
+            location=[row['US lat'], row['US lon']],
+            radius=5,
+            popup=popup_content,
+            color=color,
+            fill=True,
+            fill_color=color
+        ).add_to(folium_map)
 
-# Render the map
-folium_static(folium_map, width=1100, height=700)
+    folium_static(folium_map)
