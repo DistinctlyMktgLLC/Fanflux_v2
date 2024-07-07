@@ -18,6 +18,19 @@ def sidebar_menu():
         }
     )
 
-    # Add your submenu logic here if needed
+    if selected == "Home":
+        return "Home"
+    elif selected == "MLB":
+        submenu_items = {
+            "White": mlb_white.app,
+            "AAPI": mlb_aapi.app,
+            "American Indian": mlb_americanindian.app,
+            "Asian": mlb_asian.app,
+            "Black": mlb_black.app,
+            "Hispanic": mlb_hispanic.app
+        }
+        submenu_selected = st.sidebar.selectbox("Select Category", list(submenu_items.keys()))
+        submenu_items[submenu_selected]()
+    # Add other conditions for NBA, NFL, etc. when you have pages for them
 
     return selected
