@@ -10,36 +10,27 @@ import Pages.mlb_hispanic as mlb_hispanic
 import Pages.mlb_white as mlb_white
 
 # Custom CSS for Sidebar Menu
-st.markdown("""
+st.markdown(
+    """
     <style>
-    .sidebar .sidebar-content {
-        width: 300px;
+    .css-1v0mbdj {
+        width: 250px;
     }
     </style>
-""", unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True,
+)
 
 def sidebar_menu():
-    submenu_items = {
-        "MLB": {
-            "AAPI": mlb_aapi.app,
-            "American Indian": mlb_americanindian.app,
-            "Asian": mlb_asian.app,
-            "Black": mlb_black.app,
-            "Hispanic": mlb_hispanic.app,
-            "White": mlb_white.app
-        }
-        # Add other leagues and their respective pages here
-    }
-
     with st.sidebar:
         selected = option_menu(
-            "Sports Analysis",
-            ["Home", "MLB", "NBA", "NFL", "NHL", "MLS"],
-            icons=["house", "bar-chart-line", "bar-chart-line", "bar-chart-line", "bar-chart-line", "bar-chart-line"],
-            menu_icon="menu-app-fill",
+            menu_title="Sports Analysis",
+            options=["Home", "MLB", "NBA", "NFL", "NHL", "MLS"],
+            icons=["house", "bar-chart", "bar-chart", "bar-chart", "bar-chart", "bar-chart"],
+            menu_icon="cast",
             default_index=0,
             styles={
-                "container": {"padding": "5px", "background-color": "#343a40"},
+                "container": {"padding": "5!important", "background-color": "#2c2f38"},
                 "icon": {"color": "white", "font-size": "25px"},
                 "nav-link": {"color": "white", "font-size": "20px", "text-align": "left", "margin": "0px", "--hover-color": "#06c"},
                 "nav-link-selected": {"background-color": "#02ab21"},
@@ -48,8 +39,20 @@ def sidebar_menu():
 
     if selected == "Home":
         home.app()
-    elif selected in submenu_items:
-        submenu_selected = st.selectbox("Select Category", list(submenu_items[selected].keys()))
-        return submenu_items[selected][submenu_selected]
+    elif selected == "MLB":
+        submenu_items = {
+            "White": mlb_white.app,
+            "AAPI": mlb_aapi.app,
+            "American Indian": mlb_americanindian.app,
+            "Asian": mlb_asian.app,
+            "Black": mlb_black.app,
+            "Hispanic": mlb_hispanic.app,
+        }
+        submenu_selected = st.selectbox("Select Category", list(submenu_items.keys()))
+        return submenu_items[submenu_selected]
 
     return None
+
+selected_app = sidebar_menu()
+if selected_app:
+    selected_app()
