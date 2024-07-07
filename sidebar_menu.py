@@ -81,14 +81,19 @@ def sidebar_menu():
                     selected_league = st.multiselect("Select League(s)", league_options, default=[])
                     selected_income_level = st.multiselect("Select Income Level(s)", income_level_options, default=[])
 
-                    filtered_df = df[
-                        (df['Team'].isin(selected_team)) &
-                        (df['Fandom Level'].isin(selected_fandom_level)) &
-                        (df['League'].isin(selected_league))
-                    ]
+                    filtered_df = df.copy()
+                    if selected_team:
+                        filtered_df = filtered_df[filtered_df['Team'].isin(selected_team)]
+                    if selected_fandom_level:
+                        filtered_df = filtered_df[filtered_df['Fandom Level'].isin(selected_fandom_level)]
+                    if selected_league:
+                        filtered_df = filtered_df[filtered_df['League'].isin(selected_league)]
 
                     # Summing up the selected income levels for 'Convertible' fans
-                    filtered_df['Total Convertible Fans'] = filtered_df[selected_income_level].sum(axis=1)
+                    if selected_income_level:
+                        filtered_df['Total Convertible Fans'] = filtered_df[selected_income_level].sum(axis=1)
+                    else:
+                        filtered_df['Total Convertible Fans'] = 0
 
                     return lambda: submenu_items[selected][submenu_selected](filtered_df)
                 else:
