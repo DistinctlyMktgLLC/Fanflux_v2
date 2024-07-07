@@ -1,51 +1,65 @@
+# sidebar_menu.py
 import streamlit as st
-import pandas as pd
-import folium
-from streamlit_folium import folium_static
+from streamlit_option_menu import option_menu
+import Pages.home as home
+import Pages.mlb_aapi as mlb_aapi
+import Pages.mlb_americanindian as mlb_americanindian
+import Pages.mlb_asian as mlb_asian
+import Pages.mlb_black as mlb_black
+import Pages.mlb_hispanic as mlb_hispanic
+import Pages.mlb_white as mlb_white
 
-# Load your data
-df = pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
+# Custom CSS for Sidebar Menu
+st.markdown(
+    """
+    <style>
+    .sidebar .sidebar-content {
+        background-color: #1d1d1d;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
-# Colors for each fandom level
-colors = {
-    "Avid": "red",
-    "Casual": "blue",
-    "Convertible": "green"
-}
-
-def app():
-    st.title("White Baseball Fans Analysis")
-    st.header("Fan Demographics")
-
-    # Calculate metrics
-    total_avid_fans = df[df['Fandom Level'] == 'Avid']['Total Fans'].sum()
-    total_casual_fans = df[df['Fandom Level'] == 'Casual']['Total Fans'].sum()
-    total_convertible_fans = df[df['Fandom Level'] == 'Convertible']['Total Fans'].sum()
-
-    # Display metrics in scorecards
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric(label="Total Avid Fans", value=total_avid_fans, delta_color="off")
-    with col2:
-        st.metric(label="Total Casual Fans", value=total_casual_fans, delta_color="off")
-    with col3:
-        st.metric(label="Total Convertible Fans", value=total_convertible_fans, delta_color="off")
-
-    st.header("Fan Opportunity Map")
-
-    # Create a map
-    folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4)
-
-    for _, row in df.iterrows():
-        popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {row['Fandom Level']}<br>Race: {row['Race']}<br>Total Fans: {row['Total Fans']}"
-        color = colors.get(row['Fandom Level'], 'black')
-        folium.CircleMarker(
-            location=[row['US lat'], row['US lon']],
-            radius=5,
-            popup=popup_content,
-            color=color,
-            fill=True,
-            fill_color=color
-        ).add_to(folium_map)
-
-    folium_static(folium_map)
+def sidebar_menu():
+    with st.sidebar:
+        selected = option_menu(
+            menu_title="Sports Analysis",
+            options=["Home", "MLB", "NBA", "NFL", "NHL", "MLS"],
+            icons=["house", "bar-chart", "bar-chart", "bar-chart", "bar-chart", "bar-chart"],
+            menu_icon="cast",
+            default_index=0,
+            styles={
+                "container": {"padding": "5!important", "background-color": "#1d1d1d"},
+                "icon": {"color": "white", "font-size": "25px"}, 
+                "nav-link": {"font-size": "16px", "text-align": "left", "margin": "0px", "--hover-color": "#343a40"},
+                "nav-link-selected": {"background-color": "#02ab21"},
+            }
+        )
+        
+        submenu_items = {
+            "MLB": {
+                "AAPI": mlb_aapi.app,
+                "American Indian": mlb_americanindian.app,
+                "Asian": mlb_asian.app,
+                "Black": mlb_black.app,
+                "Hispanic": mlb_hispanic.app,
+                "White": mlb_white.app,
+            },
+            "NBA": {},
+            "NFL": {},
+            "NHL": {},
+            "MLS": {}
+        }
+        
+        if selected == "Home":
+            return home.app
+        elif selected in submenu_items:
+            if submenu_items[selected]:
+                submenu_selected = st.selectbox("Select Category", list(submenu_items[selected].keys()))
+                return submenu_items[selected].get(submenu_selected, lambda: st.error("No page selected"))
+            else:
+                st.error("No subpages available for the selected league.")
+                return None
+        else:
+            return lambda: st.error("Page not implemented yet.")

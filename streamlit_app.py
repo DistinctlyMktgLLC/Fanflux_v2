@@ -1,3 +1,4 @@
+# streamlit_app.py
 import streamlit as st
 from multiapp import MultiApp
 from sidebar_menu import sidebar_menu
