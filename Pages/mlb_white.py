@@ -15,7 +15,6 @@ colors = {
 }
 
 def app():
-    st.set_page_config(layout="wide", initial_sidebar_state="expanded")
     st.title("White Baseball Fans Analysis")
     st.header("Fan Demographics")
 
