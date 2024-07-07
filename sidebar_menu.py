@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from streamlit_option_menu import option_menu  # Ensure this import is included
 import Pages.home as home
 import Pages.mlb_aapi as mlb_aapi
 import Pages.mlb_americanindian as mlb_americanindian
@@ -98,4 +99,3 @@ def sidebar_menu():
                 return None
         else:
             return lambda: st.error("Page not implemented yet.")
-
