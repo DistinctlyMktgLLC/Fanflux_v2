@@ -38,6 +38,9 @@ def app(filtered_df=None):
     # Use the filtered dataframe if provided, else use the full dataframe
     df = filtered_df if filtered_df is not None else pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
 
+    # Replace "Not at All" with "Convertible"
+    df['Fandom Level'] = df['Fandom Level'].replace("Not at All", "Convertible")
+
     # Calculate metrics
     total_avid_fans = df[df['Fandom Level'] == 'Avid']['Intensity'].sum()
     total_casual_fans = df[df['Fandom Level'] == 'Casual']['Intensity'].sum()
