@@ -4,9 +4,6 @@ import pandas as pd
 import folium
 from streamlit_folium import folium_static
 
-# Load your data
-df = pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
-
 # Colors for each fandom level
 colors = {
     "Avid": "red",
@@ -34,9 +31,12 @@ income_columns = [
     'Affluent ($200,000 or more)'
 ]
 
-def app():
+def app(filtered_df=None):
     st.title("White Baseball Fans Analysis")
     st.header("Fan Demographics")
+
+    # Use the filtered dataframe if provided, else use the full dataframe
+    df = filtered_df if filtered_df is not None else pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
 
     # Calculate metrics
     total_avid_fans = df[df['Fandom Level'] == 'Avid']['Intensity'].sum()
@@ -46,19 +46,19 @@ def app():
     # Display metrics in scorecards
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric(label="Total Avid Fans", value=int(total_avid_fans))
+        st.metric(label="Total Avid Fans", value=total_avid_fans, delta_color="off")
     with col2:
-        st.metric(label="Total Casual Fans", value=int(total_casual_fans))
+        st.metric(label="Total Casual Fans", value=total_casual_fans, delta_color="off")
     with col3:
-        st.metric(label="Total Convertible Fans", value=int(total_convertible_fans))
+        st.metric(label="Total Convertible Fans", value=total_convertible_fans, delta_color="off")
 
     st.header("Fan Opportunity Map")
 
     # Create a map
-    folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4, control_scale=True)
+    folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4)
 
     for _, row in df.iterrows():
-        popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {row['Fandom Level']}<br>Race: {row['Race']}<br>Total Fans: {row[income_columns].sum()}"
+        popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {row['Fandom Level']}<br>Race: {row['Race']}<br>Intensity: {row['Intensity']}"
         color = colors.get(row['Fandom Level'], 'black')
         folium.CircleMarker(
             location=[row['US lat'], row['US lon']],
@@ -69,21 +69,4 @@ def app():
             fill_color=color
         ).add_to(folium_map)
 
-    folium_static(folium_map)
-
-    # Custom CSS for full width map
-    st.markdown(
-        """
-        <style>
-        .folium-map {
-            width: 100% !important;
-            height: 600px !important;
-        }
-        </style>
-        """, 
-        unsafe_allow_html=True
-    )
-
-# Run the app
-if __name__ == "__main__":
-    app()
+    folium_static(folium_map, width=1200, height=800)
