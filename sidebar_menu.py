@@ -1,6 +1,12 @@
 # sidebar_menu.py
 import streamlit as st
 from streamlit_option_menu import option_menu
+import Pages.mlb_white as mlb_white
+import Pages.mlb_aapi as mlb_aapi
+import Pages.mlb_americanindian as mlb_americanindian
+import Pages.mlb_asian as mlb_asian
+import Pages.mlb_black as mlb_black
+import Pages.mlb_hispanic as mlb_hispanic
 
 def sidebar_menu():
     selected = option_menu(
@@ -19,7 +25,7 @@ def sidebar_menu():
     )
 
     if selected == "Home":
-        return "Home"
+        st.write("Welcome to the Sports Analysis App")
     elif selected == "MLB":
         submenu_items = {
             "White": mlb_white.app,
