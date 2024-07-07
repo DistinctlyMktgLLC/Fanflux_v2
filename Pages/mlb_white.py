@@ -4,21 +4,45 @@ import pandas as pd
 import folium
 from streamlit_folium import folium_static
 
-# Load your data
-df = pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
-
-# Colors for each fandom level
-colors = {
-    "Avid": "red",
-    "Casual": "blue",
-    "Convertible": "green"
-}
-
 def app():
     st.title("White Baseball Fans Analysis")
     st.header("Fan Demographics")
 
+    # Load your data
+    df = pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
+
+    # Print dataframe columns for debugging
+    st.write("DataFrame Columns: ", df.columns.tolist())
+
+    # Colors for each fandom level
+    colors = {
+        "Avid": "red",
+        "Casual": "blue",
+        "Convertible": "green"
+    }
+
+    # List of income columns
+    income_columns = [
+        'Struggling (Less than $10,000)',
+        'Getting By ($10,000 to $14,999)',
+        'Getting By ($15,000 to $19,999)',
+        'Starting Out ($20,000 to $24,999)',
+        'Starting Out ($25,000 to $29,999)',
+        'Starting Out ($30,000 to $34,999)',
+        'Middle Class ($35,000 to $39,999)',
+        'Middle Class ($40,000 to $44,999)',
+        'Middle Class ($45,000 to $49,999)',
+        'Comfortable ($50,000 to $59,999)',
+        'Comfortable ($60,000 to $74,999)',
+        'Doing Well ($75,000 to $99,999)',
+        'Prosperous ($100,000 to $124,999)',
+        'Prosperous ($125,000 to $149,999)',
+        'Wealthy ($150,000 to $199,999)',
+        'Affluent ($200,000 or more)'
+    ]
+
     # Calculate metrics
+    df['Total Fans'] = df[income_columns].sum(axis=1)
     total_avid_fans = df[df['Fandom Level'] == 'Avid']['Total Fans'].sum()
     total_casual_fans = df[df['Fandom Level'] == 'Casual']['Total Fans'].sum()
     total_convertible_fans = df[df['Fandom Level'] == 'Convertible']['Total Fans'].sum()
