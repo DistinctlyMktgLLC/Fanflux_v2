@@ -4,6 +4,7 @@ import folium
 from streamlit_folium import folium_static
 
 def app():
+    st.set_page_config(layout="wide", initial_sidebar_state="expanded")
     st.title("White Baseball Fans Analysis")
 
     # Load your data
@@ -45,12 +46,38 @@ def app():
     total_casual_fans = df[df['Fandom Level'] == 'Casual'][income_columns].sum().sum()
     total_convertible_fans = df[df['Fandom Level'] == 'Convertible'][income_columns].sum().sum()
 
+    # Custom CSS for scorecards
+    scorecard_style = """
+    <style>
+    .scorecard {
+        background-color: black;
+        color: white;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .scorecard .highlight {
+        width: 5px;
+        height: 100%;
+        margin-right: 10px;
+    }
+    .scorecard .value {
+        font-size: 24px;
+        font-weight: bold;
+    }
+    </style>
+    """
+    st.markdown(scorecard_style, unsafe_allow_html=True)
+
     # Display scorecards
     st.write("### Fan Demographics")
     col1, col2, col3 = st.columns(3)
-    col1.metric("Total Avid Fans", total_avid_fans)
-    col2.metric("Total Casual Fans", total_casual_fans)
-    col3.metric("Total Convertible Fans", total_convertible_fans)
+    col1.markdown(f'<div class="scorecard"><div class="highlight" style="background-color: red;"></div><div class="value">Total Avid Fans<br>{total_avid_fans}</div></div>', unsafe_allow_html=True)
+    col2.markdown(f'<div class="scorecard"><div class="highlight" style="background-color: blue;"></div><div class="value">Total Casual Fans<br>{total_casual_fans}</div></div>', unsafe_allow_html=True)
+    col3.markdown(f'<div class="scorecard"><div class="highlight" style="background-color: green;"></div><div class="value">Total Convertible Fans<br>{total_convertible_fans}</div></div>', unsafe_allow_html=True)
 
     # Map rendering
     st.write("### Fan Opportunity Map")
@@ -93,5 +120,5 @@ def app():
             print(f"Unexpected error for row {index}: {e}")
 
     # Display the map in Streamlit
-    folium_static(folium_map)
+    folium_static(folium_map, width=1100)
 
