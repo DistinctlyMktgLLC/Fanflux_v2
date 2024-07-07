@@ -11,6 +11,9 @@ def app():
     # Load your data
     df = pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
 
+    # Print dataframe columns for debugging
+    st.write("DataFrame Columns: ", df.columns.tolist())
+
     # Colors for each fandom level
     colors = {
         "Avid": "red",
