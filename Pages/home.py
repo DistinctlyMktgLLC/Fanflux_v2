@@ -2,6 +2,9 @@
 import streamlit as st
 import utils
 
+# Set page config at the top
+st.set_page_config(layout="wide", initial_sidebar_state="expanded")
+
 def app():
     st.title("Welcome to Fanflux")
     utils.apply_common_styles()
