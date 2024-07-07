@@ -119,4 +119,4 @@ def app():
             print(f"Unexpected error for row {index}: {e}")
 
     # Display the map in Streamlit
-    folium_static(folium_map, width=1100)
+    folium_static(folium_map, width=1300)
