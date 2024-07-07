@@ -59,7 +59,7 @@ def app(filtered_df=None):
 
     for _, row in df.iterrows():
         # Update popup content to use "Convertible" instead of "Not at All"
-        popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {row['Fandom Level']}<br>Race: {row['Race']}<br>Intensity: {row['Intensity']}<br>Convertible Fans: {row[income_columns].sum()}"
+        popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {row['Fandom Level']}<br>Race: {row['Race']}<br>Convertible Fans: {row[income_columns].sum()}"
         color = colors.get(row['Fandom Level'], 'black')
         folium.CircleMarker(
             location=[row['US lat'], row['US lon']],
