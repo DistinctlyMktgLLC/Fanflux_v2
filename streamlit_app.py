@@ -1,5 +1,7 @@
 # streamlit_app.py
 import streamlit as st
+st.set_page_config(layout="wide", initial_sidebar_state="expanded")
+
 from multiapp import MultiApp
 from sidebar_menu import sidebar_menu
 import Pages.home as home
@@ -9,9 +11,6 @@ import Pages.mlb_asian as mlb_asian
 import Pages.mlb_black as mlb_black
 import Pages.mlb_hispanic as mlb_hispanic
 import Pages.mlb_white as mlb_white
-
-# Set the page config at the top to avoid any issues
-st.set_page_config(layout="wide", initial_sidebar_state="expanded")
 
 # Initialize the MultiApp
 app = MultiApp()
