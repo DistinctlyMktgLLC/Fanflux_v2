@@ -10,6 +10,9 @@ def app():
     # Load data
     df = pd.read_csv('data/Fanflux_Intensity_MLB_White.csv')
 
+    # Replace "Not at all" with "Convertible"
+    df['Fandom Level'] = df['Fandom Level'].replace("Not at all", "Convertible")
+
     # Custom CSS for scorecards and general styling
     st.markdown(
         """
@@ -55,6 +58,16 @@ def app():
 
         .metric-card.convertible:before {
             background-color: green;
+        }
+
+        .metric-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 0.5em;
+        }
+
+        .metric-card p {
+            font-size: 2em;
+            margin: 0;
         }
 
         .leaflet-container {
