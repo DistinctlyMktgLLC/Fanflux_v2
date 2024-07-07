@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from streamlit_option_menu import option_menu  # Ensure this import is included
+from streamlit_option_menu import option_menu
 import Pages.home as home
 import Pages.mlb_aapi as mlb_aapi
 import Pages.mlb_americanindian as mlb_americanindian
@@ -76,10 +76,10 @@ def sidebar_menu():
                     league_options = df['League'].unique().tolist()
                     income_level_options = df.columns[14:].tolist()
 
-                    selected_team = st.multiselect("Select Team(s)", team_options, default=team_options)
-                    selected_fandom_level = st.multiselect("Select Fandom Level(s)", fandom_level_options, default=fandom_level_options)
-                    selected_league = st.multiselect("Select League(s)", league_options, default=league_options)
-                    selected_income_level = st.multiselect("Select Income Level(s)", income_level_options, default=income_level_options)
+                    selected_team = st.multiselect("Select Team(s)", team_options, default=[])
+                    selected_fandom_level = st.multiselect("Select Fandom Level(s)", fandom_level_options, default=[])
+                    selected_league = st.multiselect("Select League(s)", league_options, default=[])
+                    selected_income_level = st.multiselect("Select Income Level(s)", income_level_options, default=[])
 
                     filtered_df = df[
                         (df['Team'].isin(selected_team)) &
