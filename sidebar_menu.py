@@ -1,6 +1,5 @@
 import streamlit as st
-from streamlit_option_menu import option_menu
-import pandas as pd  # Add this line to import pandas
+import pandas as pd
 import Pages.home as home
 import Pages.mlb_aapi as mlb_aapi
 import Pages.mlb_americanindian as mlb_americanindian
@@ -28,7 +27,7 @@ dataframes = {
     "MLB - Asian": pd.read_parquet("data/Fanflux_Intensity_MLB_Asian.parquet"),
     "MLB - Black": pd.read_parquet("data/Fanflux_Intensity_MLB_Black.parquet"),
     "MLB - Hispanic": pd.read_parquet("data/Fanflux_Intensity_MLB_Hispanic.parquet"),
-    "MLB - White": pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet"),
+    "MLB - White": pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
 }
 
 def sidebar_menu():
@@ -41,7 +40,7 @@ def sidebar_menu():
             default_index=0,
             styles={
                 "container": {"padding": "5!important", "background-color": "#1d1d1d"},
-                "icon": {"color": "white", "font-size": "25px"}, 
+                "icon": {"color": "white", "font-size": "25px"},
                 "nav-link": {"font-size": "16px", "text-align": "left", "margin": "0px", "--hover-color": "#343a40"},
                 "nav-link-selected": {"background-color": "#02ab21"},
             }
@@ -67,10 +66,36 @@ def sidebar_menu():
         elif selected in submenu_items:
             if submenu_items[selected]:
                 submenu_selected = st.selectbox("Select Category", list(submenu_items[selected].keys()))
-                df = dataframes[f"MLB - {submenu_selected}"]
-                return lambda: submenu_items[selected][submenu_selected](df)
+                df = dataframes.get(f"MLB - {submenu_selected}", pd.DataFrame())
+                
+                # Apply filters
+                if not df.empty:
+                    team_options = df['Team'].unique().tolist()
+                    fandom_level_options = df['Fandom Level'].unique().tolist()
+                    league_options = df['League'].unique().tolist()
+                    income_level_options = df.columns[14:].tolist()
+
+                    selected_team = st.multiselect("Select Team(s)", team_options, default=team_options)
+                    selected_fandom_level = st.multiselect("Select Fandom Level(s)", fandom_level_options, default=fandom_level_options)
+                    selected_league = st.multiselect("Select League(s)", league_options, default=league_options)
+                    selected_income_level = st.multiselect("Select Income Level(s)", income_level_options, default=income_level_options)
+
+                    filtered_df = df[
+                        (df['Team'].isin(selected_team)) &
+                        (df['Fandom Level'].isin(selected_fandom_level)) &
+                        (df['League'].isin(selected_league))
+                    ]
+
+                    # Summing up the selected income levels for 'Convertible' fans
+                    filtered_df['Total Convertible Fans'] = filtered_df[selected_income_level].sum(axis=1)
+
+                    return lambda: submenu_items[selected][submenu_selected](filtered_df)
+                else:
+                    st.error("No data available for the selected category.")
+                    return None
             else:
                 st.error("No subpages available for the selected league.")
                 return None
         else:
             return lambda: st.error("Page not implemented yet.")
+
