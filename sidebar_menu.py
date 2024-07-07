@@ -31,6 +31,11 @@ dataframes = {
     "MLB - White": pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
 }
 
+def preprocess_dataframe(df):
+    # Replace "Not at All" with "Convertible" in the DataFrame
+    df['Fandom Level'] = df['Fandom Level'].replace("Not at All", "Convertible")
+    return df
+
 def sidebar_menu():
     with st.sidebar:
         selected = option_menu(
@@ -67,7 +72,7 @@ def sidebar_menu():
         elif selected in submenu_items:
             if submenu_items[selected]:
                 submenu_selected = st.selectbox("Select Category", list(submenu_items[selected].keys()))
-                df = dataframes.get(f"MLB - {submenu_selected}", pd.DataFrame())
+                df = preprocess_dataframe(dataframes.get(f"MLB - {submenu_selected}", pd.DataFrame()))
                 
                 # Apply filters
                 if not df.empty:

@@ -1,4 +1,4 @@
-# Pages/mlb_aapi.py (similarly for other pages)
+# Pages/mlb_white.py
 import streamlit as st
 import pandas as pd
 import folium
@@ -38,9 +38,6 @@ def app(filtered_df=None):
     # Use the filtered dataframe if provided, else use the full dataframe
     df = filtered_df if filtered_df is not None else pd.read_parquet("data/Fanflux_Intensity_MLB_Hispanic.parquet")
 
-    # Replace "Not at All" with "Convertible"
-    df['Fandom Level'] = df['Fandom Level'].replace("Not at All", "Convertible")
-
     # Calculate metrics
     total_avid_fans = df[df['Fandom Level'] == 'Avid']['Intensity'].sum()
     total_casual_fans = df[df['Fandom Level'] == 'Casual']['Intensity'].sum()
@@ -61,12 +58,9 @@ def app(filtered_df=None):
     folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4)
 
     for _, row in df.iterrows():
-        # Replace "Not at All" with "Convertible" in the Fandom Level
-        fandom_level = "Convertible" if row['Fandom Level'] == "Not at All" else row['Fandom Level']
-        
         # Update popup content to use "Convertible" instead of "Not at All"
-        popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {fandom_level}<br>Race: {row['Race']}<br>Total Fans: {row[income_columns].sum()}"
-        color = colors.get(fandom_level, 'black')
+        popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {row['Fandom Level']}<br>Race: {row['Race']}<br>Total Fans: {row[income_columns].sum()}"
+        color = colors.get(row['Fandom Level'], 'black')
         folium.CircleMarker(
             location=[row['US lat'], row['US lon']],
             radius=5,
