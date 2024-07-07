@@ -81,10 +81,10 @@ def sidebar_menu():
                     league_options = df['League'].unique().tolist()
                     income_level_options = df.columns[14:].tolist()
 
-                    selected_team = st.multiselect("Select Team(s)", team_options, default=[])
-                    selected_fandom_level = st.multiselect("Select Fandom Level(s)", fandom_level_options, default=[])
-                    selected_league = st.multiselect("Select League(s)", league_options, default=[])
-                    selected_income_level = st.multiselect("Select Income Level(s)", income_level_options, default=[])
+                    selected_team = st.multiselect("Select Team(s)", team_options)
+                    selected_fandom_level = st.multiselect("Select Fandom Level(s)", fandom_level_options)
+                    selected_league = st.multiselect("Select League(s)", league_options)
+                    selected_income_level = st.multiselect("Select Income Level(s)", income_level_options)
 
                     filtered_df = df.copy()
                     if selected_team:
