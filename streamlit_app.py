@@ -74,13 +74,14 @@ if action == "Sign Up":
     st.subheader("Sign Up")
     signup_email = st.text_input("New Email", key="signup_email")
     signup_password = st.text_input("New Password", type="password", key="signup_password")
-    
-    # Add reCAPTCHA widget
+
+    # Placeholder for reCAPTCHA widget
     recaptcha_placeholder = st.empty()
-    recaptcha_response = st.text_input("Recaptcha response", key="recaptcha_response", type="hidden")
+    recaptcha_response = st.empty()
 
     if st.button("Create Account"):
-        if not recaptcha_response or not verify_recaptcha(recaptcha_response):
+        recaptcha_token = st.session_state.get("recaptcha_response_token", "")
+        if not recaptcha_token or not verify_recaptcha(recaptcha_token):
             st.error("Failed to verify reCAPTCHA. Please try again.")
         else:
             try:
@@ -96,12 +97,24 @@ if action == "Sign Up":
         <script src="https://www.google.com/recaptcha/api.js" async defer></script>
         <script>
             function submitRecaptcha(response) {{
-                var input = document.getElementsByName("recaptcha_response")[0];
-                input.value = response;
-                input.dispatchEvent(new Event('input', {{ bubbles: true }}));
+                window.parent.postMessage({{ recaptcha_response_token: response }}, "*");
             }}
         </script>
     """, unsafe_allow_html=True)
+
+    # JavaScript to capture reCAPTCHA token
+    st.markdown("""
+        <script>
+        window.addEventListener("message", function(event) {
+            if (event.data.recaptcha_response_token) {
+                const tokenInput = document.getElementsByName("recaptcha_response")[0];
+                tokenInput.value = event.data.recaptcha_response_token;
+                tokenInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        }, false);
+        </script>
+    """, unsafe_allow_html=True)
+    recaptcha_response = st.text_input("Recaptcha response", key="recaptcha_response", type="hidden")
 
 if action == "Log In":
     st.subheader("Log In")
