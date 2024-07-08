@@ -1,141 +1,89 @@
 import streamlit as st
 import yagmail
+import requests
+import json
 from firebase_config import auth, db
+import streamlit.components.v1 as components
 
 st.set_page_config(layout="wide", initial_sidebar_state="expanded")
 
-# Custom CSS to style the UI
-st.markdown(
+# Access reCAPTCHA keys
+recaptcha_site_key = st.secrets["recaptcha"]["siteKey"]
+recaptcha_secret_key = st.secrets["recaptcha"]["secretKey"]
+
+# Access email credentials
+email_username = st.secrets["email"]["username"]
+email_password = st.secrets["email"]["password"]
+
+# Initialize yagmail for sending emails
+yag = yagmail.SMTP(email_username, email_password)
+
+def send_verification_email(to_email, verification_link):
+    subject = "Verify your email"
+    contents = f"Please verify your email by clicking the following link: {verification_link}"
+    yag.send(to=to_email, subject=subject, contents=contents)
+
+def verify_recaptcha(response):
+    url = "https://www.google.com/recaptcha/api/siteverify"
+    data = {
+        "secret": recaptcha_secret_key,
+        "response": response
+    }
+    r = requests.post(url, data=data)
+    result = json.loads(r.text)
+    return result.get("success", False)
+
+def display_recaptcha(site_key):
+    recaptcha_html = f"""
+    <div id="recaptcha-container"></div>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script>
+        function onSubmit(token) {{
+            document.getElementById("recaptcha-response").value = token;
+            document.getElementById("recaptcha-form").submit();
+        }}
+    </script>
+    <form id="recaptcha-form" action="?" method="POST">
+        <input type="hidden" id="recaptcha-response" name="recaptcha-response">
+        <button class="g-recaptcha" data-sitekey="{site_key}" data-callback="onSubmit">
+            Submit
+        </button>
+    </form>
     """
-    <style>
-    .main-container {
-        padding: 20px;
-    }
-    .stTextInput > div > div > input {
-        border-radius: 5px;
-        padding: 10px;
-        margin-bottom: 10px;
-    }
-    .stButton > button {
-        background-color: #4CAF50;
-        color: white;
-        border: none;
-        padding: 10px 24px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 4px 2px;
-        cursor: pointer;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    .stButton > button:hover {
-        background-color: #45a049;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+    components.html(recaptcha_html)
 
-from multiapp import MultiApp
-from sidebar_menu import sidebar_menu
-import Pages.home as home
-import Pages.mlb_aapi as mlb_aapi
-import Pages.mlb_americanindian as mlb_americanindian
-import Pages.mlb_asian as mlb_asian
-import Pages.mlb_black as mlb_black
-import Pages.mlb_hispanic as mlb_hispanic
-import Pages.mlb_white as mlb_white
+# Registration form
+st.header("Sign Up")
+new_email = st.text_input("New Email")
+new_password = st.text_input("New Password", type="password")
 
-def send_email_notification(email):
-    try:
-        yag = yagmail.SMTP('your_email@example.com', 'your_password')
-        yag.send(
-            to="info@distinctlymktg.com",
-            subject="New Registration Notification",
-            contents=f"A new user has registered: {email}"
-        )
-    except Exception as e:
-        st.error(f"Failed to send email notification: {e}")
+if st.button("Create Account"):
+    recaptcha_response = st.experimental_get_query_params().get("recaptcha-response", [None])[0]
+    if recaptcha_response and verify_recaptcha(recaptcha_response):
+        try:
+            user = auth.create_user_with_email_and_password(new_email, new_password)
+            auth.send_email_verification(user['idToken'])
+            st.success("Registration successful! Please verify your email before logging in.")
+        except Exception as e:
+            st.error(f"Failed to register: {e}")
+    else:
+        st.error("reCAPTCHA verification failed. Please try again.")
+    display_recaptcha(recaptcha_site_key)
 
-def register_user(email, password):
-    try:
-        user = auth.create_user_with_email_and_password(email, password)
-        auth.send_email_verification(user['idToken'])
-        send_email_notification(email)
-        st.success("Registration successful! Please verify your email before logging in.")
-    except Exception as e:
-        st.error(f"Failed to register: {e}")
+# Login form
+st.header("Sign In")
+email = st.text_input("Email")
+password = st.text_input("Password", type="password")
 
-def login_user(email, password):
+if st.button("Login"):
     try:
         user = auth.sign_in_with_email_and_password(email, password)
-        st.session_state['logged_in'] = True
-        st.session_state['user'] = user
-        st.success("Login successful!")
+        if not auth.get_account_info(user['idToken'])['users'][0]['emailVerified']:
+            st.error("Email not verified. Please check your inbox.")
+        else:
+            st.success("Login successful!")
     except Exception as e:
         st.error(f"Failed to log in: {e}")
 
-if 'logged_in' not in st.session_state:
-    st.session_state['logged_in'] = False
-
-if st.session_state['logged_in']:
-    st.sidebar.success(f"Welcome {st.session_state['user']['email']}")
-
-    # Initialize the MultiApp
-    app = MultiApp()
-
-    # Add all your applications here
-    app.add_app("Home", home.app)
-    app.add_app("MLB - AAPI", mlb_aapi.app)
-    app.add_app("MLB - American Indian", mlb_americanindian.app)
-    app.add_app("MLB - Asian", mlb_asian.app)
-    app.add_app("MLB - Black", mlb_black.app)
-    app.add_app("MLB - Hispanic", mlb_hispanic.app)
-    app.add_app("MLB - White", mlb_white.app)
-
-    # Run the selected app
-    selected_app = sidebar_menu()
-    if selected_app:
-        selected_app()
-else:
-    st.title("Welcome to Fanflux")
-    st.markdown(
-        """
-        ### Dive into the Metrics that Matter
-
-        Ever wondered why certain fans are more dedicated than others? Or why some regions have higher concentrations of specific fan types? Welcome to Fanflux, where data meets fandom in the most intriguing ways. Here’s what you’ll get:
-
-        - **Discover Fan Distribution:** Visualize the geographical spread of different fan types.
-        - **Analyze Fan Intensity:** Understand how passionate fans are about their teams.
-        - **Uncover Economic Insights:** See how income levels correlate with fan engagement.
-
-        ### Why It’s Important
-
-        Sports teams, marketers, and fan clubs alike can leverage these insights to:
-
-        - **Target Marketing Efforts:** Focus your campaigns where they’ll have the most impact.
-        - **Boost Fan Engagement:** Tailor your strategies to convert casual fans into avid supporters.
-        - **Optimize Merchandising:** Stock the right products in the right places based on fan demographics.
-
-        ### Partnered with DonnLynn Partners
-
-        We are proud to collaborate with DonnLynn Partners, who brought us this innovative idea. Combined with our data and tech expertise, we have brought Fanflux to life. Together, we have transformed the way you understand and engage with sports fans.
-
-        Ready to transform your understanding of the sports fan landscape? Let’s get started!
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.header("Sign In")
-    email = st.text_input('Email')
-    password = st.text_input('Password', type='password')
-    if st.button('Login'):
-        login_user(email, password)
-    
-    st.header("Sign Up")
-    new_email = st.text_input('New Email')
-    new_password = st.text_input('New Password', type='password')
-    if st.button('Create Account'):
-        register_user(new_email, new_password)
+# Show reCAPTCHA
+display_recaptcha(recaptcha_site_key)
