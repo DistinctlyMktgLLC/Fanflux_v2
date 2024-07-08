@@ -1,4 +1,3 @@
-# Pages/chatbot_page.py
 import streamlit as st
 from streamlit_chat import message
 
