@@ -42,19 +42,36 @@ def extract_filters(user_input, combined_data):
             filters['team'] = team
             break
 
-    # Extract income levels (simple example)
-    income_levels = [
-        'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)', 'Getting By ($15,000 to $19,999)',
-        'Starting Out ($20,000 to $24,999)', 'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)',
-        'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)', 'Middle Class ($45,000 to $49,999)',
-        'Comfortable ($50,000 to $59,999)', 'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)',
-        'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)', 'Wealthy ($150,000 to $199,999)',
-        'Affluent ($200,000 or more)'
-    ]
-    for level in income_levels:
-        if re.search(re.escape(level.split()[1]), user_input):
-            filters['income_level'] = level
-            break
+    # Extract income levels using regex to match ranges
+    income_pattern = re.compile(r"\$?(\d{1,3}(?:,\d{3})*)(?:\sto\s\$?(\d{1,3}(?:,\d{3})*))?")
+    match = income_pattern.search(user_input)
+    if match:
+        min_income = int(match.group(1).replace(',', ''))
+        max_income = int(match.group(2).replace(',', '')) if match.group(2) else None
+
+        income_levels = [
+            ('Struggling (Less than $10,000)', 0, 9999),
+            ('Getting By ($10,000 to $14,999)', 10000, 14999),
+            ('Getting By ($15,000 to $19,999)', 15000, 19999),
+            ('Starting Out ($20,000 to $24,999)', 20000, 24999),
+            ('Starting Out ($25,000 to $29,999)', 25000, 29999),
+            ('Starting Out ($30,000 to $34,999)', 30000, 34999),
+            ('Middle Class ($35,000 to $39,999)', 35000, 39999),
+            ('Middle Class ($40,000 to $44,999)', 40000, 44999),
+            ('Middle Class ($45,000 to $49,999)', 45000, 49999),
+            ('Comfortable ($50,000 to $59,999)', 50000, 59999),
+            ('Comfortable ($60,000 to $74,999)', 60000, 74999),
+            ('Doing Well ($75,000 to $99,999)', 75000, 99999),
+            ('Prosperous ($100,000 to $124,999)', 100000, 124999),
+            ('Prosperous ($125,000 to $149,999)', 125000, 149999),
+            ('Wealthy ($150,000 to $199,999)', 150000, 199999),
+            ('Affluent ($200,000 or more)', 200000, float('inf'))
+        ]
+
+        for level, low, high in income_levels:
+            if min_income >= low and (max_income is None or max_income <= high):
+                filters['income_level'] = level
+                break
 
     return filters
 
