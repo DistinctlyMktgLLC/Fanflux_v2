@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from streamlit_option_menu import option_menu
-from Pages import home_app, mlb_aapi_app, mlb_americanindian_app, mlb_asian_app, mlb_black_app, mlb_hispanic_app, mlb_white_app, chatbot_page_app
+from Pages import home, mlb_aapi, mlb_americanindian, mlb_asian, mlb_black, mlb_hispanic, mlb_white, chatbot_page
 
 # Custom CSS for Sidebar Menu
 st.markdown(
@@ -36,7 +36,7 @@ def sidebar_menu():
         )
 
         if selected == "Home":
-            return home_app.app
+            return home.app
         elif selected == "MLB":
             submenu_items = {
                 "AAPI": "MLB - AAPI",
@@ -49,17 +49,17 @@ def sidebar_menu():
             submenu_selected = st.selectbox("Select Category", list(submenu_items.keys()))
             df = dataframes.get(submenu_items[submenu_selected])
             if submenu_selected == "AAPI":
-                return lambda: mlb_aapi_app.app(df)
+                return lambda: mlb_aapi.app(df)
             elif submenu_selected == "American Indian":
-                return lambda: mlb_americanindian_app.app(df)
+                return lambda: mlb_americanindian.app(df)
             elif submenu_selected == "Asian":
-                return lambda: mlb_asian_app.app(df)
+                return lambda: mlb_asian.app(df)
             elif submenu_selected == "Black":
-                return lambda: mlb_black_app.app(df)
+                return lambda: mlb_black.app(df)
             elif submenu_selected == "Hispanic":
-                return lambda: mlb_hispanic_app.app(df)
+                return lambda: mlb_hispanic.app(df)
             elif submenu_selected == "White":
-                return lambda: mlb_white_app.app(df)
+                return lambda: mlb_white.app(df)
         elif selected == "NBA":
             st.write("NBA data will be available soon.")
         elif selected == "NFL":
@@ -69,6 +69,6 @@ def sidebar_menu():
         elif selected == "MLS":
             st.write("MLS data will be available soon.")
         elif selected == "Chatbot":
-            return lambda: chatbot_page_app.app(dataframes)
+            return lambda: chatbot_page.app(dataframes)
         else:
             return None
