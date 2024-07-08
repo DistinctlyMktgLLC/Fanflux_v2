@@ -14,3 +14,4 @@ requests==2.32.3
 urllib3==1.26.7
 pyrebase4
 pycryptodome
+streamlit-authenticator
