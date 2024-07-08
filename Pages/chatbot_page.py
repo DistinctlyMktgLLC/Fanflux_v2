@@ -69,6 +69,9 @@ def generate_bot_response(user_input, dataframes):
     filters = extract_filters(user_input, combined_data)
     response = ""
 
+    # Debug: Print filters
+    st.write("Extracted Filters:", filters)
+
     # Apply filters to the data
     filtered_data = combined_data.copy()
     if filters['team']:
@@ -81,6 +84,9 @@ def generate_bot_response(user_input, dataframes):
         filtered_data = filtered_data[filtered_data['Race'] == filters['race']]
     if filters['income_level']:
         filtered_data['Total Convertible Fans'] = filtered_data[filters['income_level']].sum(axis=1)
+
+    # Debug: Print filtered data
+    st.write("Filtered Data:", filtered_data)
 
     if not filtered_data.empty:
         # Construct response with insights
