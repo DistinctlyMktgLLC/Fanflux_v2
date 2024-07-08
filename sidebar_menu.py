@@ -1,14 +1,7 @@
 import streamlit as st
 import pandas as pd
 from streamlit_option_menu import option_menu
-import Pages.home as home
-import Pages.mlb_aapi as mlb_aapi
-import Pages.mlb_americanindian as mlb_americanindian
-import Pages.mlb_asian as mlb_asian
-import Pages.mlb_black as mlb_black
-import Pages.mlb_hispanic as mlb_hispanic
-import Pages.mlb_white as mlb_white
-import Pages.chatbot_page as chatbot_page
+from Pages import home_app, mlb_aapi_app, mlb_americanindian_app, mlb_asian_app, mlb_black_app, mlb_hispanic_app, mlb_white_app, chatbot_page_app
 
 # Custom CSS for Sidebar Menu
 st.markdown(
@@ -54,12 +47,12 @@ def sidebar_menu():
 
         submenu_items = {
             "MLB": {
-                "AAPI": mlb_aapi.app,
-                "American Indian": mlb_americanindian.app,
-                "Asian": mlb_asian.app,
-                "Black": mlb_black.app,
-                "Hispanic": mlb_hispanic.app,
-                "White": mlb_white.app,
+                "AAPI": mlb_aapi_app,
+                "American Indian": mlb_americanindian_app,
+                "Asian": mlb_asian_app,
+                "Black": mlb_black_app,
+                "Hispanic": mlb_hispanic_app,
+                "White": mlb_white_app,
             },
             "NBA": {},
             "NFL": {},
@@ -68,9 +61,9 @@ def sidebar_menu():
         }
 
         if selected == "Home":
-            return home.app
+            return home_app
         elif selected == "Chatbot":
-            return lambda: chatbot_page.app(dataframes)
+            return lambda: chatbot_page_app(dataframes)
         elif selected in submenu_items:
             if submenu_items[selected]:
                 submenu_selected = st.selectbox("Select Category", list(submenu_items[selected].keys()))
