@@ -1,4 +1,3 @@
-# sidebar_menu.py
 import streamlit as st
 import pandas as pd
 from streamlit_option_menu import option_menu
@@ -81,7 +80,6 @@ def sidebar_menu():
                     selected_league = st.multiselect("Select League(s)", league_options)
                     selected_income_level = st.multiselect("Select Income Level(s)", income_level_options)
 
-                    # Store selected filters in session state
                     st.session_state.selected_filters = {
                         'team': selected_team,
                         'fandom_level': selected_fandom_level,

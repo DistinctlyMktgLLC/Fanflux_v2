@@ -16,7 +16,7 @@ app.add_app("MLB Asian", mlb_asian_app)
 app.add_app("MLB Black", mlb_black_app)
 app.add_app("MLB Hispanic", mlb_hispanic_app)
 app.add_app("MLB White", mlb_white_app)
-app.add_app("Chatbot", lambda: chatbot_page_app(sidebar_menu.dataframes))  # Pass the dataframes to the chatbot page
+app.add_app("Chatbot", chatbot_page_app)
 
 utils.apply_common_styles()
 
