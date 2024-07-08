@@ -75,10 +75,7 @@ if action == "Sign Up":
     signup_email = st.text_input("New Email", key="signup_email")
     signup_password = st.text_input("New Password", type="password", key="signup_password")
 
-    # Placeholder for reCAPTCHA widget
     recaptcha_placeholder = st.empty()
-    recaptcha_response = st.empty()
-
     if st.button("Create Account"):
         recaptcha_token = st.session_state.get("recaptcha_response_token", "")
         if not recaptcha_token or not verify_recaptcha(recaptcha_token):
@@ -107,14 +104,16 @@ if action == "Sign Up":
         <script>
         window.addEventListener("message", function(event) {
             if (event.data.recaptcha_response_token) {
-                const tokenInput = document.getElementsByName("recaptcha_response")[0];
+                const tokenInput = document.createElement('input');
+                tokenInput.type = 'hidden';
+                tokenInput.name = 'recaptcha_response';
                 tokenInput.value = event.data.recaptcha_response_token;
+                document.body.appendChild(tokenInput);
                 tokenInput.dispatchEvent(new Event('input', { bubbles: true }));
             }
         }, false);
         </script>
     """, unsafe_allow_html=True)
-    recaptcha_response = st.text_input("Recaptcha response", key="recaptcha_response", type="hidden")
 
 if action == "Log In":
     st.subheader("Log In")
