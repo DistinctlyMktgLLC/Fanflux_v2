@@ -1,89 +1,104 @@
 import streamlit as st
+import pyrebase
 import yagmail
 import requests
-import json
-from firebase_config import auth, db
-import streamlit.components.v1 as components
 
+# Set the page config
 st.set_page_config(layout="wide", initial_sidebar_state="expanded")
 
-# Access reCAPTCHA keys
+# Firebase configuration
+firebaseConfig = {
+    "apiKey": st.secrets["firebase"]["apiKey"],
+    "authDomain": st.secrets["firebase"]["authDomain"],
+    "databaseURL": st.secrets["firebase"]["databaseURL"],
+    "projectId": st.secrets["firebase"]["projectId"],
+    "storageBucket": st.secrets["firebase"]["storageBucket"],
+    "messagingSenderId": st.secrets["firebase"]["messagingSenderId"],
+    "appId": st.secrets["firebase"]["appId"],
+    "measurementId": st.secrets["firebase"]["measurementId"]
+}
+
+firebase = pyrebase.initialize_app(firebaseConfig)
+auth = firebase.auth()
+db = firebase.database()
+
+# reCAPTCHA configuration
 recaptcha_site_key = st.secrets["recaptcha"]["siteKey"]
 recaptcha_secret_key = st.secrets["recaptcha"]["secretKey"]
 
-# Access email credentials
-email_username = st.secrets["email"]["username"]
-email_password = st.secrets["email"]["password"]
+def send_email_notification(email):
+    try:
+        yag = yagmail.SMTP(st.secrets["email"]["username"], st.secrets["email"]["password"])
+        yag.send(
+            to="info@distinctlymktg.com",
+            subject="New Registration Notification",
+            contents=f"A new user has registered: {email}"
+        )
+    except Exception as e:
+        st.error(f"Failed to send email notification: {e}")
 
-# Initialize yagmail for sending emails
-yag = yagmail.SMTP(email_username, email_password)
-
-def send_verification_email(to_email, verification_link):
-    subject = "Verify your email"
-    contents = f"Please verify your email by clicking the following link: {verification_link}"
-    yag.send(to=to_email, subject=subject, contents=contents)
-
-def verify_recaptcha(response):
-    url = "https://www.google.com/recaptcha/api/siteverify"
-    data = {
-        "secret": recaptcha_secret_key,
-        "response": response
+def verify_recaptcha(response_token):
+    verify_url = "https://www.google.com/recaptcha/api/siteverify"
+    payload = {
+        'secret': recaptcha_secret_key,
+        'response': response_token
     }
-    r = requests.post(url, data=data)
-    result = json.loads(r.text)
+    response = requests.post(verify_url, data=payload)
+    result = response.json()
     return result.get("success", False)
 
-def display_recaptcha(site_key):
-    recaptcha_html = f"""
-    <div id="recaptcha-container"></div>
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    <script>
-        function onSubmit(token) {{
-            document.getElementById("recaptcha-response").value = token;
-            document.getElementById("recaptcha-form").submit();
-        }}
-    </script>
-    <form id="recaptcha-form" action="?" method="POST">
-        <input type="hidden" id="recaptcha-response" name="recaptcha-response">
-        <button class="g-recaptcha" data-sitekey="{site_key}" data-callback="onSubmit">
-            Submit
-        </button>
-    </form>
-    """
-    components.html(recaptcha_html)
+st.title("Welcome to Fanflux")
+st.subheader("Dive into the Metrics that Matter")
+st.write("""
+Ever wondered why certain fans are more dedicated than others? Or why some regions have higher concentrations of specific fan types? Welcome to Fanflux, where data meets fandom in the most intriguing ways. Here’s what you’ll get:
 
-# Registration form
-st.header("Sign Up")
-new_email = st.text_input("New Email")
-new_password = st.text_input("New Password", type="password")
+- **Discover Fan Distribution**: Visualize the geographical spread of different fan types.
+- **Analyze Fan Intensity**: Understand how passionate fans are about their teams.
+- **Uncover Economic Insights**: See how income levels correlate with fan engagement.
 
-if st.button("Create Account"):
-    recaptcha_response = st.experimental_get_query_params().get("recaptcha-response", [None])[0]
-    if recaptcha_response and verify_recaptcha(recaptcha_response):
+### Why It’s Important
+Sports teams, marketers, and fan clubs alike can leverage these insights to:
+
+- **Target Marketing Efforts**: Focus your campaigns where they’ll have the most impact.
+- **Boost Fan Engagement**: Tailor your strategies to convert casual fans into avid supporters.
+- **Optimize Merchandising**: Stock the right products in the right places based on fan demographics.
+
+### Partnered with DonnLynn Partners
+We are proud to collaborate with DonnLynn Partners, who brought us this innovative idea. Combined with our data and tech expertise, we have brought Fanflux to life. Together, we have transformed the way you understand and engage with sports fans.
+
+Ready to transform your understanding of the sports fan landscape? Let’s get started!
+""")
+
+# UI Buttons for Sign In and Sign Up
+action = st.selectbox("Select Action", ["Sign In", "Sign Up"])
+
+if action == "Sign In":
+    st.subheader("Sign In")
+    signin_email = st.text_input("Email", key="signin_email")
+    signin_password = st.text_input("Password", type="password", key="signin_password")
+    signin_button = st.button("Login")
+
+    if signin_button:
         try:
-            user = auth.create_user_with_email_and_password(new_email, new_password)
-            auth.send_email_verification(user['idToken'])
-            st.success("Registration successful! Please verify your email before logging in.")
+            user = auth.sign_in_with_email_and_password(signin_email, signin_password)
+            st.success("Successfully logged in!")
         except Exception as e:
-            st.error(f"Failed to register: {e}")
-    else:
-        st.error("reCAPTCHA verification failed. Please try again.")
-    display_recaptcha(recaptcha_site_key)
+            st.error(f"Failed to log in: {e}")
 
-# Login form
-st.header("Sign In")
-email = st.text_input("Email")
-password = st.text_input("Password", type="password")
+elif action == "Sign Up":
+    st.subheader("Sign Up")
+    signup_email = st.text_input("New Email", key="signup_email")
+    signup_password = st.text_input("New Password", type="password", key="signup_password")
+    recaptcha_response = st.text_input("Recaptcha response", key="recaptcha_response")
 
-if st.button("Login"):
-    try:
-        user = auth.sign_in_with_email_and_password(email, password)
-        if not auth.get_account_info(user['idToken'])['users'][0]['emailVerified']:
-            st.error("Email not verified. Please check your inbox.")
+    if st.button("Create Account"):
+        if not verify_recaptcha(recaptcha_response):
+            st.error("Failed to verify reCAPTCHA. Please try again.")
         else:
-            st.success("Login successful!")
-    except Exception as e:
-        st.error(f"Failed to log in: {e}")
-
-# Show reCAPTCHA
-display_recaptcha(recaptcha_site_key)
+            try:
+                user = auth.create_user_with_email_and_password(signup_email, signup_password)
+                auth.send_email_verification(user['idToken'])
+                send_email_notification(signup_email)
+                st.success("Registration successful! Please verify your email before logging in.")
+            except Exception as e:
+                st.error(f"Failed to register: {e}")
