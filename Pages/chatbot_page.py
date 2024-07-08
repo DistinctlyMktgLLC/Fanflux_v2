@@ -12,8 +12,9 @@ def extract_filters(user_input, dataframes):
     
     words = user_input.split()
     for word in words:
-        if any(word.capitalize() in df['Team'].unique() for df in dataframes.values()):
-            filters['team'] = word.capitalize()
+        word_cap = word.capitalize()
+        if any(word_cap in df['Team'].unique() for df in dataframes.values()):
+            filters['team'] = word_cap
         elif word.lower() in ["avid", "casual", "moderate"]:
             filters['fandom_level'] = word.capitalize()
         elif word.lower() in ["mlb", "nba", "nfl", "nhl", "mls"]:
@@ -27,26 +28,21 @@ def extract_filters(user_input, dataframes):
 
 def generate_bot_response(user_input, dataframes):
     filters = extract_filters(user_input, dataframes)
-    summary = []
+    filtered_data = dataframes[filters['team']] if filters['team'] else None
     
-    if filters['team']:
-        summary.append(f"Team: {filters['team']}")
-    if filters['fandom_level']:
-        summary.append(f"Fandom Level: {filters['fandom_level']}")
-    if filters['league']:
-        summary.append(f"League: {filters['league']}")
-    if filters['income_level']:
-        summary.append(f"Income Level: {filters['income_level']}")
-    if filters['race']:
-        summary.append(f"Race: {filters['race']}")
+    if filtered_data is not None:
+        if filters['race']:
+            filtered_data = filtered_data[filtered_data['Race'] == filters['race']]
+        if filters['fandom_level']:
+            filtered_data = filtered_data[filtered_data['Fandom Level'] == filters['fandom_level']]
+        if filters['income_level']:
+            filtered_data = filtered_data[filtered_data['Income Level'] == filters['income_level']]
     
-    response_summary = " | ".join(summary)
-    
-    # Simulate some insights for the user input
-    insights = "Based on your query, we have found some interesting insights related to your filters."
+        insights = f"Based on your query, here are some insights for {filters['team']} fans who are {filters['race']} with a fandom level of {filters['fandom_level']} and an income level of {filters['income_level']}."
+    else:
+        insights = "Sorry, I couldn't find any matching data for your query."
 
-    response = f"{response_summary}. {insights}"
-    return response
+    return insights
 
 def app(dataframes):
     st.title("Chat with our Data Strategist")
