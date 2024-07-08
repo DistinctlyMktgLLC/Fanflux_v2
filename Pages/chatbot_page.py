@@ -37,10 +37,9 @@ def extract_filters(user_input, combined_data):
             break
 
     # Extract team
-    words = user_input.split()
-    for word in words:
-        if word.capitalize() in combined_data['Team'].unique():
-            filters['team'] = word.capitalize()
+    for team in combined_data['Team'].unique():
+        if team.lower() in user_input:
+            filters['team'] = team
             break
 
     # Extract income levels (simple example)
@@ -53,7 +52,7 @@ def extract_filters(user_input, combined_data):
         'Affluent ($200,000 or more)'
     ]
     for level in income_levels:
-        if re.search(re.escape(level.split()[0].lower()), user_input):
+        if re.search(re.escape(level.split()[1]), user_input):
             filters['income_level'] = level
             break
 
