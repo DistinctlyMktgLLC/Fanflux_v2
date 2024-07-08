@@ -99,7 +99,10 @@ def generate_bot_response(user_input, dataframes):
     if filters['race']:
         filtered_data = filtered_data[filtered_data['Race'] == filters['race']]
     if filters['income_level']:
-        filtered_data['Total Convertible Fans'] = filtered_data[filters['income_level']].sum(axis=1)
+        if filters['income_level'] in filtered_data.columns:
+            filtered_data['Total Convertible Fans'] = filtered_data[filters['income_level']]
+        else:
+            filtered_data['Total Convertible Fans'] = 0
 
     # Debug: Print filtered data
     st.write("Filtered Data:", filtered_data)
