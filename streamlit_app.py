@@ -77,4 +77,38 @@ if action == "Sign Up":
 
     recaptcha_response = st.text_input("Recaptcha response", key="recaptcha_response", type="hidden")
     st.components.v1.html(f"""
-        <div 
+        <div class="g-recaptcha" data-sitekey="{recaptcha_site_key}" data-callback="submitRecaptcha"></div>
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        <script>
+            function submitRecaptcha(response) {{
+                window.parent.postMessage({{ recaptcha_response: response }}, "*");
+            }}
+        </script>
+    """, height=100)
+
+    if st.button("Create Account"):
+        recaptcha_token = st.session_state.get("recaptcha_response", "")
+        if not recaptcha_token or not verify_recaptcha(recaptcha_token):
+            st.error("Failed to verify reCAPTCHA. Please try again.")
+        else:
+            try:
+                user = auth.create_user_with_email_and_password(signup_email, signup_password)
+                auth.send_email_verification(user['idToken'])
+                send_email_notification(signup_email)
+                st.success("Registration successful! Please verify your email before logging in.")
+            except Exception as e:
+                st.error(f"Failed to register: {e}")
+
+if action == "Log In":
+    st.subheader("Log In")
+    login_email = st.text_input("Email", key="login_email")
+    login_password = st.text_input("Password", type="password", key="login_password")
+    if st.button("Login"):
+        try:
+            user = auth.sign_in_with_email_and_password(login_email, login_password)
+            if not user['emailVerified']:
+                st.warning("Please verify your email before logging in.")
+            else:
+                st.success("Login successful!")
+        except Exception as e:
+            st.error(f"Failed to log in: {e}")
