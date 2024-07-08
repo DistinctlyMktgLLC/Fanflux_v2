@@ -3,20 +3,7 @@ import pandas as pd
 from streamlit_option_menu import option_menu
 from Pages import home, mlb_aapi, mlb_americanindian, mlb_asian, mlb_black, mlb_hispanic, mlb_white, chatbot_page
 
-# Custom CSS for Sidebar Menu
-st.markdown(
-    """
-    <style>
-    .sidebar .sidebar-content {
-        background-color: #1d1d1d;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
 def sidebar_menu():
-    # Load your dataframes here
     dataframes = {
         "MLB - AAPI": pd.read_parquet("data/Fanflux_Intensity_MLB_AAPI.parquet"),
         "MLB - American Indian": pd.read_parquet("data/Fanflux_Intensity_MLB_AmericanIndian.parquet"),
