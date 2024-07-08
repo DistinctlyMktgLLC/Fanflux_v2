@@ -4,6 +4,40 @@ from firebase_config import auth, db
 
 st.set_page_config(layout="wide", initial_sidebar_state="expanded")
 
+# Custom CSS to style the UI
+st.markdown(
+    """
+    <style>
+    .main-container {
+        padding: 20px;
+    }
+    .stTextInput > div > div > input {
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    .stButton > button {
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 10px 24px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .stButton > button:hover {
+        background-color: #45a049;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 from multiapp import MultiApp
 from sidebar_menu import sidebar_menu
 import Pages.home as home

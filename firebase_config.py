@@ -1,14 +1,16 @@
 import pyrebase
+import streamlit as st
 
+# Load secrets from Streamlit's secrets management
 firebaseConfig = {
-    "apiKey": "AIzaSyCQ_Jcq1eCyylUpXi0lDO3WC70mOAWDoao",
-    "authDomain": "fanflux-299ad.firebaseapp.com",
-    "databaseURL": "https://console.firebase.google.com/u/0/project/fanflux-299ad/database/fanflux-299ad-default-rtdb/data/~2F",
-    "projectId": "fanflux-299ad",
-    "storageBucket": "fanflux-299ad.appspot.com",
-    "messagingSenderId": "643979891706",
-    "appId": "1:643979891706:web:107a98abb3372ec3774a43",
-    "measurementId": "G-CJ1KQVDMR2"
+    "apiKey": st.secrets["firebase"]["apiKey"],
+    "authDomain": st.secrets["firebase"]["authDomain"],
+    "databaseURL": st.secrets["firebase"]["databaseURL"],
+    "projectId": st.secrets["firebase"]["projectId"],
+    "storageBucket": st.secrets["firebase"]["storageBucket"],
+    "messagingSenderId": st.secrets["firebase"]["messagingSenderId"],
+    "appId": st.secrets["firebase"]["appId"],
+    "measurementId": st.secrets["firebase"]["measurementId"]
 }
 
 firebase = pyrebase.initialize_app(firebaseConfig)
