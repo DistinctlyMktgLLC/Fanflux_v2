@@ -16,7 +16,7 @@ import Pages.mlb_white as mlb_white
 
 def send_email_notification(email):
     try:
-        yag = yagmail.SMTP('darnel.m@distinctlymktg.com', 'wrkl qykt dvon eeyd)
+        yag = yagmail.SMTP('darnel.m@distinctlymktg.com', 'wrkl qykt dvon eeyd')
         yag.send(
             to="info@distinctlymktg.com",
             subject="New Registration Notification",
