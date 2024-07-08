@@ -12,3 +12,5 @@ streamlit-option-menu
 yagmail
 pyrebase
 pycryptodome
+requests==2.26.0
+urllib3==1.26.7
