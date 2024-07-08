@@ -1,4 +1,5 @@
 # multiapp.py
+
 import streamlit as st
 
 class MultiApp:
@@ -12,8 +13,11 @@ class MultiApp:
         })
 
     def run(self):
-        app = st.sidebar.radio(
-            'Navigation',
+        st.sidebar.title('Navigation')
+        app = st.sidebar.selectbox(
+            'Go to',
             self.apps,
-            format_func=lambda app: app['title'])
+            format_func=lambda app: app['title']
+        )
+
         app['function']()
