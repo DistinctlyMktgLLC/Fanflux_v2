@@ -1,5 +1,3 @@
-# utils.py
-
 import streamlit as st
 import pandas as pd
 import folium
@@ -16,8 +14,7 @@ def load_data(file_path):
 def create_map(df, color_column, color_key):
     m = folium.Map(location=[37.0902, -95.7129], zoom_start=4)
     marker_cluster = MarkerCluster().add_to(m)
-    
-    # Define the income columns
+
     income_columns = [
         'Struggling (Less than $10,000)',
         'Getting By ($10,000 to $14,999)',

@@ -51,7 +51,7 @@ def sidebar_menu():
                 "nav-link-selected": {"background-color": "#02ab21"},
             }
         )
-        
+
         submenu_items = {
             "MLB": {
                 "AAPI": mlb_aapi.app,
@@ -66,14 +66,14 @@ def sidebar_menu():
             "NHL": {},
             "MLS": {}
         }
-        
+
         if selected == "Home":
             return home.app
         elif selected in submenu_items:
             if submenu_items[selected]:
                 submenu_selected = st.selectbox("Select Category", list(submenu_items[selected].keys()))
                 df = preprocess_dataframe(dataframes.get(f"MLB - {submenu_selected}", pd.DataFrame()))
-                
+
                 # Apply filters
                 if not df.empty:
                     team_options = df['Team'].unique().tolist()
