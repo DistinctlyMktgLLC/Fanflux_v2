@@ -15,36 +15,60 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-def sidebar_menu(dataframes):
-    # Define the options
-    options = ["Home", "MLB", "NBA", "NFL", "NHL", "MLS", "Chatbot"]
-    submenu_items = {
-        "MLB": ["AAPI", "American Indian", "Asian", "Black", "Hispanic", "White"],
-        # Add other submenus if needed
+def sidebar_menu():
+    # Load your dataframes here
+    dataframes = {
+        "MLB - AAPI": pd.read_csv("data/Fanflux_Intensity_MLB_AAPI.parquet"),
+        "MLB - American Indian": pd.read_csv("data/Fanflux_Intensity_MLB_AmericanIndian.parquet"),
+        "MLB - Asian": pd.read_csv("data/Fanflux_Intensity_MLB_Asian.parquet"),
+        "MLB - Black": pd.read_csv("data/Fanflux_Intensity_MLB_Black.parquet"),
+        "MLB - Hispanic": pd.read_csv("data/Fanflux_Intensity_MLB_Hispanic.parquet"),
+        "MLB - White": pd.read_csv("data/Fanflux_Intensity_MLB_White.parquet"),
     }
+    
+    with st.sidebar:
+        selected = option_menu(
+            "Sports Analysis",
+            ["Home", "MLB", "NBA", "NFL", "NHL", "MLS", "Chatbot"],
+            icons=["house", "bar-chart-line", "bar-chart-line", "bar-chart-line", "bar-chart-line", "bar-chart-line", "robot"],
+            menu_icon="cast",
+            default_index=0,
+        )
 
-    selected = option_menu(
-        menu_title="Sports Analysis",
-        options=options,
-        icons=["house", "bar-chart-line", "bar-chart-line", "bar-chart-line", "bar-chart-line", "bar-chart-line", "chat-dots"],
-        menu_icon="cast",
-        default_index=0,
-    )
-
-    if selected == "Home":
-        return home_app
-    elif selected == "Chatbot":
-        return lambda: chatbot_page_app(dataframes)
-    elif selected in submenu_items:
-        if submenu_items[selected]:
-            submenu_selected = st.selectbox("Select Category", list(submenu_items[selected]))
-            df = preprocess_dataframe(dataframes.get(f"MLB - {submenu_selected}", pd.DataFrame()))
-            return lambda: show_data_page(df)
-    return None
-
-def preprocess_dataframe(df):
-    # Implement your dataframe preprocessing here if needed
-    return df
-
-def show_data_page(df):
-    st.dataframe(df)
+        if selected == "Home":
+            return home_app.app
+        elif selected == "MLB":
+            submenu_items = {
+                "AAPI": "MLB - AAPI",
+                "American Indian": "MLB - American Indian",
+                "Asian": "MLB - Asian",
+                "Black": "MLB - Black",
+                "Hispanic": "MLB - Hispanic",
+                "White": "MLB - White"
+            }
+            submenu_selected = st.selectbox("Select Category", list(submenu_items.keys()))
+            df = dataframes.get(submenu_items[submenu_selected])
+            if submenu_selected == "AAPI":
+                return lambda: mlb_aapi_app.app(df)
+            elif submenu_selected == "American Indian":
+                return lambda: mlb_americanindian_app.app(df)
+            elif submenu_selected == "Asian":
+                return lambda: mlb_asian_app.app(df)
+            elif submenu_selected == "Black":
+                return lambda: mlb_black_app.app(df)
+            elif submenu_selected == "Hispanic":
+                return lambda: mlb_hispanic_app.app(df)
+            elif submenu_selected == "White":
+                return lambda: mlb_white_app.app(df)
+        elif selected == "NBA":
+            st.write("NBA data will be available soon.")
+        elif selected == "NFL":
+            st.write("NFL data will be available soon.")
+        elif selected == "NHL":
+            st.write("NHL data will be available soon.")
+        elif selected == "MLS":
+            st.write("MLS data will be available soon.")
+        elif selected == "Chatbot":
+            return lambda: chatbot_page_app.app(dataframes)
+        else:
+            return None
