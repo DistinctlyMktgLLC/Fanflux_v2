@@ -75,56 +75,6 @@ if action == "Sign Up":
     signup_email = st.text_input("New Email", key="signup_email")
     signup_password = st.text_input("New Password", type="password", key="signup_password")
 
-    recaptcha_placeholder = st.empty()
-    if st.button("Create Account"):
-        recaptcha_token = st.session_state.get("recaptcha_response_token", "")
-        if not recaptcha_token or not verify_recaptcha(recaptcha_token):
-            st.error("Failed to verify reCAPTCHA. Please try again.")
-        else:
-            try:
-                user = auth.create_user_with_email_and_password(signup_email, signup_password)
-                auth.send_email_verification(user['idToken'])
-                send_email_notification(signup_email)
-                st.success("Registration successful! Please verify your email before logging in.")
-            except Exception as e:
-                st.error(f"Failed to register: {e}")
-
-    recaptcha_placeholder.markdown(f"""
-        <div class="g-recaptcha" data-sitekey="{recaptcha_site_key}" data-callback="submitRecaptcha"></div>
-        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-        <script>
-            function submitRecaptcha(response) {{
-                window.parent.postMessage({{ recaptcha_response_token: response }}, "*");
-            }}
-        </script>
-    """, unsafe_allow_html=True)
-
-    # JavaScript to capture reCAPTCHA token
-    st.markdown("""
-        <script>
-        window.addEventListener("message", function(event) {
-            if (event.data.recaptcha_response_token) {
-                const tokenInput = document.createElement('input');
-                tokenInput.type = 'hidden';
-                tokenInput.name = 'recaptcha_response';
-                tokenInput.value = event.data.recaptcha_response_token;
-                document.body.appendChild(tokenInput);
-                tokenInput.dispatchEvent(new Event('input', { bubbles: true }));
-            }
-        }, false);
-        </script>
-    """, unsafe_allow_html=True)
-
-if action == "Log In":
-    st.subheader("Log In")
-    login_email = st.text_input("Email", key="login_email")
-    login_password = st.text_input("Password", type="password", key="login_password")
-    if st.button("Login"):
-        try:
-            user = auth.sign_in_with_email_and_password(login_email, login_password)
-            if not user['emailVerified']:
-                st.warning("Please verify your email before logging in.")
-            else:
-                st.success("Login successful!")
-        except Exception as e:
-            st.error(f"Failed to log in: {e}")
+    recaptcha_response = st.text_input("Recaptcha response", key="recaptcha_response", type="hidden")
+    st.components.v1.html(f"""
+        <div 
