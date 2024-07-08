@@ -16,7 +16,6 @@ authenticator = stauth.Authenticate(
         "usernames": {username: {"name": name, "password": password} for username, name, password in zip(usernames, names, passwords)}
     },
     cookie_name="auth",
-    key="some_key",
     cookie_expiry_days=30,
 )
 
