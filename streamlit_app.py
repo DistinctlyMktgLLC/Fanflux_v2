@@ -3,8 +3,8 @@ import pyrebase
 import yagmail
 import requests
 
-# Set the page config
-st.set_page_config(layout="wide", initial_sidebar_state="expanded")
+# Page configuration to avoid multipage error
+st.set_page_config(page_title="Fanflux", layout="wide")
 
 # Firebase configuration
 firebaseConfig = {
@@ -26,17 +26,6 @@ db = firebase.database()
 recaptcha_site_key = st.secrets["recaptcha"]["siteKey"]
 recaptcha_secret_key = st.secrets["recaptcha"]["secretKey"]
 
-def send_email_notification(email):
-    try:
-        yag = yagmail.SMTP(st.secrets["email"]["username"], st.secrets["email"]["password"])
-        yag.send(
-            to="info@distinctlymktg.com",
-            subject="New Registration Notification",
-            contents=f"A new user has registered: {email}"
-        )
-    except Exception as e:
-        st.error(f"Failed to send email notification: {e}")
-
 def verify_recaptcha(response_token):
     verify_url = "https://www.google.com/recaptcha/api/siteverify"
     payload = {
@@ -47,21 +36,30 @@ def verify_recaptcha(response_token):
     result = response.json()
     return result.get("success", False)
 
-st.title("Welcome to Fanflux")
+def send_email_notification(email):
+    yag = yagmail.SMTP(st.secrets["email"]["username"], st.secrets["email"]["password"])
+    yag.send(
+        to="info@distinctlymktg.com",
+        subject="New Registration Notification",
+        contents=f"A new user has registered: {email}"
+    )
+
+# UI setup
+st.title("Fanflux")
 st.subheader("Dive into the Metrics that Matter")
+
 st.write("""
 Ever wondered why certain fans are more dedicated than others? Or why some regions have higher concentrations of specific fan types? Welcome to Fanflux, where data meets fandom in the most intriguing ways. Here’s what you’ll get:
 
-- **Discover Fan Distribution**: Visualize the geographical spread of different fan types.
-- **Analyze Fan Intensity**: Understand how passionate fans are about their teams.
-- **Uncover Economic Insights**: See how income levels correlate with fan engagement.
+- **Discover Fan Distribution:** Visualize the geographical spread of different fan types.
+- **Analyze Fan Intensity:** Understand how passionate fans are about their teams.
+- **Uncover Economic Insights:** See how income levels correlate with fan engagement.
 
 ### Why It’s Important
 Sports teams, marketers, and fan clubs alike can leverage these insights to:
-
-- **Target Marketing Efforts**: Focus your campaigns where they’ll have the most impact.
-- **Boost Fan Engagement**: Tailor your strategies to convert casual fans into avid supporters.
-- **Optimize Merchandising**: Stock the right products in the right places based on fan demographics.
+- **Target Marketing Efforts:** Focus your campaigns where they’ll have the most impact.
+- **Boost Fan Engagement:** Tailor your strategies to convert casual fans into avid supporters.
+- **Optimize Merchandising:** Stock the right products in the right places based on fan demographics.
 
 ### Partnered with DonnLynn Partners
 We are proud to collaborate with DonnLynn Partners, who brought us this innovative idea. Combined with our data and tech expertise, we have brought Fanflux to life. Together, we have transformed the way you understand and engage with sports fans.
@@ -69,30 +67,28 @@ We are proud to collaborate with DonnLynn Partners, who brought us this innovati
 Ready to transform your understanding of the sports fan landscape? Let’s get started!
 """)
 
-# UI Buttons for Sign In and Sign Up
-action = st.selectbox("Select Action", ["Sign In", "Sign Up"])
+# Action selection
+action = st.radio("Choose Action", ["Sign Up", "Log In"])
 
-if action == "Sign In":
-    st.subheader("Sign In")
-    signin_email = st.text_input("Email", key="signin_email")
-    signin_password = st.text_input("Password", type="password", key="signin_password")
-    signin_button = st.button("Login")
-
-    if signin_button:
-        try:
-            user = auth.sign_in_with_email_and_password(signin_email, signin_password)
-            st.success("Successfully logged in!")
-        except Exception as e:
-            st.error(f"Failed to log in: {e}")
-
-elif action == "Sign Up":
+if action == "Sign Up":
     st.subheader("Sign Up")
     signup_email = st.text_input("New Email", key="signup_email")
     signup_password = st.text_input("New Password", type="password", key="signup_password")
-    recaptcha_response = st.text_input("Recaptcha response", key="recaptcha_response")
+    
+    # Add reCAPTCHA widget
+    st.write(
+        f"""
+        <div class="g-recaptcha" data-sitekey="{recaptcha_site_key}"></div>
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    signup_button = st.button("Create Account")
 
-    if st.button("Create Account"):
-        if not verify_recaptcha(recaptcha_response):
+    if signup_button:
+        recaptcha_response = st.text_input("Recaptcha response", key="recaptcha_response")
+        if not recaptcha_response or not verify_recaptcha(recaptcha_response):
             st.error("Failed to verify reCAPTCHA. Please try again.")
         else:
             try:
@@ -102,3 +98,19 @@ elif action == "Sign Up":
                 st.success("Registration successful! Please verify your email before logging in.")
             except Exception as e:
                 st.error(f"Failed to register: {e}")
+
+if action == "Log In":
+    st.subheader("Log In")
+    login_email = st.text_input("Email", key="login_email")
+    login_password = st.text_input("Password", type="password", key="login_password")
+    login_button = st.button("Login")
+
+    if login_button:
+        try:
+            user = auth.sign_in_with_email_and_password(login_email, login_password)
+            if not user['emailVerified']:
+                st.warning("Please verify your email before logging in.")
+            else:
+                st.success("Login successful!")
+        except Exception as e:
+            st.error(f"Failed to log in: {e}")
