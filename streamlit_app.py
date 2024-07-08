@@ -76,18 +76,10 @@ if action == "Sign Up":
     signup_password = st.text_input("New Password", type="password", key="signup_password")
     
     # Add reCAPTCHA widget
-    st.write(
-        f"""
-        <div class="g-recaptcha" data-sitekey="{recaptcha_site_key}"></div>
-        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-        """,
-        unsafe_allow_html=True
-    )
-    
-    signup_button = st.button("Create Account")
+    recaptcha_placeholder = st.empty()
+    recaptcha_response = st.text_input("Recaptcha response", key="recaptcha_response", type="hidden")
 
-    if signup_button:
-        recaptcha_response = st.text_input("Recaptcha response", key="recaptcha_response")
+    if st.button("Create Account"):
         if not recaptcha_response or not verify_recaptcha(recaptcha_response):
             st.error("Failed to verify reCAPTCHA. Please try again.")
         else:
@@ -99,13 +91,23 @@ if action == "Sign Up":
             except Exception as e:
                 st.error(f"Failed to register: {e}")
 
+    recaptcha_placeholder.markdown(f"""
+        <div class="g-recaptcha" data-sitekey="{recaptcha_site_key}" data-callback="submitRecaptcha"></div>
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        <script>
+            function submitRecaptcha(response) {{
+                var input = document.getElementsByName("recaptcha_response")[0];
+                input.value = response;
+                input.dispatchEvent(new Event('input', {{ bubbles: true }}));
+            }}
+        </script>
+    """, unsafe_allow_html=True)
+
 if action == "Log In":
     st.subheader("Log In")
     login_email = st.text_input("Email", key="login_email")
     login_password = st.text_input("Password", type="password", key="login_password")
-    login_button = st.button("Login")
-
-    if login_button:
+    if st.button("Login"):
         try:
             user = auth.sign_in_with_email_and_password(login_email, login_password)
             if not user['emailVerified']:
