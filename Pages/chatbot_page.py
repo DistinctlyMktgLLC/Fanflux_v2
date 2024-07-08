@@ -4,7 +4,7 @@ from streamlit_chat import message
 import re
 import pandas as pd
 
-def extract_filters(user_input):
+def extract_filters(user_input, data):
     filters = {
         'race': None,
         'fandom_level': None,
@@ -61,12 +61,14 @@ def extract_filters(user_input):
 
 def generate_bot_response(user_input, dataframes):
     user_input = user_input.lower()
-    filters = extract_filters(user_input)
+
+    # Combine all dataframes
+    combined_data = pd.concat(dataframes.values())
+
+    # Extract filters using the combined data
+    filters = extract_filters(user_input, combined_data)
     response = ""
 
-    # Combine all dataframes (example assumes you have a single combined dataframe)
-    combined_data = pd.concat(dataframes.values())
-    
     # Apply filters to the data
     filtered_data = combined_data.copy()
     if filters['team']:
