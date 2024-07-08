@@ -18,12 +18,12 @@ st.markdown(
 def sidebar_menu():
     # Load your dataframes here
     dataframes = {
-        "MLB - AAPI": pd.read_csv("data/Fanflux_Intensity_MLB_AAPI.parquet"),
-        "MLB - American Indian": pd.read_csv("data/Fanflux_Intensity_MLB_AmericanIndian.parquet"),
-        "MLB - Asian": pd.read_csv("data/Fanflux_Intensity_MLB_Asian.parquet"),
-        "MLB - Black": pd.read_csv("data/Fanflux_Intensity_MLB_Black.parquet"),
-        "MLB - Hispanic": pd.read_csv("data/Fanflux_Intensity_MLB_Hispanic.parquet"),
-        "MLB - White": pd.read_csv("data/Fanflux_Intensity_MLB_White.parquet"),
+        "MLB - AAPI": pd.read_parquet("data/Fanflux_Intensity_MLB_AAPI.parquet"),
+        "MLB - American Indian": pd.read_parquet("data/Fanflux_Intensity_MLB_AmericanIndian.parquet"),
+        "MLB - Asian": pd.read_parquet("data/Fanflux_Intensity_MLB_Asian.parquet"),
+        "MLB - Black": pd.read_parquet("data/Fanflux_Intensity_MLB_Black.parquet"),
+        "MLB - Hispanic": pd.read_parquet("data/Fanflux_Intensity_MLB_Hispanic.parquet"),
+        "MLB - White": pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet"),
     }
     
     with st.sidebar:
