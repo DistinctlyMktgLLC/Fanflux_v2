@@ -355,6 +355,8 @@ pycparser==2.22
     # via cffi
 pycrypto==2.6.1
     # via pyrebase
+pycryptodome==3.20.0
+    # via -r requirements.in
 pydeck==0.9.1
     # via streamlit
 pygments==2.18.0

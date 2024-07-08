@@ -11,3 +11,4 @@ python-dotenv
 streamlit-option-menu
 yagmail
 pyrebase
+pycryptodome
