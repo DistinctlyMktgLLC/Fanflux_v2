@@ -35,7 +35,7 @@ st.markdown(
     }
     </style>
     """,
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
 from multiapp import MultiApp
@@ -50,7 +50,7 @@ import Pages.mlb_white as mlb_white
 
 def send_email_notification(email):
     try:
-        yag = yagmail.SMTP('darnel.m@distinctlymktg.com', 'wrkl qykt dvon eeyd')
+        yag = yagmail.SMTP('your_email@example.com', 'your_password')
         yag.send(
             to="info@distinctlymktg.com",
             subject="New Registration Notification",
@@ -125,7 +125,7 @@ else:
 
         Ready to transform your understanding of the sports fan landscape? Let’s get started!
         """,
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )
 
     st.header("Sign In")

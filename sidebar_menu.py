@@ -28,7 +28,7 @@ dataframes = {
     "MLB - Asian": pd.read_parquet("data/Fanflux_Intensity_MLB_Asian.parquet"),
     "MLB - Black": pd.read_parquet("data/Fanflux_Intensity_MLB_Black.parquet"),
     "MLB - Hispanic": pd.read_parquet("data/Fanflux_Intensity_MLB_Hispanic.parquet"),
-    "MLB - White": pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
+    "MLB - White": pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet"),
 }
 
 def preprocess_dataframe(df):
