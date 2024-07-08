@@ -4,7 +4,7 @@ from streamlit_chat import message
 import re
 import pandas as pd
 
-def extract_filters(user_input, data):
+def extract_filters(user_input, combined_data):
     filters = {
         'race': None,
         'fandom_level': None,
@@ -39,7 +39,7 @@ def extract_filters(user_input, data):
     # Extract team
     words = user_input.split()
     for word in words:
-        if word.capitalize() in data['Team'].unique():
+        if word.capitalize() in combined_data['Team'].unique():
             filters['team'] = word.capitalize()
             break
 
