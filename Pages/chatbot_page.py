@@ -27,24 +27,25 @@ def extract_filters(user_input, dataframes):
 
 def generate_bot_response(user_input, dataframes):
     filters = extract_filters(user_input, dataframes)
-    st.write("Extracted Filters:", filters)
-    
-    filtered_data = pd.concat(dataframes.values())
+    summary = []
     
     if filters['team']:
-        filtered_data = filtered_data[filtered_data['Team'] == filters['team']]
+        summary.append(f"Team: {filters['team']}")
     if filters['fandom_level']:
-        filtered_data = filtered_data[filtered_data['Fandom Level'] == filters['fandom_level']]
+        summary.append(f"Fandom Level: {filters['fandom_level']}")
     if filters['league']:
-        filtered_data = filtered_data[filtered_data['League'] == filters['league']]
+        summary.append(f"League: {filters['league']}")
     if filters['income_level']:
-        filtered_data = filtered_data[filtered_data['Income Level'] == filters['income_level']]
+        summary.append(f"Income Level: {filters['income_level']}")
     if filters['race']:
-        filtered_data = filtered_data[filtered_data['Race'] == filters['race']]
+        summary.append(f"Race: {filters['race']}")
     
-    st.write("Filtered Data:", filtered_data)
+    response_summary = " | ".join(summary)
     
-    response = f"Here are the results for your query: {filtered_data.to_dict(orient='records')}"
+    # Simulate some insights for the user input
+    insights = "Based on your query, we have found some interesting insights related to your filters."
+
+    response = f"{response_summary}. {insights}"
     return response
 
 def app(dataframes):
@@ -65,3 +66,4 @@ def app(dataframes):
 
     if st.button("Clear Chat"):
         st.session_state.chat_history = []
+

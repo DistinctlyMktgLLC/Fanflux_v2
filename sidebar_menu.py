@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
-from streamlit_option_menu import option_menu
-from Pages import home, mlb_aapi, mlb_americanindian, mlb_asian, mlb_black, mlb_hispanic, mlb_white, chatbot_page
+from Pages import home_app, mlb_aapi_app, mlb_americanindian_app, mlb_asian_app, mlb_black_app, mlb_hispanic_app, mlb_white_app, chatbot_page_app
 
 def sidebar_menu():
+    # Load your dataframes here
     dataframes = {
         "MLB - AAPI": pd.read_parquet("data/Fanflux_Intensity_MLB_AAPI.parquet"),
         "MLB - American Indian": pd.read_parquet("data/Fanflux_Intensity_MLB_AmericanIndian.parquet"),
@@ -12,50 +12,41 @@ def sidebar_menu():
         "MLB - Hispanic": pd.read_parquet("data/Fanflux_Intensity_MLB_Hispanic.parquet"),
         "MLB - White": pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet"),
     }
-    
+
+    # Custom CSS for Sidebar Menu
+    st.markdown(
+        """
+        <style>
+        .sidebar .sidebar-content {
+            background-color: #1d1d1d;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # Sidebar menu options
     with st.sidebar:
-        selected = option_menu(
-            "Sports Analysis",
+        st.header("Sports Analysis")
+        selected = st.selectbox(
+            "Choose an option",
             ["Home", "MLB", "NBA", "NFL", "NHL", "MLS", "Chatbot"],
-            icons=["house", "bar-chart-line", "bar-chart-line", "bar-chart-line", "bar-chart-line", "bar-chart-line", "robot"],
-            menu_icon="cast",
-            default_index=0,
         )
 
         if selected == "Home":
-            return home.app
+            return home_app.app
         elif selected == "MLB":
             submenu_items = {
-                "AAPI": "MLB - AAPI",
-                "American Indian": "MLB - American Indian",
-                "Asian": "MLB - Asian",
-                "Black": "MLB - Black",
-                "Hispanic": "MLB - Hispanic",
-                "White": "MLB - White"
+                "AAPI": mlb_aapi_app,
+                "American Indian": mlb_americanindian_app,
+                "Asian": mlb_asian_app,
+                "Black": mlb_black_app,
+                "Hispanic": mlb_hispanic_app,
+                "White": mlb_white_app,
             }
             submenu_selected = st.selectbox("Select Category", list(submenu_items.keys()))
-            df = dataframes.get(submenu_items[submenu_selected])
-            if submenu_selected == "AAPI":
-                return lambda: mlb_aapi.app(df)
-            elif submenu_selected == "American Indian":
-                return lambda: mlb_americanindian.app(df)
-            elif submenu_selected == "Asian":
-                return lambda: mlb_asian.app(df)
-            elif submenu_selected == "Black":
-                return lambda: mlb_black.app(df)
-            elif submenu_selected == "Hispanic":
-                return lambda: mlb_hispanic.app(df)
-            elif submenu_selected == "White":
-                return lambda: mlb_white.app(df)
-        elif selected == "NBA":
-            st.write("NBA data will be available soon.")
-        elif selected == "NFL":
-            st.write("NFL data will be available soon.")
-        elif selected == "NHL":
-            st.write("NHL data will be available soon.")
-        elif selected == "MLS":
-            st.write("MLS data will be available soon.")
+            return lambda: submenu_items[submenu_selected].app(dataframes)
         elif selected == "Chatbot":
-            return lambda: chatbot_page.app(dataframes)
-        else:
-            return None
+            return lambda: chatbot_page_app.app(dataframes)
+
+    return home_app.app
