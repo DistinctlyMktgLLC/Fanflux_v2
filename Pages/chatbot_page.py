@@ -1,3 +1,4 @@
+# Pages/chatbot.py
 import streamlit as st
 from streamlit_chat import message
 
@@ -6,7 +7,7 @@ def generate_bot_response(user_input, data):
     if "summary" in user_input.lower():
         response = "This is a summary of the AAPI data: " + str(data["MLB - AAPI"].describe())
     elif "max score" in user_input.lower():
-        response = f"The maximum score in the AAPI dataset is: {data['MLB - AAPI']['score'].max()}"
+        response is f"The maximum score in the AAPI dataset is: {data['MLB - AAPI']['score'].max()}"
     else:
         response = "I'm not sure how to help with that. Try asking for a summary or max score."
     return response

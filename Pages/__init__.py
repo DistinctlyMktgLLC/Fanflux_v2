@@ -1,6 +1,5 @@
 # Pages/__init__.py
 
-# Import all modules
 from .home import app as home_app
 from .mlb_aapi import app as mlb_aapi_app
 from .mlb_americanindian import app as mlb_americanindian_app
