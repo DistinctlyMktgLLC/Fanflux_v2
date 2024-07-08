@@ -1,64 +1,59 @@
 import streamlit as st
 import pandas as pd
 
-def extract_filters(user_input):
+def extract_filters(user_input, dataframes):
     filters = {
         "race": None,
         "fandom_level": None,
         "team": None,
         "league": None,
-        "income_level": None
+        "income_level": None,
     }
-
     words = user_input.split()
     for word in words:
         if word.capitalize() in dataframes['MLB - AAPI']['Team'].unique():
             filters['team'] = word.capitalize()
-        if word.capitalize() in dataframes['MLB - AAPI']['Fandom Level'].unique():
-            filters['fandom_level'] = word.capitalize()
-        if word.capitalize() in dataframes['MLB - AAPI']['League'].unique():
-            filters['league'] = word.capitalize()
-        if word in dataframes['MLB - AAPI'].columns[14:]:
-            filters['income_level'] = word
-
+            break
+    # Add similar logic for other filters
     return filters
 
 def generate_bot_response(user_input, dataframes):
-    user_input = user_input.lower()
+    filters = extract_filters(user_input, dataframes)
+    st.write("Extracted Filters:", filters)
+    
     combined_data = pd.concat(dataframes.values())
-
-    filters = extract_filters(user_input)
-
-    filtered_data = combined_data
-    if filters['race']:
-        filtered_data = filtered_data[filtered_data['Race'] == filters['race']]
-    if filters['fandom_level']:
-        filtered_data = filtered_data[filtered_data['Fandom Level'] == filters['fandom_level']]
+    filtered_data = combined_data.copy()
+    
     if filters['team']:
         filtered_data = filtered_data[filtered_data['Team'] == filters['team']]
-    if filters['league']:
-        filtered_data = filtered_data[filtered_data['League'] == filters['league']]
-    if filters['income_level']:
-        filtered_data['Total Convertible Fans'] = filtered_data[filters['income_level']].sum(axis=1)
-
-    response_detail = f"for {' and '.join([f'{k}: {v}' for k, v in filters.items() if v])}: \n"
-    response_detail += str(filtered_data.to_dict(orient='records'))
-
+    # Add similar filtering logic for other filters
+    
+    response_detail = filtered_data.to_dict(orient='records')
     response = (
         f"Here's a fascinating insight for you: {response_detail}. "
-        f"Isn't it intriguing how data can reveal such stories? Let's dig deeper if you have more questions!"
+        "Isn't it intriguing how data can reveal such stories? Let's dive deeper!"
     )
-
+    
     return response
 
 def app(dataframes):
     st.title("Chat with our Data Strategist")
+    
+    if "chat_history" not in st.session_state:
+        st.session_state.chat_history = []
 
+    for chat in st.session_state.chat_history:
+        st.write(f"**{chat['message']}**")
+        st.write(chat['response'])
+        
     user_input = st.text_input("Ask something about the data:")
 
     if user_input:
         response = generate_bot_response(user_input, dataframes)
-        st.write(response)
+        st.session_state.chat_history.append({"message": user_input, "response": response})
 
-    st.write("Extracted Filters:", extract_filters(user_input))
-    st.write("Filtered Data:", filtered_data)
+    if st.button("Clear Chat"):
+        st.session_state.chat_history = []
+
+# Assuming this function is called from the main app with dataframes passed as an argument.
+# app(dataframes)
