@@ -75,7 +75,7 @@ if action == "Sign Up":
     signup_email = st.text_input("New Email", key="signup_email")
     signup_password = st.text_input("New Password", type="password", key="signup_password")
 
-    recaptcha_response = st.text_input("Recaptcha response", key="recaptcha_response", type="hidden")
+    recaptcha_response = st.empty()
     st.components.v1.html(f"""
         <div class="g-recaptcha" data-sitekey="{recaptcha_site_key}" data-callback="submitRecaptcha"></div>
         <script src="https://www.google.com/recaptcha/api.js" async defer></script>
@@ -83,11 +83,19 @@ if action == "Sign Up":
             function submitRecaptcha(response) {{
                 window.parent.postMessage({{ recaptcha_response: response }}, "*");
             }}
+            window.addEventListener("message", function(event) {{
+                if (event.data.recaptcha_response) {{
+                    const input = document.querySelector("#recaptcha_response");
+                    input.value = event.data.recaptcha_response;
+                }}
+            }});
         </script>
+        <input type="hidden" id="recaptcha_response" name="recaptcha_response">
     """, height=100)
 
+    recaptcha_token = recaptcha_response.text_input("Recaptcha response", key="recaptcha_response_hidden", type="default")
+
     if st.button("Create Account"):
-        recaptcha_token = st.session_state.get("recaptcha_response", "")
         if not recaptcha_token or not verify_recaptcha(recaptcha_token):
             st.error("Failed to verify reCAPTCHA. Please try again.")
         else:
