@@ -4,14 +4,12 @@ import pandas as pd
 import folium
 from streamlit_folium import folium_static
 
-# Colors for each fandom level
 colors = {
     "Avid": "red",
     "Casual": "blue",
     "Convertible": "green"
 }
 
-# List of income columns
 income_columns = [
     'Struggling (Less than $10,000)',
     'Getting By ($10,000 to $14,999)',
@@ -31,22 +29,16 @@ income_columns = [
     'Affluent ($200,000 or more)'
 ]
 
-def app(filtered_df=None):
+def app(df):
     st.title("White Baseball Fans Analysis")
     st.header("Fan Demographics")
 
-    # Use the filtered dataframe if provided, else use the full dataframe
-    df = filtered_df if filtered_df is not None else pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
-
-    # Replace "Not at All" with "Convertible" in the Fandom Level column
     df['Fandom Level'] = df['Fandom Level'].replace("Not at All", "Convertible")
 
-    # Calculate metrics
     total_avid_fans = df[df['Fandom Level'] == 'Avid']['Intensity'].sum()
     total_casual_fans = df[df['Fandom Level'] == 'Casual']['Intensity'].sum()
     total_convertible_fans = df[income_columns].sum().sum()
 
-    # Display metrics in scorecards
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric(label="Total Avid Fans", value=total_avid_fans, delta_color="off")
@@ -57,11 +49,9 @@ def app(filtered_df=None):
 
     st.header("Fan Opportunity Map")
 
-    # Create a map
     folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4)
 
     for _, row in df.iterrows():
-        # Update popup content to use "Convertible" instead of "Not at All"
         popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {row['Fandom Level']}<br>Race: {row['Race']}<br>Total Fans: {row[income_columns].sum()}"
         color = colors.get(row['Fandom Level'], 'black')
         folium.CircleMarker(

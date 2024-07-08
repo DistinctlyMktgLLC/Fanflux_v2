@@ -8,6 +8,7 @@ import Pages.mlb_asian as mlb_asian
 import Pages.mlb_black as mlb_black
 import Pages.mlb_hispanic as mlb_hispanic
 import Pages.mlb_white as mlb_white
+import Pages.chatbot_page as chatbot_page
 
 # Custom CSS for Sidebar Menu
 st.markdown(
@@ -32,7 +33,6 @@ dataframes = {
 }
 
 def preprocess_dataframe(df):
-    # Replace "Not at All" with "Convertible" in the DataFrame
     df['Fandom Level'] = df['Fandom Level'].replace("Not at All", "Convertible")
     return df
 
@@ -40,8 +40,8 @@ def sidebar_menu():
     with st.sidebar:
         selected = option_menu(
             menu_title="Sports Analysis",
-            options=["Home", "MLB", "NBA", "NFL", "NHL", "MLS"],
-            icons=["house", "bar-chart", "bar-chart", "bar-chart", "bar-chart", "bar-chart"],
+            options=["Home", "MLB", "NBA", "NFL", "NHL", "MLS", "Chatbot"],
+            icons=["house", "bar-chart", "bar-chart", "bar-chart", "bar-chart", "bar-chart", "chat"],
             menu_icon="cast",
             default_index=0,
             styles={
@@ -69,12 +69,13 @@ def sidebar_menu():
 
         if selected == "Home":
             return home.app
+        elif selected == "Chatbot":
+            return lambda: chatbot_page.app(dataframes)
         elif selected in submenu_items:
             if submenu_items[selected]:
                 submenu_selected = st.selectbox("Select Category", list(submenu_items[selected].keys()))
                 df = preprocess_dataframe(dataframes.get(f"MLB - {submenu_selected}", pd.DataFrame()))
 
-                # Apply filters
                 if not df.empty:
                     team_options = df['Team'].unique().tolist()
                     fandom_level_options = df['Fandom Level'].unique().tolist()
@@ -94,7 +95,6 @@ def sidebar_menu():
                     if selected_league:
                         filtered_df = filtered_df[filtered_df['League'].isin(selected_league)]
 
-                    # Summing up the selected income levels for 'Convertible' fans
                     if selected_income_level:
                         filtered_df['Total Convertible Fans'] = filtered_df[selected_income_level].sum(axis=1)
                     else:

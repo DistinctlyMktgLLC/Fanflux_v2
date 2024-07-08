@@ -4,7 +4,7 @@ import utils
 import sidebar_menu
 
 # Import your application modules here
-from Pages import home, mlb_aapi, mlb_americanindian, mlb_asian, mlb_black, mlb_hispanic, mlb_white
+from Pages import home, mlb_aapi, mlb_americanindian, mlb_asian, mlb_black, mlb_hispanic, mlb_white, chatbot_page
 
 app = MultiApp()
 
@@ -16,6 +16,7 @@ app.add_app("MLB Asian", mlb_asian.app)
 app.add_app("MLB Black", mlb_black.app)
 app.add_app("MLB Hispanic", mlb_hispanic.app)
 app.add_app("MLB White", mlb_white.app)
+app.add_app("Chatbot", lambda: chatbot_page.app(sidebar_menu.dataframes))  # Pass the dataframes to the chatbot page
 
 utils.apply_common_styles()
 
