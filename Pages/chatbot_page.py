@@ -97,7 +97,7 @@ def generate_bot_response(user_input, dataframes):
             response_parts.append(f"income level {filters['income_level']}")
 
         response_detail = f"for {' and '.join(response_parts)}: \n"
-        response_detail += filtered_data.to_dict(orient='records')
+        response_detail += str(filtered_data.to_dict(orient='records'))
         response = (
             f"Here's a fascinating insight for you: {response_detail}. "
             "Isn't it intriguing how data can reveal such stories? Let's dive deeper or explore another query!"
