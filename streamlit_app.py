@@ -7,13 +7,11 @@ import streamlit_authenticator as stauth
 # Configuration for the authenticator
 credentials = st.secrets["credentials"]
 
-# Reformatting credentials for streamlit_authenticator
+# Create hashed passwords manually if necessary
 hashed_passwords = stauth.Hasher([credentials[user]["password"] for user in credentials]).generate()
 
 authenticator = stauth.Authenticate(
-    names=[credentials[user]["name"] for user in credentials],
-    usernames=[user for user in credentials],
-    passwords=hashed_passwords,
+    credentials={"usernames": {user: {"name": credentials[user]["name"], "password": hash_pass} for user, hash_pass in zip(credentials, hashed_passwords)}},
     cookie_name="auth",
     key="auth",
     cookie_expiry_days=30,
