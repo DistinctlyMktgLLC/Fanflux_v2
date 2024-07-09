@@ -62,4 +62,3 @@ def app(dataframes):
 
     if st.button("Clear Chat"):
         st.session_state.chat_history = []
-
