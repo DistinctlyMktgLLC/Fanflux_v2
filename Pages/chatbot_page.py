@@ -1,5 +1,6 @@
+# Pages/chatbot_page.py
 import streamlit as st
 
-def coming_soon():
-    st.title("Chatbot")
-    st.write("Our chatbot feature is coming soon! Stay tuned.")
+def app():
+    st.title("Chatbot Page")
+    st.write("Coming soon!")
