@@ -1,10 +1,7 @@
 import streamlit as st
-import utils
 
 def app():
     st.title("Welcome to Fanflux")
-    utils.apply_common_styles()
-
     st.markdown(
         """
         ### Dive into the Metrics that Matter

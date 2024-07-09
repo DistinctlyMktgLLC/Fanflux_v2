@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from Pages import home_app, mlb_aapi_app, mlb_americanindian_app, mlb_asian_app, mlb_black_app, mlb_hispanic_app, mlb_white_app, chatbot_page_app
+from Pages import home, mlb_aapi, mlb_americanindian, mlb_asian, mlb_black, mlb_hispanic, mlb_white
 
 # Custom CSS for Sidebar Menu
 st.markdown(
@@ -18,21 +18,30 @@ def sidebar_menu():
     # Load your dataframes here
     dataframes = {
         "MLB - AAPI": pd.read_parquet("data/Fanflux_Intensity_MLB_AAPI.parquet"),
-        "MLB - American Indian": pd.read_parquet("data/Fanflux_Intensity_MLB_AmericanIndian.parquet"),
+        "MLB - American Indian": pd.read_parquet("data/Fanflux_Intensity_MLB_American_Indian.parquet"),
         "MLB - Asian": pd.read_parquet("data/Fanflux_Intensity_MLB_Asian.parquet"),
         "MLB - Black": pd.read_parquet("data/Fanflux_Intensity_MLB_Black.parquet"),
         "MLB - Hispanic": pd.read_parquet("data/Fanflux_Intensity_MLB_Hispanic.parquet"),
         "MLB - White": pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet"),
     }
 
-    st.sidebar.title("Sports Analysis")
-    options = ["Home", "MLB", "NBA", "NFL", "NHL", "MLS", "Chatbot"]
-    selected = st.sidebar.selectbox("Choose an option", options)
+    menu_options = ["Home", "MLB - AAPI", "MLB - American Indian", "MLB - Asian", "MLB - Black", "MLB - Hispanic", "MLB - White", "Chatbot"]
+    selected = st.sidebar.selectbox("Choose an option", menu_options)
 
     if selected == "Home":
-        return lambda: home_app()
+        return home.app
+    elif selected == "MLB - AAPI":
+        return mlb_aapi.app
+    elif selected == "MLB - American Indian":
+        return mlb_americanindian.app
+    elif selected == "MLB - Asian":
+        return mlb_asian.app
+    elif selected == "MLB - Black":
+        return mlb_black.app
+    elif selected == "MLB - Hispanic":
+        return mlb_hispanic.app
+    elif selected == "MLB - White":
+        return mlb_white.app
     elif selected == "Chatbot":
-        return lambda: chatbot_page_app(dataframes)
-    # Add logic for other pages if necessary
-
-    return lambda: home_app()
+        from Pages import chatbot_page
+        return lambda: chatbot_page.app(dataframes)
