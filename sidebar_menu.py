@@ -1,6 +1,8 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 import pandas as pd
+import folium
+from streamlit_folium import folium_static
 from Pages import home, mlb_aapi, mlb_american_indian, mlb_asian, mlb_black, mlb_hispanic, mlb_white, chatbot_page
 
 def sidebar_menu():
@@ -92,6 +94,27 @@ def sidebar_menu():
             filtered_df = filtered_df[filtered_df['Team'].isin(selected_teams)]
         if selected_income_levels:
             filtered_df = filtered_df[[col for col in filtered_df.columns if col in selected_income_levels]]
+
+        # Create a map
+        folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4, width='100%', height='100%')
+
+        for _, row in filtered_df.iterrows():
+            # Replace "Not at All" with "Convertible" in the Fandom Level
+            fandom_level = "Convertible" if row['Fandom Level'] == "Not at All" else row['Fandom Level']
+
+            # Update popup content to use "Convertible" instead of "Not at All"
+            popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {fandom_level}<br>Race: {row['Race']}<br>Total Fans: {row[income_columns].sum()}"
+            color = colors.get(fandom_level, 'black')
+            folium.CircleMarker(
+                location=[row['US lat'], row['US lon']],
+                radius=5,
+                popup=popup_content,
+                color=color,
+                fill=True,
+                fill_color=color
+            ).add_to(folium_map)
+
+        folium_static(folium_map, width=1200, height=800)
 
         # Call the selected app with the filtered dataframe
         menu_options[selected](filtered_df)
