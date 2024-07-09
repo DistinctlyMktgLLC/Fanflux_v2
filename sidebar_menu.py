@@ -76,14 +76,14 @@ def sidebar_menu():
         }
 
         if selected != "🏠 Home":
-            selected_fandom_level = st.sidebar.multiselect("Select Fandom Level", dataframes[selected.split()[0] + " " + selected.split()[1]]['Fandom Level'].unique())
-            selected_race = st.sidebar.multiselect("Select Race", dataframes[selected.split()[0] + " " + selected.split()[1]]['Race'].unique())
+            selected_fandom_level = st.sidebar.multiselect("Select Fandom Level", dataframes[selected.split()[1] + " " + selected.split()[2]].loc[:, 'Fandom Level'].unique())
+            selected_race = st.sidebar.multiselect("Select Race", dataframes[selected.split()[1] + " " + selected.split()[2]].loc[:, 'Race'].unique())
             selected_league = st.sidebar.selectbox("Select League", ["MLB"])
-            selected_teams = st.sidebar.multiselect("Select Team", dataframes[selected.split()[0] + " " + selected.split()[1]]['Team'].unique())
+            selected_teams = st.sidebar.multiselect("Select Team", dataframes[selected.split()[1] + " " + selected.split()[2]].loc[:, 'Team'].unique())
             selected_income_level = st.sidebar.multiselect("Select Income Level", income_columns)
 
             # Filter data based on selections
-            filtered_df = dataframes[selected.split()[0] + " " + selected.split()[1]]
+            filtered_df = dataframes[selected.split()[1] + " " + selected.split()[2]]
             if selected_fandom_level:
                 filtered_df = filtered_df[filtered_df['Fandom Level'].isin(selected_fandom_level)]
             if selected_race:
@@ -98,4 +98,3 @@ def sidebar_menu():
         else:
             page_function = menu_options[selected]
             page_function()
-
