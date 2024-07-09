@@ -1,5 +1,5 @@
 import streamlit as st
 
-def app():
-    st.title("Chat with our Data Strategist")
-    st.write("Coming soon!")
+def coming_soon():
+    st.title("Chatbot")
+    st.write("Our chatbot feature is coming soon! Stay tuned.")
