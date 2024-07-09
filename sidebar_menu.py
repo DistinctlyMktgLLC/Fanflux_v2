@@ -1,6 +1,18 @@
 import streamlit as st
 import pandas as pd
-from Pages import home_app, mlb_aapi_app, mlb_americanindian_app, mlb_asian_app, mlb_black_app, mlb_hispanic_app, mlb_white_app, chatbot_page_app
+from Pages import home_app, mlb_aapi_app, mlb_americanindian_app, mlb_asian_app, mlb_black_app, mlb_hispanic_app, mlb_white_app
+
+# Custom CSS for Sidebar Menu
+st.markdown(
+    """
+    <style>
+    .sidebar .sidebar-content {
+        background-color: #1d1d1d;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 def sidebar_menu():
     # Load your dataframes here
@@ -13,40 +25,24 @@ def sidebar_menu():
         "MLB - White": pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet"),
     }
 
-    # Custom CSS for Sidebar Menu
-    st.markdown(
-        """
-        <style>
-        .sidebar .sidebar-content {
-            background-color: #1d1d1d;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+    menu_options = ["Home", "MLB - AAPI", "MLB - American Indian", "MLB - Asian", "MLB - Black", "MLB - Hispanic", "MLB - White", "Chatbot"]
+    selected = st.sidebar.selectbox("Choose an option", menu_options)
 
-    # Sidebar menu options
-    with st.sidebar:
-        st.header("Sports Analysis")
-        selected = st.selectbox(
-            "Choose an option",
-            ["Home", "MLB", "NBA", "NFL", "NHL", "MLS", "Chatbot"],
-        )
-
-        if selected == "Home":
-            return home_app.app
-        elif selected == "MLB":
-            submenu_items = {
-                "AAPI": mlb_aapi_app.app,
-                "American Indian": mlb_americanindian_app.app,
-                "Asian": mlb_asian_app.app,
-                "Black": mlb_black_app.app,
-                "Hispanic": mlb_hispanic_app.app,
-                "White": mlb_white_app.app,
-            }
-            submenu_selected = st.selectbox("Select Category", list(submenu_items.keys()))
-            return lambda: submenu_items[submenu_selected](dataframes)
-        elif selected == "Chatbot":
-            return lambda: chatbot_page_app.app(dataframes)
-
-    return home_app.app
+    if selected == "Home":
+        return home_app.app
+    elif selected == "MLB - AAPI":
+        return mlb_aapi_app.app
+    elif selected == "MLB - American Indian":
+        return mlb_americanindian_app.app
+    elif selected == "MLB - Asian":
+        return mlb_asian_app.app
+    elif selected == "MLB - Black":
+        return mlb_black_app.app
+    elif selected == "MLB - Hispanic":
+        return mlb_hispanic_app.app
+    elif selected == "MLB - White":
+        return mlb_white_app.app
+    elif selected == "Chatbot":
+        return chatbot_page_app
+    else:
+        return home_app.app
