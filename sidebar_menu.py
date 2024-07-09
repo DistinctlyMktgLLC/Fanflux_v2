@@ -37,6 +37,7 @@ def sidebar_menu():
             icons=["house", "bar-chart", "bar-chart", "bar-chart", "bar-chart", "bar-chart", "bar-chart", "robot"],
             menu_icon="cast",
             default_index=0,
+            key="main_menu",
             styles={
                 "container": {"padding": "5!important", "background-color": "#1d1d1d"},
                 "icon": {"color": "white", "font-size": "25px"},
@@ -47,23 +48,23 @@ def sidebar_menu():
 
     # Load your dataframes here
     dataframes = {
-        "MLB - AAPI": pd.read_parquet("data/Fanflux_Intensity_MLB_AAPI.parquet"),
-        "MLB - American Indian": pd.read_parquet("data/Fanflux_Intensity_MLB_American_Indian.parquet"),
-        "MLB - Asian": pd.read_parquet("data/Fanflux_Intensity_MLB_Asian.parquet"),
-        "MLB - Black": pd.read_parquet("data/Fanflux_Intensity_MLB_Black.parquet"),
-        "MLB - Hispanic": pd.read_parquet("data/Fanflux_Intensity_MLB_Hispanic.parquet"),
-        "MLB - White": pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet"),
+        "AAPI Baseball": pd.read_parquet("data/Fanflux_Intensity_MLB_AAPI.parquet"),
+        "American Indian Baseball": pd.read_parquet("data/Fanflux_Intensity_MLB_American_Indian.parquet"),
+        "Asian Baseball": pd.read_parquet("data/Fanflux_Intensity_MLB_Asian.parquet"),
+        "Black Baseball": pd.read_parquet("data/Fanflux_Intensity_MLB_Black.parquet"),
+        "Hispanic Baseball": pd.read_parquet("data/Fanflux_Intensity_MLB_Hispanic.parquet"),
+        "White Baseball": pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet"),
     }
 
     if selected != "🏠 Home" and selected != "🤖 Chatbot":
-        key = selected.split()[1] + " " + selected.split()[2]
+        key = " ".join(selected.split(" ")[1:3])
         df = dataframes[key]
 
-        selected_fandom_level = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique())
-        selected_race = st.sidebar.multiselect("Select Race", df['Race'].unique())
-        selected_league = st.sidebar.selectbox("Select League", df['League'].unique())
-        selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique())
-        selected_income_level = st.sidebar.multiselect("Select Income Level", df.columns[14:])
+        selected_fandom_level = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique(), key="fandom_level")
+        selected_race = st.sidebar.multiselect("Select Race", df['Race'].unique(), key="race")
+        selected_league = st.sidebar.selectbox("Select League", df['League'].unique(), key="league")
+        selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique(), key="team")
+        selected_income_level = st.sidebar.multiselect("Select Income Level", df.columns[14:], key="income_level")
 
         # Apply the filtering
         if selected_fandom_level:
