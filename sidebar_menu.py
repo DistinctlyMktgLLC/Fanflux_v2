@@ -1,6 +1,7 @@
+# sidebar_menu.py
 import streamlit as st
 import pandas as pd
-from Pages import home_app, mlb_aapi_app, mlb_american_indian_app, mlb_asian_app, mlb_black_app, mlb_hispanic_app, mlb_white_app, chatbot_page
+from Pages import home, mlb_aapi, mlb_american_indian, mlb_asian, mlb_black, mlb_hispanic, mlb_white, chatbot_page
 
 def sidebar_menu():
     # Load your dataframes here
@@ -11,10 +12,8 @@ def sidebar_menu():
         "MLB - Black": pd.read_parquet("data/Fanflux_Intensity_MLB_Black.parquet"),
         "MLB - Hispanic": pd.read_parquet("data/Fanflux_Intensity_MLB_Hispanic.parquet"),
         "MLB - White": pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet"),
-        # Add more dataframes for other leagues as you add them
     }
 
-    # Custom CSS for Sidebar Menu
     st.markdown(
         """
         <style>
@@ -26,35 +25,26 @@ def sidebar_menu():
         unsafe_allow_html=True
     )
 
-    # Sidebar menu options with emojis/icons
-    menu_options = {
-        "Home": "🏠 Home",
-        "MLB - AAPI": "📊 MLB - AAPI",
-        "MLB - American Indian": "📊 MLB - American Indian",
-        "MLB - Asian": "📊 MLB - Asian",
-        "MLB - Black": "📊 MLB - Black",
-        "MLB - Hispanic": "📊 MLB - Hispanic",
-        "MLB - White": "📊 MLB - White",
-        "Chatbot": "🤖 Chatbot"
-    }
+    # Menu options
+    menu_options = ["Home", "MLB - AAPI", "MLB - American Indian", "MLB - Asian", "MLB - Black", "MLB - Hispanic", "MLB - White", "Chatbot"]
+    selected = st.sidebar.selectbox("Choose an option", menu_options)
 
-    selected = st.sidebar.selectbox("Choose an option", list(menu_options.values()))
-
-    if selected == menu_options["Home"]:
-        return home_app.app
-    elif selected == menu_options["MLB - AAPI"]:
-        return lambda: mlb_aapi_app.app(dataframes["MLB - AAPI"])
-    elif selected == menu_options["MLB - American Indian"]:
-        return lambda: mlb_american_indian_app.app(dataframes["MLB - American Indian"])
-    elif selected == menu_options["MLB - Asian"]:
-        return lambda: mlb_asian_app.app(dataframes["MLB - Asian"])
-    elif selected == menu_options["MLB - Black"]:
-        return lambda: mlb_black_app.app(dataframes["MLB - Black"])
-    elif selected == menu_options["MLB - Hispanic"]:
-        return lambda: mlb_hispanic_app.app(dataframes["MLB - Hispanic"])
-    elif selected == menu_options["MLB - White"]:
-        return lambda: mlb_white_app.app(dataframes["MLB - White"])
-    elif selected == menu_options["Chatbot"]:
-        return chatbot_page.coming_soon
+    # Page selection logic
+    if selected == "Home":
+        return home.app
+    elif selected == "MLB - AAPI":
+        return lambda: mlb_aapi.app(dataframes["MLB - AAPI"])
+    elif selected == "MLB - American Indian":
+        return lambda: mlb_american_indian.app(dataframes["MLB - American Indian"])
+    elif selected == "MLB - Asian":
+        return lambda: mlb_asian.app(dataframes["MLB - Asian"])
+    elif selected == "MLB - Black":
+        return lambda: mlb_black.app(dataframes["MLB - Black"])
+    elif selected == "MLB - Hispanic":
+        return lambda: mlb_hispanic.app(dataframes["MLB - Hispanic"])
+    elif selected == "MLB - White":
+        return lambda: mlb_white.app(dataframes["MLB - White"])
+    elif selected == "Chatbot":
+        return chatbot_page.app
     else:
-        return home_app.app
+        return home.app
