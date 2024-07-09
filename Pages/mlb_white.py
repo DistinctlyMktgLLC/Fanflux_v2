@@ -37,10 +37,14 @@ def app(filtered_df):
     # Use the filtered dataframe
     df = filtered_df
 
-    # Calculate metrics
-    total_avid_fans = df[df['Fandom Level'] == 'Avid']['Intensity'].sum()
-    total_casual_fans = df[df['Fandom Level'] == 'Casual']['Intensity'].sum()
-    total_convertible_fans = df[income_columns].sum().sum()
+    # Check if the dataframe is empty
+    if df.empty:
+        total_avid_fans = total_casual_fans = total_convertible_fans = 0
+    else:
+        # Calculate metrics
+        total_avid_fans = df[df['Fandom Level'] == 'Avid'][income_columns].sum().sum()
+        total_casual_fans = df[df['Fandom Level'] == 'Casual'][income_columns].sum().sum()
+        total_convertible_fans = df[df['Fandom Level'] == 'Not at All'][income_columns].sum().sum()
 
     # Display metrics in scorecards
     col1, col2, col3 = st.columns(3)

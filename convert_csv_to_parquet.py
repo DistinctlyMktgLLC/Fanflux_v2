@@ -9,12 +9,9 @@ parquet_dir = 'data'
 
 # List of CSV files to be converted
 csv_files = [
-    'Fanflux_Intensity_MLB_AAPI.csv',
-    'Fanflux_Intensity_MLB_American_Indian.csv',
-    'Fanflux_Intensity_MLB_Asian.csv',
-    'Fanflux_Intensity_MLB_Black.csv',
-    'Fanflux_Intensity_MLB_Hispanic.csv',
-    'Fanflux_Intensity_MLB_White.csv'
+    'Fanflux_Intensity_NFL_Black.csv',
+    'Fanflux_Intensity_NFL_Hispanic.csv',
+    'Fanflux_Intensity_NFL_White.csv'
 ]
 
 for csv_file in csv_files:
