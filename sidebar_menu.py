@@ -2,9 +2,11 @@ import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import folium_static
+from streamlit_option_menu import option_menu
 from Pages import home, mlb_aapi, mlb_american_indian, mlb_asian, mlb_black, mlb_hispanic, mlb_white, chatbot_page
 
 def sidebar_menu():
+    # Custom CSS for Sidebar Menu
     st.markdown(
         """
         <style>
@@ -28,7 +30,20 @@ def sidebar_menu():
         "🤖 Chatbot": chatbot_page.coming_soon
     }
 
-    selected = st.sidebar.radio("Choose an option", list(menu_options.keys()))
+    with st.sidebar:
+        selected = option_menu(
+            menu_title="Fanflux",
+            options=list(menu_options.keys()),
+            icons=["house", "bar-chart", "bar-chart", "bar-chart", "bar-chart", "bar-chart", "bar-chart", "robot"],
+            menu_icon="cast",
+            default_index=0,
+            styles={
+                "container": {"padding": "5!important", "background-color": "#1d1d1d"},
+                "icon": {"color": "white", "font-size": "25px"},
+                "nav-link": {"font-size": "16px", "text-align": "left", "margin": "0px", "--hover-color": "#565656"},
+                "nav-link-selected": {"background-color": "green"},
+            }
+        )
 
     # Load your dataframes here
     dataframes = {
@@ -40,18 +55,31 @@ def sidebar_menu():
         "MLB - White": pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet"),
     }
 
-    # Debugging information
-    print("Available keys in dataframes dictionary:", dataframes.keys())
-    print("Selected key:", selected.split()[0] + " " + selected.split()[1])
-
     if selected != "🏠 Home" and selected != "🤖 Chatbot":
-        df = dataframes[selected.split()[0] + " " + selected.split()[1]]
-        print("Columns in the DataFrame:", df.columns)
+        key = selected.split()[1] + " " + selected.split()[2]
+        df = dataframes[key]
 
         selected_fandom_level = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique())
         selected_race = st.sidebar.multiselect("Select Race", df['Race'].unique())
         selected_league = st.sidebar.selectbox("Select League", df['League'].unique())
         selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique())
-        selected_income_level = st.sidebar.selectbox("Select Income Level", df.columns[15:])
+        selected_income_level = st.sidebar.multiselect("Select Income Level", df.columns[14:])
 
-    return menu_options[selected]
+        # Apply the filtering
+        if selected_fandom_level:
+            df = df[df['Fandom Level'].isin(selected_fandom_level)]
+        if selected_race:
+            df = df[df['Race'].isin(selected_race)]
+        if selected_league:
+            df = df[df['League'] == selected_league]
+        if selected_teams:
+            df = df[df['Team'].isin(selected_teams)]
+        if selected_income_level:
+            df = df[df[selected_income_level].sum(axis=1) > 0]
+
+        return menu_options[selected](df)
+
+    return menu_options[selected]()
+
+# Run the sidebar menu
+sidebar_menu()
