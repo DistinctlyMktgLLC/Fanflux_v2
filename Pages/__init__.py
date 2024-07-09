@@ -1,4 +1,3 @@
-# Pages/__init__.py
 from .home import app as home_app
 from .mlb_aapi import app as mlb_aapi_app
 from .mlb_american_indian import app as mlb_american_indian_app
