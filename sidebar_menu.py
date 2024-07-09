@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from Pages import home, mlb_aapi, mlb_americanindian, mlb_asian, mlb_black, mlb_hispanic, mlb_white, chatbot_page
+from Pages import home_app, mlb_aapi_app, mlb_americanindian_app, mlb_asian_app, mlb_black_app, mlb_hispanic_app, mlb_white_app, chatbot_page_app
 
 # Custom CSS for Sidebar Menu
 st.markdown(
@@ -14,33 +14,41 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+def load_dataframe(file_path):
+    try:
+        df = pd.read_parquet(file_path)
+        required_columns = ["Race", "Team", "League", "Fandom Level", "Income Level"]
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        if missing_columns:
+            st.warning(f"File {file_path} is missing columns: {missing_columns}")
+            return pd.DataFrame(columns=required_columns)
+        return df
+    except FileNotFoundError:
+        st.warning(f"File not found: {file_path}")
+        return pd.DataFrame(columns=required_columns)
+
 def sidebar_menu():
-    # Load your dataframes here
     dataframes = {
-        "MLB - AAPI": pd.read_parquet("data/Fanflux_Intensity_MLB_AAPI.parquet"),
-        "MLB - American Indian": pd.read_parquet("data/Fanflux_Intensity_MLB_American_Indian.parquet"),
-        "MLB - Asian": pd.read_parquet("data/Fanflux_Intensity_MLB_Asian.parquet"),
-        "MLB - Black": pd.read_parquet("data/Fanflux_Intensity_MLB_Black.parquet"),
-        "MLB - Hispanic": pd.read_parquet("data/Fanflux_Intensity_MLB_Hispanic.parquet"),
-        "MLB - White": pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet"),
-        # Add other leagues' dataframes here
+        "MLB - AAPI": load_dataframe("data/Fanflux_Intensity_MLB_AAPI.parquet"),
+        "MLB - American Indian": load_dataframe("data/Fanflux_Intensity_MLB_American_Indian.parquet"),
+        "MLB - Asian": load_dataframe("data/Fanflux_Intensity_MLB_Asian.parquet"),
+        "MLB - Black": load_dataframe("data/Fanflux_Intensity_MLB_Black.parquet"),
+        "MLB - Hispanic": load_dataframe("data/Fanflux_Intensity_MLB_Hispanic.parquet"),
+        "MLB - White": load_dataframe("data/Fanflux_Intensity_MLB_White.parquet"),
     }
 
-    # Combine all dataframes into one for filtering
-    combined_df = pd.concat(dataframes.values())
+    combined_df = pd.concat(dataframes.values(), ignore_index=True)
 
     menu_options = ["Home", "MLB - AAPI", "MLB - American Indian", "MLB - Asian", "MLB - Black", "MLB - Hispanic", "MLB - White", "Chatbot"]
     selected = st.sidebar.selectbox("Choose an option", menu_options)
 
-    # Filters
     st.sidebar.header("Filter options")
     selected_race = st.sidebar.multiselect("Race", combined_df["Race"].unique())
     selected_team = st.sidebar.multiselect("Team", combined_df["Team"].unique())
     selected_league = st.sidebar.multiselect("League", combined_df["League"].unique())
-    selected_fandom_level = st.sidebar.multiselect("Fandom Level", combined_df["Fandom_Level"].unique())
-    selected_income_level = st.sidebar.multiselect("Income Level", combined_df["Income_Level"].unique())
+    selected_fandom_level = st.sidebar.multiselect("Fandom Level", combined_df["Fandom Level"].unique())
+    selected_income_level = st.sidebar.multiselect("Income Level", combined_df["Income Level"].unique())
 
-    # Apply filters
     if selected_race:
         combined_df = combined_df[combined_df["Race"].isin(selected_race)]
     if selected_team:
@@ -48,27 +56,24 @@ def sidebar_menu():
     if selected_league:
         combined_df = combined_df[combined_df["League"].isin(selected_league)]
     if selected_fandom_level:
-        combined_df = combined_df[combined_df["Fandom_Level"].isin(selected_fandom_level)]
+        combined_df = combined_df[combined_df["Fandom Level"].isin(selected_fandom_level)]
     if selected_income_level:
-        combined_df = combined_df[combined_df["Income_Level"].isin(selected_income_level)]
+        combined_df = combined_df[combined_df["Income Level"].isin(selected_income_level)]
 
-    # Display filtered results (for debugging purposes only, should be removed later)
-    st.dataframe(combined_df)
-
-    # Return the app corresponding to the selected menu option
     if selected == "Home":
-        return home.app
+        return home_app.app
     elif selected == "MLB - AAPI":
-        return mlb_aapi.app
+        return mlb_aapi_app.app
     elif selected == "MLB - American Indian":
-        return mlb_americanindian.app
+        return mlb_americanindian_app.app
     elif selected == "MLB - Asian":
-        return mlb_asian.app
+        return mlb_asian_app.app
     elif selected == "MLB - Black":
-        return mlb_black.app
+        return mlb_black_app.app
     elif selected == "MLB - Hispanic":
-        return mlb_hispanic.app
+        return mlb_hispanic_app.app
     elif selected == "MLB - White":
-        return mlb_white.app
+        return mlb_white_app.app
     elif selected == "Chatbot":
-        return chatbot_page.app
+        st.write("Coming Soon")
+        return chatbot_page_app.app
