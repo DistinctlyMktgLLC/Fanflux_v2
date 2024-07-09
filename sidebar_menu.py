@@ -44,31 +44,57 @@ def sidebar_menu():
             }
         )
 
-    # Load dataframes
-    dataframes = {
-        "MLB - AAPI": pd.read_parquet("data/Fanflux_Intensity_MLB_AAPI.parquet"),
-        "MLB - American Indian": pd.read_parquet("data/Fanflux_Intensity_MLB_American_Indian.parquet"),
-        "MLB - Asian": pd.read_parquet("data/Fanflux_Intensity_MLB_Asian.parquet"),
-        "MLB - Black": pd.read_parquet("data/Fanflux_Intensity_MLB_Black.parquet"),
-        "MLB - Hispanic": pd.read_parquet("data/Fanflux_Intensity_MLB_Hispanic.parquet"),
-        "MLB - White": pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
-    }
+    # Only show filters when a specific race page is selected
+    if selected != "🏠 Home" and selected != "🤖 Chatbot":
+        # Load dataframes
+        dataframes = {
+            "AAPI Baseball Fans": pd.read_parquet("data/Fanflux_Intensity_MLB_AAPI.parquet"),
+            "American Indian Baseball Fans": pd.read_parquet("data/Fanflux_Intensity_MLB_American_Indian.parquet"),
+            "Asian Baseball Fans": pd.read_parquet("data/Fanflux_Intensity_MLB_Asian.parquet"),
+            "Black Baseball Fans": pd.read_parquet("data/Fanflux_Intensity_MLB_Black.parquet"),
+            "Hispanic Baseball Fans": pd.read_parquet("data/Fanflux_Intensity_MLB_Hispanic.parquet"),
+            "White Baseball Fans": pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
+        }
 
-    # Add filter widgets to the sidebar
-    selected_fandom_level = st.sidebar.multiselect("Select Fandom Level", ["Avid", "Casual", "Convertible"])
-    selected_race = st.sidebar.multiselect("Select Race", ["AAPI", "American Indian", "Asian", "Black", "Hispanic", "White"])
-    selected_league = st.sidebar.selectbox("Select League", ["MLB", "NBA", "NFL", "NHL", "MLS"])
-    selected_teams = st.sidebar.multiselect("Select Team", dataframes[selected.split()[0] + " " + selected.split()[1]].Team.unique())
+        # Ensure the selected key maps correctly to the dataframes dictionary
+        selected_key = selected.split(" ", 1)[1]
 
-    # Call the appropriate app function with the filtered data
-    if selected in menu_options:
-        filtered_df = dataframes[selected.split()[0] + " " + selected.split()[1]]
+        selected_fandom_level = st.sidebar.multiselect("Select Fandom Level", ["Avid", "Casual", "Convertible"])
+        selected_race = st.sidebar.multiselect("Select Race", ["AAPI", "American Indian", "Asian", "Black", "Hispanic", "White"])
+        selected_league = st.sidebar.selectbox("Select League", ["MLB", "NBA", "NFL", "NHL", "MLS"])
+        selected_teams = st.sidebar.multiselect("Select Team", dataframes[selected_key].Team.unique())
+        selected_income_levels = st.sidebar.multiselect("Select Income Level", [
+            'Struggling (Less than $10,000)',
+            'Getting By ($10,000 to $14,999)',
+            'Getting By ($15,000 to $19,999)',
+            'Starting Out ($20,000 to $24,999)',
+            'Starting Out ($25,000 to $29,999)',
+            'Starting Out ($30,000 to $34,999)',
+            'Middle Class ($35,000 to $39,999)',
+            'Middle Class ($40,000 to $44,999)',
+            'Middle Class ($45,000 to $49,999)',
+            'Comfortable ($50,000 to $59,999)',
+            'Comfortable ($60,000 to $74,999)',
+            'Doing Well ($75,000 to $99,999)',
+            'Prosperous ($100,000 to $124,999)',
+            'Prosperous ($125,000 to $149,999)',
+            'Wealthy ($150,000 to $199,999)',
+            'Affluent ($200,000 or more)'
+        ])
+
+        # Filter the dataframe
+        filtered_df = dataframes[selected_key]
         if selected_fandom_level:
             filtered_df = filtered_df[filtered_df['Fandom Level'].isin(selected_fandom_level)]
         if selected_race:
             filtered_df = filtered_df[filtered_df['Race'].isin(selected_race)]
         if selected_teams:
             filtered_df = filtered_df[filtered_df['Team'].isin(selected_teams)]
+        if selected_income_levels:
+            filtered_df = filtered_df[[col for col in filtered_df.columns if col in selected_income_levels]]
 
         # Call the selected app with the filtered dataframe
         menu_options[selected](filtered_df)
+    else:
+        # Call the selected app without filtering
+        menu_options[selected]()
