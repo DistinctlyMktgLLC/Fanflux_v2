@@ -37,15 +37,15 @@ def sidebar_menu():
             return home_app.app
         elif selected == "MLB":
             submenu_items = {
-                "AAPI": mlb_aapi_app,
-                "American Indian": mlb_americanindian_app,
-                "Asian": mlb_asian_app,
-                "Black": mlb_black_app,
-                "Hispanic": mlb_hispanic_app,
-                "White": mlb_white_app,
+                "AAPI": mlb_aapi_app.app,
+                "American Indian": mlb_americanindian_app.app,
+                "Asian": mlb_asian_app.app,
+                "Black": mlb_black_app.app,
+                "Hispanic": mlb_hispanic_app.app,
+                "White": mlb_white_app.app,
             }
             submenu_selected = st.selectbox("Select Category", list(submenu_items.keys()))
-            return lambda: submenu_items[submenu_selected].app(dataframes)
+            return lambda: submenu_items[submenu_selected](dataframes)
         elif selected == "Chatbot":
             return lambda: chatbot_page_app.app(dataframes)
 
