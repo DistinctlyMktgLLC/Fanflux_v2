@@ -75,22 +75,27 @@ def sidebar_menu():
             "MLB - White": pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet")
         }
 
-        selected_fandom_level = st.sidebar.multiselect("Select Fandom Level", dataframes[selected.split()[0] + " " + selected.split()[1]]['Fandom Level'].unique())
-        selected_race = st.sidebar.multiselect("Select Race", dataframes[selected.split()[0] + " " + selected.split()[1]]['Race'].unique())
-        selected_league = st.sidebar.selectbox("Select League", ["MLB"])
-        selected_teams = st.sidebar.multiselect("Select Team", dataframes[selected.split()[0] + " " + selected.split()[1]]['Team'].unique())
-        selected_income_level = st.sidebar.multiselect("Select Income Level", income_columns)
+        if selected != "🏠 Home":
+            selected_fandom_level = st.sidebar.multiselect("Select Fandom Level", dataframes[selected.split()[0] + " " + selected.split()[1]]['Fandom Level'].unique())
+            selected_race = st.sidebar.multiselect("Select Race", dataframes[selected.split()[0] + " " + selected.split()[1]]['Race'].unique())
+            selected_league = st.sidebar.selectbox("Select League", ["MLB"])
+            selected_teams = st.sidebar.multiselect("Select Team", dataframes[selected.split()[0] + " " + selected.split()[1]]['Team'].unique())
+            selected_income_level = st.sidebar.multiselect("Select Income Level", income_columns)
 
-        # Filter data based on selections
-        filtered_df = dataframes[selected.split()[0] + " " + selected.split()[1]]
-        if selected_fandom_level:
-            filtered_df = filtered_df[filtered_df['Fandom Level'].isin(selected_fandom_level)]
-        if selected_race:
-            filtered_df = filtered_df[filtered_df['Race'].isin(selected_race)]
-        if selected_teams:
-            filtered_df = filtered_df[filtered_df['Team'].isin(selected_teams)]
-        if selected_income_level:
-            filtered_df = filtered_df[selected_income_level + ['US lat', 'US lon', 'Team', 'League', 'Neighborhood', 'Fandom Level', 'Race']]
+            # Filter data based on selections
+            filtered_df = dataframes[selected.split()[0] + " " + selected.split()[1]]
+            if selected_fandom_level:
+                filtered_df = filtered_df[filtered_df['Fandom Level'].isin(selected_fandom_level)]
+            if selected_race:
+                filtered_df = filtered_df[filtered_df['Race'].isin(selected_race)]
+            if selected_teams:
+                filtered_df = filtered_df[filtered_df['Team'].isin(selected_teams)]
+            if selected_income_level:
+                filtered_df = filtered_df[selected_income_level + ['US lat', 'US lon', 'Team', 'League', 'Neighborhood', 'Fandom Level', 'Race']]
 
-        page_function = menu_options[selected]
-        page_function(filtered_df)
+            page_function = menu_options[selected]
+            page_function(filtered_df)
+        else:
+            page_function = menu_options[selected]
+            page_function()
+
