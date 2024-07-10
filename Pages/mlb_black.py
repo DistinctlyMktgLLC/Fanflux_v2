@@ -31,21 +31,17 @@ income_columns = [
     'Affluent ($200,000 or more)'
 ]
 
-def app(filtered_df):
+def app(df):
     st.title("Black Baseball Fans Analysis")
     st.header("Fan Demographics")
 
-    # Use the filtered dataframe
-    df = filtered_df
+    # Use the filtered dataframe if provided, else use the full dataframe
+    df = df if df is not None else pd.read_parquet("data/Fanflux_Intensity_MLB_Black.parquet")
 
-    # Check if the dataframe is empty
-    if df.empty:
-        total_avid_fans = total_casual_fans = total_convertible_fans = 0
-    else:
-        # Calculate metrics
-        total_avid_fans = df[df['Fandom Level'] == 'Avid'][income_columns].sum().sum()
-        total_casual_fans = df[df['Fandom Level'] == 'Casual'][income_columns].sum().sum()
-        total_convertible_fans = df[df['Fandom Level'] == 'Convertible'][income_columns].sum().sum()
+    # Calculate metrics
+    total_avid_fans = df[df['Fandom Level'] == 'Avid']['Intensity'].sum()
+    total_casual_fans = df[df['Fandom Level'] == 'Casual']['Intensity'].sum()
+    total_convertible_fans = df[income_columns].sum().sum()
 
     # Display metrics in scorecards
     col1, col2, col3 = st.columns(3)
@@ -62,10 +58,8 @@ def app(filtered_df):
     folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4)
 
     for _, row in df.iterrows():
-        # Ensure all fandom levels are correctly mapped
-        fandom_level = row['Fandom Level']
-        if fandom_level == "Not at All":
-            fandom_level = "Convertible"
+        # Replace "Not at All" with "Convertible" in the Fandom Level
+        fandom_level = "Convertible" if row['Fandom Level'] == "Not at All" else row['Fandom Level']
 
         # Update popup content to use "Convertible" instead of "Not at All"
         popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {fandom_level}<br>Race: {row['Race']}<br>Total Fans: {row[income_columns].sum()}"
