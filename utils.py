@@ -1,9 +1,9 @@
 import streamlit as st
 
 def display_fan_demographics(df):
-    total_avid_fans = df[df['Fandom Level'] == 'Avid'].shape[0]
-    total_casual_fans = df[df['Fandom Level'] == 'Casual'].shape[0]
-    total_convertible_fans = df[df['Fandom Level'] == 'Convertible'].shape[0]
+    total_avid_fans = df[df['Fandom Level'] == 'Avid'][df.columns[12:28]].sum().sum()
+    total_casual_fans = df[df['Fandom Level'] == 'Casual'][df.columns[12:28]].sum().sum()
+    total_convertible_fans = df[df['Fandom Level'] == 'Convertible'][df.columns[12:28]].sum().sum()
 
     st.markdown("""
         <style>
