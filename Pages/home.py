@@ -1,9 +1,16 @@
 import streamlit as st
-from utils import apply_common_styles
 
 def app():
-    apply_common_styles()
     st.title("Welcome to Fanflux")
+
+    st.markdown("""
+    <style>
+        .main {
+            background-color: #262730;
+            color: white;
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
     st.subheader("Dive into the Metrics that Matter")
     st.markdown("""
