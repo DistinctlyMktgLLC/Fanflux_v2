@@ -18,4 +18,3 @@ def app():
 
     # Display the map
     st.map(filtered_df[['Latitude', 'Longitude']])
-
