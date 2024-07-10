@@ -11,7 +11,7 @@ def sidebar_menu():
         default_index=0,
         orientation="vertical",
         styles={
-            "container": {"padding": "5!important", "background-color": "#262730"},
+            "container": {"padding": "5!important", "background-color": "#262730", "position": "fixed"},
             "icon": {"color": "white", "font-size": "25px"},
             "nav-link": {
                 "font-size": "20px",
