@@ -1,7 +1,7 @@
 # sidebar_menu.py
 import streamlit as st
 from streamlit_option_menu import option_menu
-from Pages import home, mlb_page, chatbot_page
+from Pages import home, mlb_page, nba_page, nfl_page, nhl_page, mls_page, chatbot_page
 
 # Load the foam finger image
 foam_finger_path = "data/istockphoto-1305157472-612x612.jpg"
