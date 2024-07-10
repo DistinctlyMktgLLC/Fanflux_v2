@@ -48,16 +48,16 @@ def sidebar_menu():
 
     # Load your dataframes here
     dataframes = {
-        "AAPI Baseball": pd.read_parquet("data/Fanflux_Intensity_MLB_AAPI.parquet"),
-        "American Indian Baseball": pd.read_parquet("data/Fanflux_Intensity_MLB_American_Indian.parquet"),
-        "Asian Baseball": pd.read_parquet("data/Fanflux_Intensity_MLB_Asian.parquet"),
-        "Black Baseball": pd.read_parquet("data/Fanflux_Intensity_MLB_Black.parquet"),
-        "Hispanic Baseball": pd.read_parquet("data/Fanflux_Intensity_MLB_Hispanic.parquet"),
-        "White Baseball": pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet"),
+        "AAPI Baseball Fans": pd.read_parquet("data/Fanflux_Intensity_MLB_AAPI.parquet"),
+        "American Indian Baseball Fans": pd.read_parquet("data/Fanflux_Intensity_MLB_American_Indian.parquet"),
+        "Asian Baseball Fans": pd.read_parquet("data/Fanflux_Intensity_MLB_Asian.parquet"),
+        "Black Baseball Fans": pd.read_parquet("data/Fanflux_Intensity_MLB_Black.parquet"),
+        "Hispanic Baseball Fans": pd.read_parquet("data/Fanflux_Intensity_MLB_Hispanic.parquet"),
+        "White Baseball Fans": pd.read_parquet("data/Fanflux_Intensity_MLB_White.parquet"),
     }
 
     if selected != "🏠 Home" and selected != "🤖 Chatbot":
-        key = " ".join(selected.split(" ")[1:3])
+        key = selected.split("📊 ")[1]
         df = dataframes[key]
 
         selected_fandom_level = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique(), key="fandom_level")
