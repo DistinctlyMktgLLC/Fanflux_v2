@@ -28,3 +28,16 @@ def display_fan_demographics(df):
 
 def load_data():
     return pd.read_parquet("data/Fanflux_Intensity_All_Leagues_Cleaned.parquet")
+
+def filter_data(df, leagues, teams, fandom_levels, races, income_levels):
+    if leagues:
+        df = df[df['League'].isin(leagues)]
+    if teams:
+        df = df[df['Team'].isin(teams)]
+    if fandom_levels:
+        df = df[df['Fandom Level'].isin(fandom_levels)]
+    if races:
+        df = df[df['Race'].isin(races)]
+    if income_levels:
+        df = df[df['Income Level'].isin(income_levels)]
+    return df
