@@ -1,3 +1,4 @@
+# utils.py
 import streamlit as st
 
 def apply_common_styles():
@@ -14,3 +15,12 @@ def apply_common_styles():
         """,
         unsafe_allow_html=True,
     )
+
+def display_fan_demographics(df):
+    total_avid_fans = df["Avid Fans"].sum()
+    total_casual_fans = df["Casual Fans"].sum()
+    total_convertible_fans = df["Convertible Fans"].sum()
+
+    st.metric(label="Total Avid Fans", value=total_avid_fans)
+    st.metric(label="Total Casual Fans", value=total_casual_fans)
+    st.metric(label="Total Convertible Fans", value=total_convertible_fans)
