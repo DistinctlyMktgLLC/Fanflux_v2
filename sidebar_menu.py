@@ -3,7 +3,7 @@ from streamlit_option_menu import option_menu
 import pandas as pd
 import folium
 from streamlit_folium import folium_static
-from Pages import home, mlb_aapi, mlb_american_indian, mlb_asian, mlb_black, mlb_hispanic, mlb_white, chatbot_page
+from Pages import home_app, mlb_aapi_app, mlb_american_indian_app, mlb_asian_app, mlb_black_app, mlb_hispanic_app, mlb_white_app, chatbot_page_app
 
 # List of income columns
 income_columns = [
@@ -27,16 +27,16 @@ income_columns = [
 
 # Menu options with main and sub-navigation
 menu_options = {
-    "🏠 Home": home.app,
+    "🏠 Home": home_app.app,
     "⚾ MLB": {
-        "📊 AAPI Baseball Fans": mlb_aapi.app,
-        "📊 American Indian Baseball Fans": mlb_american_indian.app,
-        "📊 Asian Baseball Fans": mlb_asian.app,
-        "📊 Black Baseball Fans": mlb_black.app,
-        "📊 Hispanic Baseball Fans": mlb_hispanic.app,
-        "📊 White Baseball Fans": mlb_white.app,
+        "📊 AAPI Baseball Fans": mlb_aapi_app.app,
+        "📊 American Indian Baseball Fans": mlb_american_indian_app.app,
+        "📊 Asian Baseball Fans": mlb_asian_app.app,
+        "📊 Black Baseball Fans": mlb_black_app.app,
+        "📊 Hispanic Baseball Fans": mlb_hispanic_app.app,
+        "📊 White Baseball Fans": mlb_white_app.app,
     },
-    "🤖 Chatbot": chatbot_page.app
+    "🤖 Chatbot": chatbot_page_app.app
 }
 
 def apply_filters(df):
@@ -68,6 +68,7 @@ def sidebar_menu():
             icons=["house", "baseball", "basketball", "football", "hockey-puck", "soccer-ball", "robot"],
             menu_icon="cast",
             default_index=0,
+            key="main_menu",
             styles={
                 "container": {"padding": "5!important", "background-color": "black"},
                 "icon": {"color": "white", "font-size": "23px"},
@@ -84,6 +85,7 @@ def sidebar_menu():
                 icons=["bar-chart"] * len(menu_options[selected]),
                 menu_icon="cast",
                 default_index=0,
+                key="submenu",
                 styles={
                     "container": {"padding": "5!important", "background-color": "black"},
                     "icon": {"color": "white", "font-size": "23px"},
