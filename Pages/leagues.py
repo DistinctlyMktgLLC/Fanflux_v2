@@ -35,6 +35,10 @@ def app():
     display_fan_demographics(df)
 
     st.subheader("Fan Opportunity Map")
+    
+    # Filter out rows with NaN values in 'US lat' or 'US lon'
+    df = df.dropna(subset=['US lat', 'US lon'])
+
     m = leafmap.Map(center=[37.7749, -122.4194], zoom=4)
     for i, row in df.iterrows():
         m.add_marker(location=[row['US lat'], row['US lon']], tooltip=row['Team'])
