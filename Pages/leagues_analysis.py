@@ -2,6 +2,22 @@ import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import folium_static
+from sklearn.model_selection import train_test_split
+
+def stratified_sample(df, n, strata):
+    """
+    Perform stratified sampling on the dataframe based on the given strata column.
+    """
+    # Check if the dataframe is larger than the sample size
+    if len(df) <= n:
+        return df
+
+    # Perform stratified sampling
+    stratified_df = df.groupby(strata, group_keys=False).apply(
+        lambda x: x.sample(min(len(x), max(int(n / len(df) * len(x)), 1)))
+    )
+
+    return stratified_df.sample(n=n)
 
 def app(df):
     st.title("Leagues Analysis")
@@ -34,10 +50,9 @@ def app(df):
     if selected_income_levels:
         filtered_df = filtered_df[filtered_df[selected_income_levels].sum(axis=1) > 0]
 
-    # If no filters are applied, sample data for faster map rendering
+    # If no filters are applied, perform stratified sampling for faster map rendering
     if not (selected_fandom_levels or selected_races or selected_leagues or selected_teams or selected_income_levels):
-        if len(filtered_df) > 1000:
-            filtered_df = filtered_df.sample(n=1000)
+        filtered_df = stratified_sample(filtered_df, 1000, 'Race')
 
     # Income columns
     income_columns = [
