@@ -1,18 +1,19 @@
 import streamlit as st
-import pandas as pd
 from utils import load_data, filter_data, display_fan_demographics
 
 def app():
     st.title("Fanflux League Analysis")
     
     df = load_data()
+    
+    if df.empty:
+        st.stop()  # Stop execution if there are errors in loading data
 
     leagues = st.multiselect("Select Leagues", options=df['League'].unique())
     teams = st.multiselect("Select Teams", options=df['Team'].unique())
     fandom_levels = st.multiselect("Select Fandom Levels", options=["Avid", "Casual", "Convertible"])
     races = st.multiselect("Select Races", options=df['Race'].unique())
     
-    # Ensure the income columns exist in the DataFrame
     income_columns = [
         'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)', 
         'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)', 
@@ -23,11 +24,6 @@ def app():
         'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)', 
         'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)'
     ]
-
-    for col in income_columns:
-        if col not in df.columns:
-            st.error(f"The column '{col}' is missing in the dataset.")
-            return
 
     income_levels = st.multiselect("Select Income Levels", options=income_columns)
 
