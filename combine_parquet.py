@@ -1,35 +1,64 @@
 import pandas as pd
 import os
 
-# Define the directory containing the Parquet files
-parquet_dir = 'data/'
+# Define the directory containing the CSV files
+data_dir = 'data'
 
-# List all Parquet files in the directory
-parquet_files = [f for f in os.listdir(parquet_dir) if f.endswith('.parquet')]
+# Define the columns with their desired data types
+column_types = {
+    'dCategory': 'object',
+    'Team': 'object',
+    'League': 'object',
+    'City': 'object',
+    'City Alt.': 'object',
+    'Neighborhood': 'object',
+    'zipcode': 'float64',
+    'US lat': 'float64',
+    'US lon': 'float64',
+    'Intensity Score': 'float64',
+    'Race': 'object',
+    'Fandom Level': 'object',
+    'Struggling (Less than $10,000)': 'float64',
+    'Getting By ($10,000 to $14,999)': 'float64',
+    'Getting By ($15,000 to $19,999)': 'float64',
+    'Starting Out ($20,000 to $24,999)': 'float64',
+    'Starting Out ($25,000 to $29,999)': 'float64',
+    'Starting Out ($30,000 to $34,999)': 'float64',
+    'Middle Class ($35,000 to $39,999)': 'float64',
+    'Middle Class ($40,000 to $44,999)': 'float64',
+    'Middle Class ($45,000 to $49,999)': 'float64',
+    'Comfortable ($50,000 to $59,999)': 'float64',
+    'Comfortable ($60,000 to $74,999)': 'float64',
+    'Doing Well ($75,000 to $99,999)': 'float64',
+    'Prosperous ($100,000 to $124,999)': 'float64',
+    'Prosperous ($125,000 to $149,999)': 'float64',
+    'Wealthy ($150,000 to $199,999)': 'float64',
+    'Affluent ($200,000 or more)': 'float64'
+}
 
-# Read and combine the Parquet files
-df_list = [pd.read_parquet(os.path.join(parquet_dir, file)) for file in parquet_files]
-df_combined = pd.concat(df_list, ignore_index=True)
+# Initialize an empty list to store DataFrames
+dfs = []
 
-# Ensure all columns are strings to avoid mixed data type issues
-df_combined = df_combined.applymap(str)
+# Iterate over each file in the data directory
+for filename in os.listdir(data_dir):
+    if filename.endswith('.csv'):
+        filepath = os.path.join(data_dir, filename)
+        
+        # Read the CSV file
+        df = pd.read_csv(filepath)
+        
+        # Ensure consistent data types
+        for column, dtype in column_types.items():
+            if column in df.columns:
+                df[column] = df[column].astype(dtype)
+        
+        # Append the DataFrame to the list
+        dfs.append(df)
 
-# Create a combined 'Income Level' column for tooltip purposes
-income_columns = [
-    'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)', 'Getting By ($15,000 to $19,999)',
-    'Starting Out ($20,000 to $24,999)', 'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)',
-    'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)', 'Middle Class ($45,000 to $49,999)',
-    'Comfortable ($50,000 to $59,999)', 'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)',
-    'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)', 'Wealthy ($150,000 to $199,999)',
-    'Affluent ($200,000 or more)'
-]
+# Concatenate all DataFrames
+df_combined = pd.concat(dfs, ignore_index=True)
 
-# Merge the income columns into a single 'Income Level' column for tooltips
-def merge_income_levels(row):
-    levels = [col for col in income_columns if row[col] == '1.0']
-    return ', '.join(levels)
+# Save the combined DataFrame to a Parquet file
+df_combined.to_parquet('data/combined_leagues.parquet', index=False)
 
-df_combined['Income Level'] = df_combined.apply(merge_income_levels, axis=1)
-
-# Save the combined DataFrame as a new Parquet file
-df_combined.to_parquet('data/combined_leagues.parquet')
+print("Combined CSV files and saved to data/combined_leagues.parquet")
