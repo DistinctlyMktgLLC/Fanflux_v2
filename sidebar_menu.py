@@ -27,16 +27,16 @@ income_columns = [
 
 # Menu options with main and sub-navigation
 menu_options = {
-    "🏠 Home": home_app.app,
+    "🏠 Home": home_app,
     "⚾ MLB": {
-        "📊 AAPI Baseball Fans": mlb_aapi_app.app,
-        "📊 American Indian Baseball Fans": mlb_american_indian_app.app,
-        "📊 Asian Baseball Fans": mlb_asian_app.app,
-        "📊 Black Baseball Fans": mlb_black_app.app,
-        "📊 Hispanic Baseball Fans": mlb_hispanic_app.app,
-        "📊 White Baseball Fans": mlb_white_app.app,
+        "📊 AAPI Baseball Fans": mlb_aapi_app,
+        "📊 American Indian Baseball Fans": mlb_american_indian_app,
+        "📊 Asian Baseball Fans": mlb_asian_app,
+        "📊 Black Baseball Fans": mlb_black_app,
+        "📊 Hispanic Baseball Fans": mlb_hispanic_app,
+        "📊 White Baseball Fans": mlb_white_app,
     },
-    "🤖 Chatbot": chatbot_page_app.app
+    "🤖 Chatbot": chatbot_page_app
 }
 
 def apply_filters(df):
