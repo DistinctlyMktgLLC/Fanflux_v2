@@ -1,4 +1,5 @@
 import streamlit as st
-import sidebar_menu
+from sidebar_menu import sidebar_menu
 
-sidebar_menu.sidebar_menu()
+# Run the sidebar menu function
+sidebar_menu()
