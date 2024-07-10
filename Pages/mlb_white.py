@@ -44,7 +44,7 @@ def app(filtered_df):
         # Calculate metrics
         total_avid_fans = df[df['Fandom Level'] == 'Avid'][income_columns].sum().sum()
         total_casual_fans = df[df['Fandom Level'] == 'Casual'][income_columns].sum().sum()
-        total_convertible_fans = df[df['Fandom Level'] == 'Not at All'][income_columns].sum().sum()
+        total_convertible_fans = df[df['Fandom Level'] == 'Convertible'][income_columns].sum().sum()
 
     # Display metrics in scorecards
     col1, col2, col3 = st.columns(3)
@@ -61,8 +61,10 @@ def app(filtered_df):
     folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4)
 
     for _, row in df.iterrows():
-        # Replace "Not at All" with "Convertible" in the Fandom Level
-        fandom_level = "Convertible" if row['Fandom Level'] == "Not at All" else row['Fandom Level']
+        # Ensure all fandom levels are correctly mapped
+        fandom_level = row['Fandom Level']
+        if fandom_level == "Not at All":
+            fandom_level = "Convertible"
 
         # Update popup content to use "Convertible" instead of "Not at All"
         popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {fandom_level}<br>Race: {row['Race']}<br>Total Fans: {row[income_columns].sum()}"
