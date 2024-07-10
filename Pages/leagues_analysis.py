@@ -83,7 +83,15 @@ def app(df):
     folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4)
     for _, row in filtered_df.iterrows():
         fandom_level = "Convertible" if row['Fandom Level'] == "Not at All" else row['Fandom Level']
-        popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {fandom_level}<br>Race: {row['Race']}<br>Total Fans: {row[income_columns].sum()}"
+        total_fans = int(row[income_columns].sum())
+        popup_content = (
+            f"Team: {row['Team']}<br>"
+            f"League: {row['League']}<br>"
+            f"Neighborhood: {row['Neighborhood']}<br>"
+            f"Fandom Level: {fandom_level}<br>"
+            f"Race: {row['Race']}<br>"
+            f"Total Fans: {total_fans:,}"
+        )
         color = {"Avid": "red", "Casual": "blue", "Convertible": "green"}.get(fandom_level, 'black')
         folium.CircleMarker(
             location=[row['US lat'], row['US lon']],
