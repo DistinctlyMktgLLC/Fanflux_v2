@@ -1,14 +1,13 @@
 import streamlit as st
 import pandas as pd
 from utils import display_fan_demographics, apply_common_styles
+import leafmap.foliumap as leafmap
 
 def app():
-    # Load the cleaned parquet file
-    df = pd.read_parquet("data/Fanflux_Intensity_All_Leagues_Cleaned_Final.parquet")
-
     st.title("Fanflux League Analysis")
 
-    # Sidebar filters
+    df = pd.read_parquet('data/Fanflux_Intensity_All_Leagues_Cleaned.parquet')
+
     leagues = st.multiselect("Select Leagues", options=df['League'].unique())
     teams = st.multiselect("Select Teams", options=df['Team'].unique())
     fandom_levels = st.multiselect("Select Fandom Levels", options=['Avid', 'Casual', 'Convertible'])
@@ -22,16 +21,21 @@ def app():
         'Affluent ($200,000 or more)'
     ])
 
-    # Filter the dataframe based on selections
-    filtered_df = df[
-        (df['League'].isin(leagues)) &
-        (df['Team'].isin(teams)) &
-        (df['Fandom Level'].isin(fandom_levels)) &
-        (df['Race'].isin(races))
-    ]
+    if leagues:
+        df = df[df['League'].isin(leagues)]
+    if teams:
+        df = df[df['Team'].isin(teams)]
+    if fandom_levels:
+        df = df[df['Fandom Level'].isin(fandom_levels)]
+    if races:
+        df = df[df['Race'].isin(races)]
+    if income_levels:
+        df = df[df[income_levels].any(axis=1)]
 
-    # Display the fan demographics
-    display_fan_demographics(filtered_df)
+    display_fan_demographics(df)
 
-    # Display filtered data
-    st.write(filtered_df)
+    st.subheader("Fan Opportunity Map")
+    m = leafmap.Map(center=[37.7749, -122.4194], zoom=4)
+    for i, row in df.iterrows():
+        m.add_marker(location=[row['US lat'], row['US lon']], tooltip=row['Team'])
+    m.to_streamlit(height=600)
