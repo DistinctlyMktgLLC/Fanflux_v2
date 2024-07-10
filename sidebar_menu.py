@@ -23,18 +23,18 @@ def sidebar_menu():
         unsafe_allow_html=True
     )
 
-    # Sidebar menu options with emojis/icons
+    # Sidebar menu options without emojis/icons
     menu_options = {
-        "🏠 Home": home_app,
-        "📊 Leagues Analysis": leagues_analysis_app,
-        "🤖 Chatbot": chatbot_page_app
+        "Home": home_app,
+        "Leagues Analysis": leagues_analysis_app,
+        "Chatbot": chatbot_page_app
     }
 
     with st.sidebar:
         selected = option_menu(
             menu_title="Fanflux",
             options=list(menu_options.keys()),
-            icons=["house", "bar-chart", "robot"],
+            icons=["", "", ""],  # No icons
             menu_icon="cast",
             default_index=0,
             key="main_menu_option",
@@ -47,7 +47,7 @@ def sidebar_menu():
         )
 
     # Run the selected app
-    if selected == "🏠 Home":
+    if selected == "Home":
         menu_options[selected]()
     else:
         menu_options[selected](df)

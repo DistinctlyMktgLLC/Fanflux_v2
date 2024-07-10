@@ -59,17 +59,26 @@ def app(df):
     total_casual_fans = filtered_df[filtered_df['Fandom Level'] == 'Casual'][income_columns].sum().sum()
     total_convertible_fans = filtered_df[filtered_df['Fandom Level'] == 'Convertible'][income_columns].sum().sum()
 
+    # Format metrics as whole numbers
+    total_avid_fans = int(total_avid_fans)
+    total_casual_fans = int(total_casual_fans)
+    total_convertible_fans = int(total_convertible_fans)
+
     # Display metrics in scorecards
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric(label="Total Avid Fans", value=total_avid_fans, delta_color="off")
+        st.metric(label="Total Avid Fans", value=f"{total_avid_fans:,}", delta_color="off")
     with col2:
-        st.metric(label="Total Casual Fans", value=total_casual_fans, delta_color="off")
+        st.metric(label="Total Casual Fans", value=f"{total_casual_fans:,}", delta_color="off")
     with col3:
-        st.metric(label="Total Convertible Fans", value=total_convertible_fans, delta_color="off")
+        st.metric(label="Total Convertible Fans", value=f"{total_convertible_fans:,}", delta_color="off")
 
-    # Map
     st.header("Fan Opportunity Map")
+
+    # Sample data for faster map rendering if necessary
+    if len(filtered_df) > 1000:
+        filtered_df = filtered_df.sample(n=1000)
+
     folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4)
     for _, row in filtered_df.iterrows():
         fandom_level = "Convertible" if row['Fandom Level'] == "Not at All" else row['Fandom Level']
@@ -83,4 +92,5 @@ def app(df):
             fill=True,
             fill_color=color
         ).add_to(folium_map)
+
     folium_static(folium_map, width=1200, height=800)
