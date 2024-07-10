@@ -3,13 +3,12 @@ import pandas as pd
 from utils import display_fan_demographics, apply_common_styles
 
 def app():
-    apply_common_styles()
-    
-    # Load your parquet file
-    df = pd.read_parquet("data/Fanflux_Intensity_All_Leagues_Cleaned.parquet")
+    # Load the cleaned parquet file
+    df = pd.read_parquet("data/Fanflux_Intensity_All_Leagues_Cleaned_Final.parquet")
 
     st.title("Fanflux League Analysis")
-    
+
+    # Sidebar filters
     leagues = st.multiselect("Select Leagues", options=df['League'].unique())
     teams = st.multiselect("Select Teams", options=df['Team'].unique())
     fandom_levels = st.multiselect("Select Fandom Levels", options=['Avid', 'Casual', 'Convertible'])
@@ -23,16 +22,16 @@ def app():
         'Affluent ($200,000 or more)'
     ])
 
-    filtered_df = df.copy()
-    if leagues:
-        filtered_df = filtered_df[filtered_df['League'].isin(leagues)]
-    if teams:
-        filtered_df = filtered_df[filtered_df['Team'].isin(teams)]
-    if fandom_levels:
-        filtered_df = filtered_df[filtered_df['Fandom Level'].isin(fandom_levels)]
-    if races:
-        filtered_df = filtered_df[filtered_df['Race'].isin(races)]
-    if income_levels:
-        filtered_df = filtered_df[filtered_df['Income Level'].isin(income_levels)]
+    # Filter the dataframe based on selections
+    filtered_df = df[
+        (df['League'].isin(leagues)) &
+        (df['Team'].isin(teams)) &
+        (df['Fandom Level'].isin(fandom_levels)) &
+        (df['Race'].isin(races))
+    ]
 
+    # Display the fan demographics
     display_fan_demographics(filtered_df)
+
+    # Display filtered data
+    st.write(filtered_df)
