@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import folium_static
-from sklearn.model_selection import train_test_split
 
 def stratified_sample(df, n, strata):
     """
@@ -12,12 +11,12 @@ def stratified_sample(df, n, strata):
     if len(df) <= n:
         return df
 
-    # Perform stratified sampling
+    # Calculate the number of samples per stratum
     stratified_df = df.groupby(strata, group_keys=False).apply(
-        lambda x: x.sample(min(len(x), max(int(n / len(df) * len(x)), 1)))
+        lambda x: x.sample(frac=min(n/len(df), 1))
     )
 
-    return stratified_df.sample(n=n)
+    return stratified_df
 
 def app(df):
     st.title("Leagues Analysis")
