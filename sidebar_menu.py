@@ -4,21 +4,22 @@ from Pages import home_app, chatbot_page_app, leagues_app
 from utils import apply_common_styles
 
 def sidebar_menu():
-    apply_common_styles()
+    with st.sidebar:
+        selected = option_menu(
+            "Fanflux",
+            ["Home", "Leagues", "Chatbot"],
+            icons=["house", "megaphone", "robot"],  # Icons for Home, Leagues, and Chatbot
+            menu_icon="cast",
+            default_index=0,
+            styles={
+                "container": {"padding": "5!important", "background-color": "#262730"},
+                "icon": {"color": "#f3f4f6", "font-size": "25px"},
+                "nav-link": {"font-size": "16px", "text-align": "left", "margin": "0px", "--hover-color": "#3c3f41"},
+                "nav-link-selected": {"background-color": "#4CAF50"},
+            }
+        )
 
-    selected = option_menu(
-        menu_title="Fanflux",  # required
-        options=["Home", "Leagues", "Chatbot"],  # required
-        icons=["house", "megaphone", "robot"],  # required
-        menu_icon="cast",  # optional
-        default_index=0,  # optional
-        styles={
-            "container": {"padding": "5!important", "background-color": "#262730"},
-            "icon": {"color": "white", "font-size": "25px"}, 
-            "nav-link": {"font-size": "16px", "text-align": "left", "margin": "0px", "--hover-color": "#3c3f41"},
-            "nav-link-selected": {"background-color": "#4CAF50"},
-        }
-    )
+    apply_common_styles()
 
     if selected == "Home":
         home_app()
