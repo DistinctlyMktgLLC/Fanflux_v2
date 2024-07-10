@@ -1,7 +1,7 @@
+# utils.py
 import streamlit as st
 
 def display_fan_demographics(df):
-    # Calculate the total fans by summing the specified income columns for each fandom level
     income_columns = [
         'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)',
         'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)',
@@ -12,25 +12,26 @@ def display_fan_demographics(df):
         'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)',
         'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)'
     ]
-    
+
+    # Calculate the total sums for each fandom level
     total_avid_fans = df[df['Fandom Level'] == 'Avid'][income_columns].sum().sum()
     total_casual_fans = df[df['Fandom Level'] == 'Casual'][income_columns].sum().sum()
     total_convertible_fans = df[df['Fandom Level'] == 'Convertible'][income_columns].sum().sum()
 
     st.markdown("""
-        <style>
-            .card {
-                padding: 20px;
-                margin: 10px;
-                background-color: #333;
-                color: white;
-                border-radius: 10px;
-                box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
-            }
-            .card h3 {
-                margin: 0;
-            }
-        </style>
+    <style>
+        .card {
+            padding: 20px;
+            margin: 10px;
+            background-color: #333;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        .card h3 {
+            margin: 0;
+        }
+    </style>
     """, unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3)
