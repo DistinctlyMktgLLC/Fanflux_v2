@@ -3,10 +3,10 @@ import streamlit as st
 
 def app():
     st.title("Welcome to Fanflux")
-    st.markdown("""
+    st.write("""
     Dive into the Metrics that Matter
 
-    Ever wondered why certain fans are more dedicated than others? Or why some regions have higher concentrations of specific fan types? Welcome to Fanflux, where data meets fandom in the most intriguing ways. Here’s what you’ll get:
+    Ever wondered why certain fans are more dedicated than others? Or why some regions have higher concentrations of specific fan types? Welcome to Fanflux, where data meets fandom in the most intriguing ways. Here's what you'll get:
 
     - Discover Fan Distribution: Visualize the geographical spread of different fan types.
     - Analyze Fan Intensity: Understand how passionate fans are about their teams.

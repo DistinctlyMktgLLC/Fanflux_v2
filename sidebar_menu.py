@@ -1,6 +1,8 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-from Pages import home as home_app, chatbot_page as chatbot_page_app, leagues as leagues_app
+from Pages import home, chatbot_page, leagues
+
+from utils import apply_common_styles
 
 def sidebar_menu():
     with st.sidebar:
@@ -18,9 +20,11 @@ def sidebar_menu():
             }
         )
 
+    apply_common_styles()
+
     if selected == "🏠 Home":
-        home_app()
+        home.app()
     elif selected == "📣 Leagues":
-        leagues_app()
+        leagues.app()
     elif selected == "🤖 Chatbot":
-        chatbot_page_app()
+        chatbot_page.app()
