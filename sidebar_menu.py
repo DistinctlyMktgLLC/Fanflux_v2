@@ -1,12 +1,9 @@
 import streamlit as st
+from streamlit_option_menu import option_menu
 import pandas as pd
 import folium
-from streamlit_option_menu import option_menu
 from streamlit_folium import folium_static
-from Pages import home, chatbot_page  # Import all other pages as needed
-
-# Load the combined Parquet file
-df_all = pd.read_parquet("data/Fanflux_Intensity_All_Leagues.parquet")
+from Pages import home, mlb_aapi, mlb_american_indian, mlb_asian, mlb_black, mlb_hispanic, mlb_white, chatbot_page
 
 # List of income columns
 income_columns = [
@@ -28,57 +25,21 @@ income_columns = [
     'Affluent ($200,000 or more)'
 ]
 
-# Custom CSS for Sidebar Menu
-st.markdown(
-    """
-    <style>
-    .sidebar .sidebar-content {
-        background-color: #1d1d1d;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-# Sidebar menu options with emojis/icons
+# Menu options with main and sub-navigation
 menu_options = {
     "🏠 Home": home.app,
     "⚾ MLB": {
-        "📊 AAPI Baseball Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'MLB'], 'AAPI'),
-        "📊 American Indian Baseball Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'MLB'], 'American Indian'),
-        "📊 Asian Baseball Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'MLB'], 'Asian'),
-        "📊 Black Baseball Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'MLB'], 'Black'),
-        "📊 Hispanic Baseball Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'MLB'], 'Hispanic'),
-        "📊 White Baseball Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'MLB'], 'White'),
+        "📊 AAPI Baseball Fans": mlb_aapi.app,
+        "📊 American Indian Baseball Fans": mlb_american_indian.app,
+        "📊 Asian Baseball Fans": mlb_asian.app,
+        "📊 Black Baseball Fans": mlb_black.app,
+        "📊 Hispanic Baseball Fans": mlb_hispanic.app,
+        "📊 White Baseball Fans": mlb_white.app,
     },
-    "🏀 NBA": {
-        "📊 AAPI Basketball Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'NBA'], 'AAPI'),
-        "📊 American Indian Basketball Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'NBA'], 'American Indian'),
-        "📊 Asian Basketball Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'NBA'], 'Asian'),
-        "📊 Black Basketball Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'NBA'], 'Black'),
-        "📊 Hispanic Basketball Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'NBA'], 'Hispanic'),
-        "📊 White Basketball Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'NBA'], 'White'),
-    },
-    "🏈 NFL": {
-        "📊 Black Football Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'NFL'], 'Black'),
-        "📊 Hispanic Football Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'NFL'], 'Hispanic'),
-        "📊 White Football Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'NFL'], 'White'),
-    },
-    "🏒 NHL": {
-        "📊 AAPI Hockey Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'NHL'], 'AAPI'),
-        "📊 American Indian Hockey Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'NHL'], 'American Indian'),
-        "📊 Asian Hockey Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'NHL'], 'Asian'),
-        "📊 Black Hockey Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'NHL'], 'Black'),
-        "📊 Hispanic Hockey Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'NHL'], 'Hispanic'),
-        "📊 White Hockey Fans": lambda: render_filtered_page(df_all[df_all['dCategory'] == 'NHL'], 'White'),
-    },
-    "⚽ MLS": {
-        # Add options for MLS as needed
-    },
-    "🤖 Chatbot": chatbot_page.app,
+    "🤖 Chatbot": chatbot_page.app
 }
 
-def render_filtered_page(df, race):
+def apply_filters(df):
     selected_fandom_level = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique())
     selected_race = st.sidebar.multiselect("Select Race", df['Race'].unique())
     selected_league = st.sidebar.selectbox("Select League", df['League'].unique())
@@ -97,8 +58,7 @@ def render_filtered_page(df, race):
     if selected_income_levels:
         df = df[['Team', 'League', 'Fandom Level', 'Race'] + selected_income_levels]
 
-    # Call the app function for the selected race
-    page_function(df)
+    return df
 
 def sidebar_menu():
     with st.sidebar:
