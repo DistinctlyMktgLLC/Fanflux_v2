@@ -37,7 +37,7 @@ def sidebar_menu():
             icons=["house", "bar-chart", "robot"],
             menu_icon="cast",
             default_index=0,
-            key="main_menu",
+            key="main_menu_option",
             styles={
                 "container": {"padding": "5!important", "background-color": "#1d1d1d"},
                 "icon": {"color": "white", "font-size": "25px"},
