@@ -9,12 +9,10 @@ def sidebar_menu():
         selected = option_menu(
             "Fanflux",
             ["🏠 Home", "📣 Leagues", "🤖 Chatbot"],
-            icons=["house", "menu-button-fill", "robot"],
             menu_icon="cast",
             default_index=0,
             styles={
                 "container": {"padding": "5!important", "background-color": "#1d1d1d"},
-                "icon": {"color": "orange", "font-size": "25px"},
                 "nav-link": {"font-size": "16px", "text-align": "left", "margin": "0px", "--hover-color": "#eee"},
                 "nav-link-selected": {"background-color": "#00c853"},
             }
