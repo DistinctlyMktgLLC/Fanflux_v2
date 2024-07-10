@@ -1,17 +1,18 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-from Pages import home, chatbot_page, leagues
+from Pages import home_app, chatbot_page_app, leagues_app
 from utils import apply_common_styles
 
 def sidebar_menu():
     apply_common_styles()
 
     selected = option_menu(
-        "Fanflux",
+        "",
         ["🏠 Home", "📣 Leagues", "🤖 Chatbot"],
         icons=["house", "megaphone", "robot"],
         menu_icon="cast",
         default_index=0,
+        orientation="vertical",
         styles={
             "container": {"padding": "5!important", "background-color": "#262730"},
             "icon": {"color": "#f3f4f6", "font-size": "25px"},
@@ -21,8 +22,8 @@ def sidebar_menu():
     )
 
     if selected == "🏠 Home":
-        home.app()
+        home_app()
     elif selected == "📣 Leagues":
-        leagues.app()
+        leagues_app()
     elif selected == "🤖 Chatbot":
-        chatbot_page.app()
+        chatbot_page_app()
