@@ -16,3 +16,4 @@ pyrebase4
 pycryptodome
 streamlit-authenticator
 streamlit-chat
+scikit-learn
