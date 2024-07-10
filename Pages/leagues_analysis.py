@@ -34,6 +34,11 @@ def app(df):
     if selected_income_levels:
         filtered_df = filtered_df[filtered_df[selected_income_levels].sum(axis=1) > 0]
 
+    # If no filters are applied, sample data for faster map rendering
+    if not (selected_fandom_levels or selected_races or selected_leagues or selected_teams or selected_income_levels):
+        if len(filtered_df) > 1000:
+            filtered_df = filtered_df.sample(n=1000)
+
     # Income columns
     income_columns = [
         'Struggling (Less than $10,000)',
@@ -74,10 +79,6 @@ def app(df):
         st.metric(label="Total Convertible Fans", value=f"{total_convertible_fans:,}", delta_color="off")
 
     st.header("Fan Opportunity Map")
-
-    # Sample data for faster map rendering if necessary
-    if len(filtered_df) > 1000:
-        filtered_df = filtered_df.sample(n=1000)
 
     folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4)
     for _, row in filtered_df.iterrows():
