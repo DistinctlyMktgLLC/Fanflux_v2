@@ -6,7 +6,8 @@ import leafmap.foliumap as leafmap
 def app():
     st.title("Fanflux League Analysis")
 
-    df = pd.read_parquet('data/Fanflux_Intensity_All_Leagues_Cleaned.parquet')
+    # Read the combined Parquet file
+    df = pd.read_parquet('data/combined_leagues.parquet')
 
     leagues = st.multiselect("Select Leagues", options=df['League'].unique())
     teams = st.multiselect("Select Teams", options=df['Team'].unique())
@@ -21,6 +22,7 @@ def app():
         'Affluent ($200,000 or more)'
     ])
 
+    # Apply filters
     if leagues:
         df = df[df['League'].isin(leagues)]
     if teams:
@@ -41,5 +43,5 @@ def app():
 
     m = leafmap.Map(center=[37.7749, -122.4194], zoom=4)
     for i, row in df.iterrows():
-        m.add_marker(location=[row['US lat'], row['US lon']], tooltip=row['Team'])
+        m.add_marker(location=[row['US lat'], row['US lon']], tooltip=f"Team: {row['Team']}<br>League: {row['League']}<br>Fandom Level: {row['Fandom Level']}<br>Race: {row['Race']}<br>Income Level: {row['Income Level']}")
     m.to_streamlit(height=600)
