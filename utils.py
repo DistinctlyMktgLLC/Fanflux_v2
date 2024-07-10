@@ -43,5 +43,6 @@ def filter_data(df, leagues, teams, fandom_levels, races, income_levels):
     if races:
         df = df[df['Race'].isin(races)]
     if income_levels:
-        df = df[df['Income Level'].isin(income_levels)]
+        df = df[income_levels]
+
     return df
