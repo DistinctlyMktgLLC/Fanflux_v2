@@ -12,6 +12,10 @@ def apply_common_styles():
         .sidebar .sidebar-content {
             background-color: #1d1d1d;
         }
+        .stApp {
+            background-color: white;
+            opacity: 1;
+        }
         </style>
         """,
         unsafe_allow_html=True,
