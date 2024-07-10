@@ -20,6 +20,13 @@ def app():
     # Load the combined dataset
     df = pd.read_parquet('data/combined_leagues.parquet')
 
+    # Check if the required columns are present
+    required_columns = ['Team', 'League', 'US lat', 'US lon', 'Fandom Level', 'Race'] + income_columns
+    missing_columns = [col for col in required_columns if col not in df.columns]
+    if missing_columns:
+        st.error(f"The following columns are missing in the dataset: {', '.join(missing_columns)}")
+        return
+
     # Filters
     leagues = st.multiselect("Select Leagues", options=df['League'].unique())
     teams = st.multiselect("Select Teams", options=df['Team'].unique())
@@ -36,7 +43,7 @@ def app():
     ]
 
     if income_levels:
-        income_mask = filtered_df[income_columns].apply(lambda row: any(row[level] == '1.0' for level in income_levels), axis=1)
+        income_mask = filtered_df[income_columns].apply(lambda row: any(row[level] == 1.0 for level in income_levels), axis=1)
         filtered_df = filtered_df[income_mask]
 
     # Display fan demographics
@@ -50,7 +57,7 @@ def app():
         if pd.notna(row['US lat']) and pd.notna(row['US lon']):
             folium.Marker(
                 location=[float(row['US lat']), float(row['US lon'])],
-                tooltip=f"Team: {row['Team']}<br>League: {row['League']}<br>Fandom Level: {row['Fandom Level']}<br>Race: {row['Race']}<br>Income Level: {row['Income Level']}"
+                tooltip=f"Team: {row['Team']}<br>League: {row['League']}<br>Fandom Level: {row['Fandom Level']}<br>Race: {row['Race']}"
             ).add_to(m)
 
     # Display the map
