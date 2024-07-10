@@ -1,40 +1,30 @@
 import streamlit as st
-from utils import load_data, filter_data, display_fan_demographics
+from streamlit_option_menu import option_menu
+from Pages import home, chatbot_page, leagues
 
-def app():
-    st.title("Fanflux League Analysis")
-    
-    df = load_data()
-    
-    if df.empty:
-        st.stop()  # Stop execution if there are errors in loading data
+from utils import apply_common_styles
 
-    leagues = st.multiselect("Select Leagues", options=df['League'].unique())
-    teams = st.multiselect("Select Teams", options=df['Team'].unique())
-    fandom_levels = st.multiselect("Select Fandom Levels", options=["Avid", "Casual", "Convertible"])
-    races = st.multiselect("Select Races", options=df['Race'].unique())
-    
-    income_columns = [
-        'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)', 
-        'Getting By ($15,000 to $19,999)', 'Starting Out ($20,000 to $24,999)', 
-        'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)', 
-        'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)', 
-        'Middle Class ($45,000 to $49,999)', 'Comfortable ($50,000 to $59,999)', 
-        'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)', 
-        'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)', 
-        'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)'
-    ]
+def sidebar_menu():
+    with st.sidebar:
+        selected = option_menu(
+            "Fanflux",
+            ["Home", "Leagues", "Chatbot"],
+            icons=["house", "bar-chart", "robot"],
+            menu_icon="cast",
+            default_index=0,
+            styles={
+                "container": {"padding": "5!important", "background-color": "#1d1d1d"},
+                "icon": {"color": "orange", "font-size": "25px"},
+                "nav-link": {"font-size": "16px", "text-align": "left", "margin": "0px", "--hover-color": "#eee"},
+                "nav-link-selected": {"background-color": "#00c853"},
+            }
+        )
 
-    income_levels = st.multiselect("Select Income Levels", options=income_columns)
+    apply_common_styles()
 
-    filtered_df = filter_data(df, leagues, teams, fandom_levels, races, income_levels)
-    
-    display_fan_demographics(filtered_df)
-
-    # Display income levels totals
-    if income_levels:
-        total_income = filtered_df[income_levels].sum().sum()
-        st.metric(label="Total Income Level Fans", value=total_income)
-    else:
-        total_income = df[income_columns].sum().sum()
-        st.metric(label="Total Income Level Fans", value=total_income)
+    if selected == "Home":
+        home.app()
+    elif selected == "Leagues":
+        leagues.app()
+    elif selected == "Chatbot":
+        chatbot_page.app()

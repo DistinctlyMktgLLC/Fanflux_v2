@@ -8,11 +8,13 @@ def sidebar_menu():
     with st.sidebar:
         selected = option_menu(
             "Fanflux",
-            ["🏠 Home", "📣 Leagues", "🤖 Chatbot"],
+            ["Home", "Leagues", "Chatbot"],
+            icons=["house", "bar-chart", "robot"],
             menu_icon="cast",
             default_index=0,
             styles={
                 "container": {"padding": "5!important", "background-color": "#1d1d1d"},
+                "icon": {"color": "orange", "font-size": "25px"},
                 "nav-link": {"font-size": "16px", "text-align": "left", "margin": "0px", "--hover-color": "#eee"},
                 "nav-link-selected": {"background-color": "#00c853"},
             }
@@ -20,9 +22,9 @@ def sidebar_menu():
 
     apply_common_styles()
 
-    if selected == "🏠 Home":
+    if selected == "Home":
         home.app()
-    elif selected == "📣 Leagues":
+    elif selected == "Leagues":
         leagues.app()
-    elif selected == "🤖 Chatbot":
+    elif selected == "Chatbot":
         chatbot_page.app()
