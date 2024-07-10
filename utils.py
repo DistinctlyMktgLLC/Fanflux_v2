@@ -1,5 +1,6 @@
 # utils.py
 import streamlit as st
+import pandas as pd
 
 def apply_common_styles():
     st.markdown(
@@ -24,3 +25,6 @@ def display_fan_demographics(df):
     st.metric(label="Total Avid Fans", value=total_avid_fans)
     st.metric(label="Total Casual Fans", value=total_casual_fans)
     st.metric(label="Total Convertible Fans", value=total_convertible_fans)
+
+def load_data():
+    return pd.read_parquet("data/Fanflux_Intensity_All_Leagues_Cleaned.parquet")
