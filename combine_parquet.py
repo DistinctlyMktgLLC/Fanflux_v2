@@ -36,6 +36,13 @@ column_types = {
     'Affluent ($200,000 or more)': 'float64'
 }
 
+# Function to clean data by replacing non-numeric values with 0
+def clean_data(df):
+    for column, dtype in column_types.items():
+        if column in df.columns and dtype == 'float64':
+            df[column] = pd.to_numeric(df[column], errors='coerce').fillna(0)
+    return df
+
 # Initialize an empty list to store DataFrames
 dfs = []
 
@@ -46,6 +53,9 @@ for filename in os.listdir(data_dir):
         
         # Read the CSV file
         df = pd.read_csv(filepath)
+        
+        # Clean the data
+        df = clean_data(df)
         
         # Ensure consistent data types
         for column, dtype in column_types.items():
@@ -60,5 +70,3 @@ df_combined = pd.concat(dfs, ignore_index=True)
 
 # Save the combined DataFrame to a Parquet file
 df_combined.to_parquet('data/combined_leagues.parquet', index=False)
-
-print("Combined CSV files and saved to data/combined_leagues.parquet")
