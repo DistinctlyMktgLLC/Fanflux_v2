@@ -1,4 +1,4 @@
-# Pages/mlb_white.py
+# Pages/mlb_aapi.py
 import streamlit as st
 import pandas as pd
 import folium
