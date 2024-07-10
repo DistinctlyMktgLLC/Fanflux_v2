@@ -4,7 +4,7 @@ from streamlit_option_menu import option_menu
 import os
 from Pages.home import app as home_app
 from Pages.leagues_analysis import app as leagues_analysis_app
-from Pages.chatbot_page import app as chatbot_page
+from Pages.chatbot_page import app as chatbot_page_app
 
 # Load the combined data from a single Parquet file
 data_path = "data/combined_leagues.parquet"
@@ -27,7 +27,7 @@ def sidebar_menu():
     menu_options = {
         "🏠 Home": home_app,
         "📊 Leagues Analysis": leagues_analysis_app,
-        "🤖 Chatbot": chatbot_page
+        "🤖 Chatbot": chatbot_page_app
     }
 
     with st.sidebar:
