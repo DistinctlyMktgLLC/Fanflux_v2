@@ -6,8 +6,12 @@ from sklearn.utils import resample
 
 # Function to stratified sample
 def stratified_sample(df, n, stratify_col):
-    stratified_df = df.groupby(stratify_col, group_keys=False).apply(lambda x: x.sample(min(len(x), n // len(df[stratify_col].unique()))))
-    return stratified_df.sample(n=n)
+    # Calculate the minimum sample size per group
+    min_size_per_group = min(n // df[stratify_col].nunique(), df.groupby(stratify_col).size().min())
+    # Perform stratified sampling
+    stratified_df = df.groupby(stratify_col, group_keys=False).apply(lambda x: x.sample(min(len(x), min_size_per_group)))
+    # Shuffle the resulting dataframe and take the final sample
+    return stratified_df.sample(n=min(n, len(stratified_df)))
 
 # Main app function for leagues analysis
 def app(df):
