@@ -1,4 +1,5 @@
-from sidebar_menu import sidebar_menu
+import streamlit as st
+from Pages.leagues_analysis import app as Leagues_analysis
 
-# Run the sidebar menu function
-sidebar_menu()
+# Run the Leagues Analysis page
+Leagues_analysis()
