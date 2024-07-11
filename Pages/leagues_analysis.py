@@ -70,7 +70,15 @@ def app(df):
 
     for _, row in sampled_df.iterrows():
         fandom_level = row['Fandom Level']
-        popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {fandom_level}<br>Race: {row['Race']}<br>Total Fans: {row[income_columns].sum()}"
+        total_fans = int(row[income_columns].sum())  # Convert total fans to integer
+        popup_content = (
+            f"Team: {row['Team']}<br>"
+            f"League: {row['League']}<br>"
+            f"Neighborhood: {row['Neighborhood']}<br>"
+            f"Fandom Level: {fandom_level}<br>"
+            f"Race: {row['Race']}<br>"
+            f"Total Fans: {total_fans}"
+        )
         color = 'red' if fandom_level == 'Avid' else 'blue' if fandom_level == 'Casual' else 'green'
         folium.CircleMarker(
             location=[row['US lat'], row['US lon']],
