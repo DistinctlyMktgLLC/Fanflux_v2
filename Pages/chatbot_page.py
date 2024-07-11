@@ -1,7 +1,7 @@
 import streamlit as st
 import uuid
 
-def app():
+def app(df=None):
     st.title("Chatbot")
     st.write("This is the chatbot page.")
 

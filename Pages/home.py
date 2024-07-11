@@ -1,6 +1,6 @@
 import streamlit as st
 
-def app():
+def app(df=None):
     st.title("Welcome to Fanflux")
 
     st.markdown("""
