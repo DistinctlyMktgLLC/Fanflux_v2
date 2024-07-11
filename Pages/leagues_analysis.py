@@ -10,6 +10,9 @@ def load_data():
 
 df = load_data().to_pandas()
 
+# Sample 10% of the data for initial display
+initial_sample = df.sample(frac=0.1, random_state=42)
+
 # Main app function for leagues analysis
 st.title("Leagues Analysis")
 
@@ -21,8 +24,8 @@ selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique()
 selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique(), key="team_filter_leagues")
 selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[12:], key="income_level_filter_leagues")
 
-# Apply filters
-filtered_df = df.copy()
+# Apply filters to the initial sample
+filtered_df = initial_sample.copy()
 if selected_fandom_levels:
     filtered_df = filtered_df[filtered_df['Fandom Level'].isin(selected_fandom_levels)]
 if selected_races:
