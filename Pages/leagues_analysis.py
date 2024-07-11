@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import folium_static
-import uuid
 
 # Main app function for leagues analysis
 def app(df):
@@ -10,11 +9,11 @@ def app(df):
 
     # Filters
     st.sidebar.header("Filters")
-    selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique(), key=f"fandom_level_filter_{uuid.uuid4()}")
-    selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique(), key=f"race_filter_{uuid.uuid4()}")
-    selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique(), key=f"league_filter_{uuid.uuid4()}")
-    selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique(), key=f"team_filter_{uuid.uuid4()}")
-    selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[14:], key=f"income_level_filter_{uuid.uuid4()}")
+    selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique(), key="fandom_level_filter")
+    selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique(), key="race_filter")
+    selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique(), key="league_filter")
+    selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique(), key="team_filter")
+    selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[14:], key="income_level_filter")
 
     # Apply filters
     filtered_df = df.copy()

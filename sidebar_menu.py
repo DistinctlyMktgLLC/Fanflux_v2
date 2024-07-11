@@ -2,7 +2,6 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 import pandas as pd
 import os
-import uuid
 
 # Load all data into a single dataframe
 data_dir = "data"
@@ -30,7 +29,7 @@ def sidebar_menu():
             icons=["house", "bar-chart", "robot"],
             menu_icon="cast",
             default_index=0,
-            key=f"main_menu_option_sidebar_{uuid.uuid4()}",
+            key="main_menu_option_sidebar",
             styles={
                 "container": {"padding": "5!important", "background-color": "#262730"},
                 "icon": {"color": "white", "font-size": "25px"},
@@ -50,10 +49,8 @@ def sidebar_menu():
         "Chatbot": chatbot_app
     }
 
-    if selected == "Home":
-        menu_options[selected]()
-    else:
-        menu_options[selected](df)
+    # Run the selected app
+    menu_options[selected](df)
 
 # Run the sidebar menu
 sidebar_menu()
