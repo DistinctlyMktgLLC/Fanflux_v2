@@ -16,6 +16,9 @@ def sidebar_menu():
         unsafe_allow_html=True
     )
 
+    # Load the dataframe
+    df = pd.read_parquet("data/combined_leagues.parquet")
+
     # Sidebar menu options
     menu_options = {
         "Home": home.app,
@@ -40,10 +43,10 @@ def sidebar_menu():
         )
 
     # Run the selected app
-    if selected != "Home":
+    if selected == "Home":
         menu_options[selected]()
-
-    return menu_options[selected]()
+    else:
+        menu_options[selected](df)
 
 # Run the sidebar menu
 sidebar_menu()
