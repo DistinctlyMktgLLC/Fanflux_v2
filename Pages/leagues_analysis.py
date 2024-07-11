@@ -2,6 +2,7 @@ import streamlit as st
 import polars as pl
 import folium
 from streamlit_folium import folium_static
+from folium.plugins import MarkerCluster
 
 # Load the data
 @st.cache_data
@@ -33,51 +34,30 @@ def app():
     if selected_teams:
         filtered_df = filtered_df[filtered_df['Team'].isin(selected_teams)]
     if selected_income_levels:
-        filtered_df = filtered_df[filtered_df[selected_income_levels].sum(axis=1) > 0]
+        filtered_df = filtered_df[selected_income_levels + ['US lat', 'US lon']]
 
     # Calculate metrics
-    income_columns = [
-        'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)', 'Getting By ($15,000 to $19,999)',
-        'Starting Out ($20,000 to $24,999)', 'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)',
-        'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)', 'Middle Class ($45,000 to $49,999)',
-        'Comfortable ($50,000 to $59,999)', 'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)',
-        'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)', 'Wealthy ($150,000 to $199,999)',
-        'Affluent ($200,000 or more)'
-    ]
+    total_avid_fans = len(filtered_df[filtered_df['Fandom Level'] == 'Avid'])
+    total_casual_fans = len(filtered_df[filtered_df['Fandom Level'] == 'Casual'])
+    total_convertible_fans = len(filtered_df[filtered_df['Fandom Level'] == 'Convertible'])
 
-    total_avid_fans = filtered_df[filtered_df['Fandom Level'] == 'Avid'][income_columns].sum().sum()
-    total_casual_fans = filtered_df[filtered_df['Fandom Level'] == 'Casual'][income_columns].sum().sum()
-    total_convertible_fans = filtered_df[filtered_df['Fandom Level'] == 'Convertible'][income_columns].sum().sum()
+    st.metric(label="Total Avid Fans", value=total_avid_fans)
+    st.metric(label="Total Casual Fans", value=total_casual_fans)
+    st.metric(label="Total Convertible Fans", value=total_convertible_fans)
 
-    # Display metrics in scorecards
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric(label="Total Avid Fans", value=int(total_avid_fans))
-    with col2:
-        st.metric(label="Total Casual Fans", value=int(total_casual_fans))
-    with col3:
-        st.metric(label="Total Convertible Fans", value=int(total_convertible_fans))
+    # Create the map
+    st.text("Finding Fandom...")
+    folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4)
+    marker_cluster = MarkerCluster().add_to(folium_map)
 
-    # Display map loading spinner
-    st.markdown("<h3 style='text-align: center;'>Loading Map...</h3>", unsafe_allow_html=True)
+    for _, row in filtered_df.iterrows():
+        folium.Marker(
+            location=[row['US lat'], row['US lon']],
+            popup=f"Team: {row['Team']}<br>League: {row['League']}<br>Fandom Level: {row['Fandom Level']}<br>Race: {row['Race']}",
+            icon=folium.Icon(color='red' if row['Fandom Level'] == 'Avid' else 'blue' if row['Fandom Level'] == 'Casual' else 'green')
+        ).add_to(marker_cluster)
 
-    # Display map
-    if not filtered_df.empty:
-        folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4)
+    folium_static(folium_map, width=1200, height=800)
 
-        for _, row in filtered_df.iterrows():
-            fandom_level = row['Fandom Level']
-            popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {fandom_level}<br>Race: {row['Race']}<br>Total Fans: {row[income_columns].sum()}"
-            color = 'red' if fandom_level == 'Avid' else 'blue' if fandom_level == 'Casual' else 'green'
-            folium.CircleMarker(
-                location=[row['US lat'], row['US lon']],
-                radius=5,
-                popup=popup_content,
-                color=color,
-                fill=True,
-                fill_color=color
-            ).add_to(folium_map)
-
-        folium_static(folium_map, width=1200, height=800)
-    else:
-        st.write("No data available for the selected filters.")
+if __name__ == "__main__":
+    app()
