@@ -2,6 +2,7 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 import pandas as pd
 import os
+import uuid
 
 # Load all data into a single dataframe
 data_dir = "data"
@@ -29,7 +30,7 @@ def sidebar_menu():
             icons=["house", "bar-chart", "robot"],
             menu_icon="cast",
             default_index=0,
-            key="main_menu_option_sidebar_unique_12345",
+            key=f"main_menu_option_sidebar_{uuid.uuid4()}",
             styles={
                 "container": {"padding": "5!important", "background-color": "#262730"},
                 "icon": {"color": "white", "font-size": "25px"},

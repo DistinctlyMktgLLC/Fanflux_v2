@@ -1,8 +1,9 @@
 import streamlit as st
+import uuid
 
 def app():
     st.title("Chatbot")
-    st.write("Interact with our AI-powered assistant for additional insights.")
+    st.write("This is the chatbot page.")
 
-if __name__ == "__main__":
-    app()
+    # Example widget with unique key
+    st.text_input("Enter your message", key=f"text_input_{uuid.uuid4()}")
