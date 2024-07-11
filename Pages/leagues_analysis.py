@@ -10,7 +10,7 @@ def load_data():
         pl.col("Fandom Level").str.to_lowercase()
     ])
     df = df.with_columns([
-        pl.col("Fandom Level").apply(lambda x: x.title())
+        pl.struct(pl.col("Fandom Level")).apply(lambda x: x["Fandom Level"].title()).alias("Fandom Level")
     ])
     return df
 
