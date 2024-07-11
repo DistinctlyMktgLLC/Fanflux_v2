@@ -5,7 +5,11 @@ import polars as pl
 # Load the data
 @st.cache_data
 def load_data():
-    return pl.read_parquet('data/combined_leagues.parquet')
+    df = pl.read_parquet('data/combined_leagues.parquet')
+    df = df.with_columns([
+        pl.col("Fandom Level").str.to_lowercase().str.capitalize()
+    ])
+    return df
 
 df = load_data().to_pandas()
 
@@ -31,49 +35,58 @@ def app():
         filtered_df = filtered_df[filtered_df['League'].isin(selected_leagues)]
     if selected_teams:
         filtered_df = filtered_df[filtered_df['Team'].isin(selected_teams)]
-    
-    # Calculate totals
-    total_avid_fans = int(filtered_df[filtered_df['Fandom Level'] == 'Avid'][selected_income_levels].sum().sum())
-    total_casual_fans = int(filtered_df[filtered_df['Fandom Level'] == 'Casual'][selected_income_levels].sum().sum())
-    total_convertible_fans = int(filtered_df[filtered_df['Fandom Level'] == 'Convertible'][selected_income_levels].sum().sum())
+    if selected_income_levels:
+        filtered_df = filtered_df[filtered_df[selected_income_levels].sum(axis=1) > 0]
+
+    # Add total fans column
+    income_columns = [
+        'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)', 'Getting By ($15,000 to $19,999)',
+        'Starting Out ($20,000 to $24,999)', 'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)',
+        'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)', 'Middle Class ($45,000 to $49,999)',
+        'Comfortable ($50,000 to $59,999)', 'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)',
+        'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)', 'Wealthy ($150,000 to $199,999)',
+        'Affluent ($200,000 or more)'
+    ]
+    filtered_df['Total Fans'] = filtered_df[income_columns].sum(axis=1)
+
+    # Calculate metrics
+    total_avid_fans = filtered_df[filtered_df['Fandom Level'] == 'Avid']['Total Fans'].sum()
+    total_casual_fans = filtered_df[filtered_df['Fandom Level'] == 'Casual']['Total Fans'].sum()
+    total_convertible_fans = filtered_df[filtered_df['Fandom Level'] == 'Convertible']['Total Fans'].sum()
 
     # Display metrics in scorecards
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric(label="Total Avid Fans", value=total_avid_fans)
+        st.metric(label="Total Avid Fans", value=int(total_avid_fans))
     with col2:
-        st.metric(label="Total Casual Fans", value=total_casual_fans)
+        st.metric(label="Total Casual Fans", value=int(total_casual_fans))
     with col3:
-        st.metric(label="Total Convertible Fans", value=total_convertible_fans)
-
-    # Define color map for specific fandom levels
-    color_map = {
-        "Avid": "red",
-        "Casual": "blue",
-        "Convertible": "green"
-    }
-
-    # Filter the DataFrame to include only rows with "Avid", "Casual", and "Convertible" fandom levels
-    filtered_df = filtered_df[filtered_df['Fandom Level'].isin(color_map.keys())]
+        st.metric(label="Total Convertible Fans", value=int(total_convertible_fans))
 
     # Create the map with marker clustering
     st.subheader("Fan Opportunity Map")
     with st.spinner("Finding Fandom..."):
         m = leafmap.Map(center=[40, -100], zoom=4, draw_export=False)
+        color_column = "Fandom Level"
+        color_map = {
+            "Avid": "red",
+            "Casual": "blue",
+            "Convertible": "green"
+        }
+        popup = ["Team", "League", "Neighborhood", "Fandom Level", "Race", "Total Fans"]
 
-        # Add marker clustering to the map
         m.add_points_from_xy(
             filtered_df,
             x="US lon",
             y="US lat",
-            color_column="Fandom Level",
-            popup=["Team", "League", "Fandom Level", "Race"] + selected_income_levels,
-            icon_names=["gear", "map", "leaf", "globe"],
-            spin=True,
-            add_legend=True,
-            colors=color_map
+            color_column=color_column,
+            colors=[color_map[val] for val in filtered_df[color_column].unique()],
+            popup=popup,
+            min_width=200,
+            max_width=300
         )
-        m.to_streamlit(height=700, width=1200)
 
-if __name__ == "__main__":
-    app()
+        m.to_streamlit(width=1200, height=700)
+
+# Run the app function
+app()
