@@ -52,6 +52,9 @@ def app():
     # Create the map with marker clustering
     st.subheader("Fan Opportunity Map")
     with st.spinner("Finding Fandom..."):
+        # Load a smaller initial subset of data for faster loading
+        initial_df = filtered_df.sample(frac=0.1) if len(filtered_df) > 1000 else filtered_df
+
         m = leafmap.Map(center=[40, -100], zoom=4, draw_export=False)
         color_column = "Fandom Level"
         color_map = {
@@ -62,11 +65,11 @@ def app():
         popup = ["Team", "League", "Neighborhood", "Fandom Level", "Race", "Total Fans"]
 
         m.add_points_from_xy(
-            filtered_df,
+            initial_df,
             x="US lon",
             y="US lat",
             color_column=color_column,
-            colors=[color_map[val] for val in filtered_df[color_column].unique()],
+            colors=[color_map[val] for val in initial_df[color_column].unique()],
             popup=popup,
             min_width=200,
             max_width=300
