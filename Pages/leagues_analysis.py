@@ -56,9 +56,19 @@ def app():
     marker_cluster = MarkerCluster().add_to(folium_map)
 
     for _, row in filtered_df.iterrows():
+        total_fans = total_avid_fans + total_casual_fans + total_convertible_fans
+        popup_content = f"""
+        <div style="width: 200px;">
+            <strong>Team:</strong> {row['Team']}<br>
+            <strong>League:</strong> {row['League']}<br>
+            <strong>Fandom Level:</strong> {row['Fandom Level']}<br>
+            <strong>Race:</strong> {row['Race']}<br>
+            <strong>Total Fans:</strong> {total_fans}
+        </div>
+        """
         folium.Marker(
             location=[row['US lat'], row['US lon']],
-            popup=f"Team: {row['Team']}<br>League: {row['League']}<br>Fandom Level: {row['Fandom Level']}<br>Race: {row['Race']}",
+            popup=popup_content,
             icon=folium.Icon(color='red' if row['Fandom Level'] == 'Avid' else 'blue' if row['Fandom Level'] == 'Casual' else 'green')
         ).add_to(marker_cluster)
 
