@@ -46,6 +46,14 @@ def app():
     with col3:
         st.metric(label="Total Convertible Fans", value=total_convertible_fans)
 
+    # Define custom colors for each fandom level
+    color_map = {
+        'Avid': 'red',
+        'Casual': 'blue',
+        'Convertible': 'green'
+        # Add more mappings as needed
+    }
+
     # Create the map with marker clustering
     st.subheader("Fan Opportunity Map")
     with st.spinner("Finding Fandom..."):
@@ -59,8 +67,9 @@ def app():
             icon_names=["gear", "map", "leaf", "globe"],
             spin=True,
             add_legend=True,
+            colors=color_map
         )
-        m.to_streamlit(height=700)
+        m.to_streamlit(height=700, width=1200)
 
 if __name__ == "__main__":
     app()
