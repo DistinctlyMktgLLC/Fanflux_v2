@@ -15,7 +15,8 @@ def sidebar_menu():
     )
 
     # Clear the previous content
-    st.session_state.clear()
+    if "clear_page" not in st.session_state:
+        st.session_state.clear_page = True
 
     if selected == "Home":
         Home()
@@ -24,5 +25,4 @@ def sidebar_menu():
     elif selected == "Chatbot":
         Chatbot()
 
-# Run the sidebar menu function
-sidebar_menu()
+# Make sure to call the sidebar menu function in the main file
