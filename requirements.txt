@@ -17,3 +17,4 @@ pycryptodome
 streamlit-authenticator
 streamlit-chat
 scikit-learn
+polars-1.1.0
