@@ -7,7 +7,9 @@ from sklearn.utils import resample
 # Function to stratified sample
 def stratified_sample(df, n, stratify_col):
     # Ensure n does not exceed the number of samples available
-    n = min(n, df[stratify_col].count())
+    if df.empty:
+        return df
+    n = min(n, len(df))
     stratified_df = df.groupby(stratify_col, group_keys=False).apply(lambda x: x.sample(min(len(x), n // len(df[stratify_col].unique()))))
     return stratified_df.sample(n=n)
 
