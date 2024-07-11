@@ -1,8 +1,6 @@
 import streamlit as st
+import leafmap.foliumap as leafmap
 import polars as pl
-import folium
-from streamlit_folium import folium_static
-from folium.plugins import MarkerCluster
 
 # Load the data
 @st.cache_data
@@ -52,9 +50,9 @@ def app():
     st.markdown("<h2 style='text-align: center;'>Finding Fandom...</h2>", unsafe_allow_html=True)
 
     # Create the map
-    folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4)
-    marker_cluster = MarkerCluster().add_to(folium_map)
-
+    m = leafmap.Map(center=[40, -100], zoom=4)
+    
+    # Add points to the map
     for _, row in filtered_df.iterrows():
         total_fans = total_avid_fans + total_casual_fans + total_convertible_fans
         popup_content = f"""
@@ -66,13 +64,12 @@ def app():
             <strong>Total Fans:</strong> {total_fans}
         </div>
         """
-        folium.Marker(
+        m.add_marker(
             location=[row['US lat'], row['US lon']],
-            popup=popup_content,
-            icon=folium.Icon(color='red' if row['Fandom Level'] == 'Avid' else 'blue' if row['Fandom Level'] == 'Casual' else 'green')
-        ).add_to(marker_cluster)
+            popup=popup_content
+        )
 
-    folium_static(folium_map, width=1200, height=800)
+    m.to_streamlit(height=700)
 
 if __name__ == "__main__":
     app()
