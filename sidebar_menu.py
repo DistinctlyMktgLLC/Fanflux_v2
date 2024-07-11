@@ -31,13 +31,14 @@ def sidebar_menu():
     }
 
     with st.sidebar:
+        unique_key = "main_menu_" + str(hash(os.urandom(16)))
         selected = option_menu(
             menu_title="Fanflux",
             options=list(menu_options.keys()),
             icons=["", "", ""],  # No icons
             menu_icon="cast",
             default_index=0,
-            key="fanflux_main_menu_option_" + str(hash(os.urandom(16))),  # Ensure unique key
+            key=unique_key,  # Ensure unique key
             styles={
                 "container": {"padding": "5!important", "background-color": "#1d1d1d"},
                 "icon": {"color": "white", "font-size": "25px"},
