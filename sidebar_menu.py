@@ -9,7 +9,7 @@ def sidebar_menu():
         menu_icon="cast",
         default_index=0,
         orientation="vertical",
-        key="main_menu_option_sidebar_unique"
+        key="main_menu_option_sidebar_unique_1"  # Ensure unique key
     )
 
     if selected == "Home":

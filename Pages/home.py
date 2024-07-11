@@ -2,6 +2,7 @@ import streamlit as st
 
 def app(df=None):
     st.title("Welcome to Fanflux")
+    st.write("Explore Key Insights")
 
     st.markdown("""
     <style>
@@ -32,3 +33,7 @@ def app(df=None):
 
     Ready to transform your understanding of the sports fan landscape? Let's get started!
     """)
+
+# Ensure the app function is only called if this script is run directly
+if __name__ == "__main__":
+    app()
