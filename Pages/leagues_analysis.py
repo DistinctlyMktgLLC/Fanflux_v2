@@ -41,12 +41,17 @@ def app():
     total_casual_fans = len(filtered_df[filtered_df['Fandom Level'] == 'Casual'])
     total_convertible_fans = len(filtered_df[filtered_df['Fandom Level'] == 'Convertible'])
 
-    st.metric(label="Total Avid Fans", value=total_avid_fans)
-    st.metric(label="Total Casual Fans", value=total_casual_fans)
-    st.metric(label="Total Convertible Fans", value=total_convertible_fans)
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric(label="Total Avid Fans", value=total_avid_fans)
+    with col2:
+        st.metric(label="Total Casual Fans", value=total_casual_fans)
+    with col3:
+        st.metric(label="Total Convertible Fans", value=total_convertible_fans)
+
+    st.markdown("<h2 style='text-align: center;'>Finding Fandom...</h2>", unsafe_allow_html=True)
 
     # Create the map
-    st.text("Finding Fandom...")
     folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4)
     marker_cluster = MarkerCluster().add_to(folium_map)
 
