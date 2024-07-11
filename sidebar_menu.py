@@ -37,7 +37,7 @@ def sidebar_menu():
             icons=["", "", ""],  # No icons
             menu_icon="cast",
             default_index=0,
-            key="main_menu_option",  # Ensure unique key
+            key="unique_main_menu_option",  # Ensure unique key
             styles={
                 "container": {"padding": "5!important", "background-color": "#1d1d1d"},
                 "icon": {"color": "white", "font-size": "25px"},
