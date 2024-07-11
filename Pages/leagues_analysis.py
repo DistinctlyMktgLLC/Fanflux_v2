@@ -49,25 +49,21 @@ def app():
 
     st.markdown("<h2 style='text-align: center;'>Finding Fandom...</h2>", unsafe_allow_html=True)
 
-    # Create the map
-    m = leafmap.Map(center=[40, -100], zoom=4)
-    
-    # Add points to the map
-    for _, row in filtered_df.iterrows():
-        total_fans = total_avid_fans + total_casual_fans + total_convertible_fans
-        popup_content = f"""
-        <div style="width: 200px;">
-            <strong>Team:</strong> {row['Team']}<br>
-            <strong>League:</strong> {row['League']}<br>
-            <strong>Fandom Level:</strong> {row['Fandom Level']}<br>
-            <strong>Race:</strong> {row['Race']}<br>
-            <strong>Total Fans:</strong> {total_fans}
-        </div>
-        """
-        m.add_marker(
-            location=[row['US lat'], row['US lon']],
-            popup=popup_content
-        )
+    # Create the map with marker clustering
+    m = leafmap.Map(center=[40, -100], zoom=4, draw_export=False)
+    m.add_points_from_xy(
+        filtered_df,
+        x="US lon",
+        y="US lat",
+        popup=[
+            "Team",
+            "League",
+            "Fandom Level",
+            "Race",
+            "Total Fans"
+        ],
+        marker_cluster=True,
+    )
 
     m.to_streamlit(height=700)
 
