@@ -2,13 +2,7 @@ import streamlit as st
 import pandas as pd
 import folium
 from streamlit_folium import folium_static
-from sklearn.utils import resample
 import uuid
-
-# Function to stratified sample
-def stratified_sample(df, n, stratify_col):
-    df = df.groupby(stratify_col, group_keys=False).apply(lambda x: x.sample(min(len(x), n // len(df[stratify_col].unique()))))
-    return df.sample(n=min(n, len(df)))
 
 # Main app function for leagues analysis
 def app(df):
@@ -34,9 +28,6 @@ def app(df):
         filtered_df = filtered_df[filtered_df['Team'].isin(selected_teams)]
     if selected_income_levels:
         filtered_df = filtered_df[filtered_df[selected_income_levels].sum(axis=1) > 0]
-
-    # Sample data for map visualization
-    sampled_df = stratified_sample(filtered_df, 1000, 'Race')
 
     # Calculate metrics
     income_columns = [
@@ -65,7 +56,7 @@ def app(df):
     st.header("Fan Opportunity Map")
     folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4)
 
-    for _, row in sampled_df.iterrows():
+    for _, row in filtered_df.iterrows():
         fandom_level = row['Fandom Level']
         popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {fandom_level}<br>Race: {row['Race']}<br>Total Fans: {row[income_columns].sum()}"
         color = 'red' if fandom_level == 'Avid' else 'blue' if fandom_level == 'Casual' else 'green'

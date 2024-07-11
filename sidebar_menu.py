@@ -50,10 +50,7 @@ def sidebar_menu():
         "Chatbot": chatbot_app
     }
 
-    if selected == "Home":
-        menu_options[selected]()
-    else:
-        menu_options[selected](df)
+    menu_options[selected](df)
 
 # Run the sidebar menu
 sidebar_menu()
