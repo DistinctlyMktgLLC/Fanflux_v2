@@ -16,13 +16,12 @@ def sidebar_menu():
         )
 
     # Clear the previous content
-    st.session_state.clear()
+    for key in st.session_state.keys():
+        del st.session_state[key]
 
     if selected == "Home":
         Home()
     elif selected == "Leagues Analysis":
-        st.empty()  # Clear the previous page content
         Leagues_analysis()
     elif selected == "Chatbot":
-        st.empty()  # Clear the previous page content
         Chatbot()

@@ -13,6 +13,7 @@ df = load_data().to_pandas()
 # Main app function for leagues analysis
 def app():
     st.title("Leagues Analysis")
+    st.write("Finding Fandom...")
 
     # Filters
     st.sidebar.header("Filters")
@@ -58,25 +59,24 @@ def app():
     with col3:
         st.metric(label="Total Convertible Fans", value=int(total_convertible_fans))
 
-    # Display loading message while processing
-    with st.spinner("Finding Fandom..."):
-        # Display map
-        if not filtered_df.empty:
-            folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4)
+    # Display map
+    if not filtered_df.empty:
+        folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4)
 
-            for _, row in filtered_df.iterrows():
-                fandom_level = row['Fandom Level']
-                popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {fandom_level}<br>Race: {row['Race']}<br>Total Fans: {row[income_columns].sum()}"
-                color = 'red' if fandom_level == 'Avid' else 'blue' if fandom_level == 'Casual' else 'green'
-                folium.CircleMarker(
-                    location=[row['US lat'], row['US lon']],
-                    radius=5,
-                    popup=popup_content,
-                    color=color,
-                    fill=True,
-                    fill_color=color
-                ).add_to(folium_map)
+        for _, row in filtered_df.iterrows():
+            fandom_level = row['Fandom Level']
+            popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {fandom_level}<br>Race: {row['Race']}<br>Total Fans: {row[income_columns].sum()}"
+            color = 'red' if fandom_level == 'Avid' else 'blue' if fandom_level == 'Casual' else 'green'
+            folium.CircleMarker(
+                location=[row['US lat'], row['US lon']],
+                radius=5,
+                popup=popup_content,
+                color=color,
+                fill=True,
+                fill_color=color
+            ).add_to(folium_map)
 
-            folium_static(folium_map, width=1200, height=800)
-        else:
-            st.write("No data available for the selected filters.")
+        st.write("Map is loading, please wait...")
+        folium_static(folium_map, width=1200, height=800)
+    else:
+        st.write("No data available for the selected filters.")
