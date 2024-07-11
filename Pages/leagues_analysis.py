@@ -31,14 +31,13 @@ def app():
         filtered_df = filtered_df[filtered_df['League'].isin(selected_leagues)]
     if selected_teams:
         filtered_df = filtered_df[filtered_df['Team'].isin(selected_teams)]
-    if selected_income_levels:
-        filtered_df = filtered_df[selected_income_levels + ['US lat', 'US lon']]
+    
+    # Calculate totals
+    total_avid_fans = int(filtered_df[filtered_df['Fandom Level'] == 'Avid'][selected_income_levels].sum().sum())
+    total_casual_fans = int(filtered_df[filtered_df['Fandom Level'] == 'Casual'][selected_income_levels].sum().sum())
+    total_convertible_fans = int(filtered_df[filtered_df['Fandom Level'] == 'Convertible'][selected_income_levels].sum().sum())
 
-    # Calculate metrics
-    total_avid_fans = len(filtered_df[filtered_df['Fandom Level'] == 'Avid'])
-    total_casual_fans = len(filtered_df[filtered_df['Fandom Level'] == 'Casual'])
-    total_convertible_fans = len(filtered_df[filtered_df['Fandom Level'] == 'Convertible'])
-
+    # Display metrics in scorecards
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric(label="Total Avid Fans", value=total_avid_fans)
@@ -47,25 +46,21 @@ def app():
     with col3:
         st.metric(label="Total Convertible Fans", value=total_convertible_fans)
 
-    st.markdown("<h2 style='text-align: center;'>Finding Fandom...</h2>", unsafe_allow_html=True)
-
     # Create the map with marker clustering
-    m = leafmap.Map(center=[40, -100], zoom=4, draw_export=False)
-    m.add_points_from_xy(
-        filtered_df,
-        x="US lon",
-        y="US lat",
-        popup=[
-            "Team",
-            "League",
-            "Fandom Level",
-            "Race",
-            "Total Fans"
-        ],
-        marker_cluster=True,
-    )
-
-    m.to_streamlit(height=700)
+    st.subheader("Fan Opportunity Map")
+    with st.spinner("Finding Fandom..."):
+        m = leafmap.Map(center=[40, -100], zoom=4, draw_export=False)
+        m.add_points_from_xy(
+            filtered_df,
+            x="US lon",
+            y="US lat",
+            color_column="Fandom Level",
+            popup=["Team", "League", "Fandom Level", "Race"] + selected_income_levels,
+            icon_names=["gear", "map", "leaf", "globe"],
+            spin=True,
+            add_legend=True,
+        )
+        m.to_streamlit(height=700)
 
 if __name__ == "__main__":
     app()
