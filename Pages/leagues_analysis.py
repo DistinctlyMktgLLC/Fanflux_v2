@@ -13,7 +13,6 @@ df = load_data().to_pandas()
 # Main app function for leagues analysis
 def app():
     st.title("Leagues Analysis")
-    st.write("Finding Fandom...")
 
     # Filters
     st.sidebar.header("Filters")
@@ -59,6 +58,9 @@ def app():
     with col3:
         st.metric(label="Total Convertible Fans", value=int(total_convertible_fans))
 
+    # Display map loading spinner
+    st.markdown("<h3 style='text-align: center;'>Loading Map...</h3>", unsafe_allow_html=True)
+
     # Display map
     if not filtered_df.empty:
         folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4)
@@ -76,7 +78,6 @@ def app():
                 fill_color=color
             ).add_to(folium_map)
 
-        st.write("Map is loading, please wait...")
         folium_static(folium_map, width=1200, height=800)
     else:
         st.write("No data available for the selected filters.")
