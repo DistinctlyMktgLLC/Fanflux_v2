@@ -1,13 +1,15 @@
 import streamlit as st
+import pandas as pd
 from streamlit_option_menu import option_menu
 from Pages import home, leagues_analysis, chatbot_page
 
 def sidebar_menu():
+    # Custom CSS for Sidebar Menu
     st.markdown(
         """
         <style>
         .sidebar .sidebar-content {
-            background-color: #262730;
+            background-color: #1d1d1d;
         }
         </style>
         """,
@@ -28,9 +30,9 @@ def sidebar_menu():
             icons=["house", "bar-chart", "robot"],
             menu_icon="cast",
             default_index=0,
-            key="unique_main_menu_option",
+            key="main_menu_option",
             styles={
-                "container": {"padding": "5!important", "background-color": "#262730"},
+                "container": {"padding": "5!important", "background-color": "#1d1d1d"},
                 "icon": {"color": "white", "font-size": "25px"},
                 "nav-link": {"font-size": "16px", "text-align": "left", "margin": "0px", "--hover-color": "#565656"},
                 "nav-link-selected": {"background-color": "green"},
@@ -38,8 +40,10 @@ def sidebar_menu():
         )
 
     # Run the selected app
-    if selected in menu_options:
+    if selected != "Home":
         menu_options[selected]()
+
+    return menu_options[selected]()
 
 # Run the sidebar menu
 sidebar_menu()
