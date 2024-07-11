@@ -14,16 +14,16 @@ def app():
 
     st.subheader("Explore Key Insights")
     st.markdown("""
-    - **See Where Fans Are**: Visualize where different types of fans are located.
-    - **Measure Fan Passion**: Understand how dedicated fans are to their teams.
-    - **Economic Insights**: Learn how income levels relate to fan engagement.
+    - See Where Fans Are: Visualize where different types of fans are located.
+    - Measure Fan Passion: Understand how dedicated fans are to their teams.
+    - Economic Insights: Learn how income levels relate to fan engagement.
     """)
 
     st.subheader("Why Fanflux Matters")
     st.markdown("""
-    - **Smart Marketing**: Focus your campaigns on the areas that will have the most impact.
-    - **Increase Engagement**: Find ways to turn casual fans into passionate supporters.
-    - **Better Merchandising**: Ensure you have the right products in the right places for your fans.
+    - Smart Marketing: Focus your campaigns on the areas that will have the most impact.
+    - Increase Engagement: Find ways to turn casual fans into passionate supporters.
+    - Better Merchandising: Ensure you have the right products in the right places for your fans.
     """)
 
     st.subheader("Partnered with DonnLynn Partners")
@@ -32,6 +32,3 @@ def app():
 
     Ready to transform your understanding of the sports fan landscape? Let's get started!
     """)
-
-if __name__ == "__main__":
-    app()

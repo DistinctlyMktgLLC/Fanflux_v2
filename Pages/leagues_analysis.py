@@ -54,11 +54,11 @@ def app(df):
     # Display metrics in scorecards
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric(label="Total Avid Fans", value=int(total_avid_fans))
+        st.metric(label="Total Avid Fans", value=int(total_avid_fans), key="avid_metric_unique_leagues")
     with col2:
-        st.metric(label="Total Casual Fans", value=int(total_casual_fans))
+        st.metric(label="Total Casual Fans", value=int(total_casual_fans), key="casual_metric_unique_leagues")
     with col3:
-        st.metric(label="Total Convertible Fans", value=int(total_convertible_fans))
+        st.metric(label="Total Convertible Fans", value=int(total_convertible_fans), key="convertible_metric_unique_leagues")
 
     # Display map
     st.header("Fan Opportunity Map")
