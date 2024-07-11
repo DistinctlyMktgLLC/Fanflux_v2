@@ -29,7 +29,7 @@ def sidebar_menu():
             icons=["house", "bar-chart", "robot"],
             menu_icon="cast",
             default_index=0,
-            key="main_menu_option_sidebar",
+            key="main_menu_option_sidebar_1",  # Ensure this key is unique
             styles={
                 "container": {"padding": "5!important", "background-color": "#262730"},
                 "icon": {"color": "white", "font-size": "25px"},

@@ -9,11 +9,11 @@ def app(df):
 
     # Filters
     st.sidebar.header("Filters")
-    selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique(), key="fandom_level_filter")
-    selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique(), key="race_filter")
-    selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique(), key="league_filter")
-    selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique(), key="team_filter")
-    selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[14:], key="income_level_filter")
+    selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique(), key="fandom_level_filter_1")
+    selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique(), key="race_filter_1")
+    selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique(), key="league_filter_1")
+    selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique(), key="team_filter_1")
+    selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[14:], key="income_level_filter_1")
 
     # Apply filters
     filtered_df = df.copy()
