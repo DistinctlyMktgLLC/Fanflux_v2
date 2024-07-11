@@ -32,3 +32,6 @@ def app():
 
     Ready to transform your understanding of the sports fan landscape? Let's get started!
     """)
+
+if __name__ == "__main__":
+    app()

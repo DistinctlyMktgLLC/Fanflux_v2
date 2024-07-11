@@ -1,42 +1,54 @@
 import streamlit as st
-import pandas as pd
 from streamlit_option_menu import option_menu
-from Pages import home, chatbot_page, leagues_analysis
+import pandas as pd
+import os
+
+# Load all data into a single dataframe
+data_dir = "data"
+df_list = []
+for file in os.listdir(data_dir):
+    if file.endswith(".parquet"):
+        df_list.append(pd.read_parquet(os.path.join(data_dir, file)))
+df = pd.concat(df_list, ignore_index=True)
 
 def sidebar_menu():
-    # Load your data
-    df = pd.read_parquet("data/combined_leagues.parquet")
-
     # Custom CSS for Sidebar Menu
-    st.markdown(
-        """
-        <style>
-        .sidebar .sidebar-content {
-            background-color: #1d1d1d;
+    st.markdown("""
+    <style>
+        .main {
+            background-color: #262730;
+            color: white;
         }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-    # Sidebar menu options with emojis/icons
-    menu_options = {
-        "Home": home.app,
-        "Leagues Analysis": leagues_analysis.app,
-        "Chatbot": chatbot_page.app
-    }
+    </style>
+    """, unsafe_allow_html=True)
 
     with st.sidebar:
         selected = option_menu(
             menu_title="Fanflux",
-            options=list(menu_options.keys()),
+            options=["Home", "Leagues Analysis", "Chatbot"],
             icons=["house", "bar-chart", "robot"],
             menu_icon="cast",
             default_index=0,
-            key="main_menu_option"
+            key="main_menu_option_sidebar",
+            styles={
+                "container": {"padding": "5!important", "background-color": "#262730"},
+                "icon": {"color": "white", "font-size": "25px"},
+                "nav-link": {"font-size": "16px", "text-align": "left", "margin": "0px", "--hover-color": "#555"},
+                "nav-link-selected": {"background-color": "green"},
+            }
         )
 
-    # Run the selected app
+    # Import the different pages
+    from Pages.home import app as home_app
+    from Pages.leagues_analysis import app as leagues_analysis_app
+    from Pages.chatbot_page import app as chatbot_app
+
+    menu_options = {
+        "Home": home_app,
+        "Leagues Analysis": leagues_analysis_app,
+        "Chatbot": chatbot_app
+    }
+
     if selected == "Home":
         menu_options[selected]()
     else:
