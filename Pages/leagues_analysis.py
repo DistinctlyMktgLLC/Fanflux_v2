@@ -38,6 +38,9 @@ def app():
     if selected_income_levels:
         filtered_df = filtered_df[filtered_df[selected_income_levels].sum(axis=1) > 0]
 
+    # Format 'Total Fans' as integer
+    filtered_df['Total Fans'] = filtered_df['Total Fans'].astype(int)
+
     # Calculate metrics
     total_avid_fans = filtered_df[filtered_df['Fandom Level'] == 'Avid']['Total Fans'].sum()
     total_casual_fans = filtered_df[filtered_df['Fandom Level'] == 'Casual']['Total Fans'].sum()
