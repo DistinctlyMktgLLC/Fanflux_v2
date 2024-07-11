@@ -15,8 +15,7 @@ def sidebar_menu():
     )
 
     # Clear the previous content
-    for key in st.session_state.keys():
-        del st.session_state[key]
+    st.session_state.clear()
 
     if selected == "Home":
         Home()
