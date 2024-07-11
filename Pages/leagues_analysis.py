@@ -15,11 +15,11 @@ def app(df):
 
     # Filters
     st.sidebar.header("Filters")
-    selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique())
-    selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique())
-    selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique())
-    selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique())
-    selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[14:])
+    selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique(), key="fandom_level_filter_unique_leagues")
+    selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique(), key="race_filter_unique_leagues")
+    selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique(), key="league_filter_unique_leagues")
+    selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique(), key="team_filter_unique_leagues")
+    selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[14:], key="income_level_filter_unique_leagues")
 
     # Apply filters
     filtered_df = df.copy()
@@ -78,6 +78,3 @@ def app(df):
         ).add_to(folium_map)
 
     folium_static(folium_map, width=1200, height=800)
-
-if __name__ == "__main__":
-    app(pd.DataFrame())  # Example call for testing
