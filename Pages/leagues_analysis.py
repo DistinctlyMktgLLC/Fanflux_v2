@@ -46,18 +46,16 @@ def app():
     with col3:
         st.metric(label="Total Convertible Fans", value=total_convertible_fans)
 
-    # Define custom colors for each fandom level
-    color_map = {
-        'Avid': 'red',
-        'Casual': 'blue',
-        'Convertible': 'green'
-        # Add more mappings as needed
-    }
-
     # Create the map with marker clustering
     st.subheader("Fan Opportunity Map")
     with st.spinner("Finding Fandom..."):
         m = leafmap.Map(center=[40, -100], zoom=4, draw_export=False)
+
+        # Generate color map dynamically
+        unique_fandom_levels = filtered_df['Fandom Level'].unique()
+        color_palette = ["red", "blue", "green", "purple", "orange", "darkred", "lightred", "beige", "darkblue", "darkgreen", "cadetblue", "darkpurple", "white", "pink", "lightblue", "lightgreen", "gray", "black", "lightgray"]
+        color_map = {fandom_level: color_palette[i % len(color_palette)] for i, fandom_level in enumerate(unique_fandom_levels)}
+
         m.add_points_from_xy(
             filtered_df,
             x="US lon",
