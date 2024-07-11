@@ -1,6 +1,6 @@
 import streamlit as st
 
-def app(df=None):
+def app():
     st.title("Welcome to Fanflux")
     st.write("Explore Key Insights")
 

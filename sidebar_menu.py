@@ -1,5 +1,8 @@
-import streamlit as st
 from streamlit_option_menu import option_menu
+import streamlit as st
+from Pages.home import app as Home  # Adjusted import path to correct location
+from Pages.leagues_analysis import app as Leagues_analysis  # Adjusted import path
+from Pages.chatbot_page import app as Chatbot  # Adjusted import path
 
 def sidebar_menu():
     selected = option_menu(
@@ -8,18 +11,17 @@ def sidebar_menu():
         icons=["house", "bar-chart", "robot"],
         menu_icon="cast",
         default_index=0,
-        orientation="vertical",
-        key="main_menu_option_sidebar_unique_1"  # Ensure unique key
+        key="main_menu_option_sidebar_unique_12345"
     )
 
+    # Clear the previous content
+    st.session_state.clear()
+
     if selected == "Home":
-        st.write("Welcome to Fanflux")
-        # Home page content
+        Home()
     elif selected == "Leagues Analysis":
-        from Pages.leagues_analysis import app as leagues_analysis
-        leagues_analysis()
+        Leagues_analysis()
     elif selected == "Chatbot":
-        from Pages.chatbot_page import app as chatbot_page
-        chatbot_page()
+        Chatbot()
 
 sidebar_menu()
