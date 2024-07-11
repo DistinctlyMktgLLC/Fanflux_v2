@@ -7,7 +7,10 @@ import polars as pl
 def load_data():
     df = pl.read_parquet('data/combined_leagues.parquet')
     df = df.with_columns([
-        pl.col("Fandom Level").str.to_lowercase().str.titlecase()
+        pl.col("Fandom Level").str.to_lowercase()
+    ])
+    df = df.with_columns([
+        pl.col("Fandom Level").apply(lambda x: x.title())
     ])
     return df
 
