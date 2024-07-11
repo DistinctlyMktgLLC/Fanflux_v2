@@ -1,32 +1,44 @@
 import streamlit as st
-import pandas as pd
+import polars as pl
 import folium
 from streamlit_folium import folium_static
 
+# Function to load and cache data
+@st.cache_data
+def load_data(file_path):
+    return pl.read_parquet(file_path)
+
 # Main app function for leagues analysis
-def app(df):
+def app():
     st.title("Leagues Analysis")
+
+    # Placeholder text while loading data
+    with st.spinner("Finding Fandom..."):
+        df = load_data('path_to_your_file.parquet')
 
     # Filters
     st.sidebar.header("Filters")
-    selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique(), key="fandom_level_filter_1")
-    selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique(), key="race_filter_1")
-    selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique(), key="league_filter_1")
-    selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique(), key="team_filter_1")
-    selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[14:], key="income_level_filter_1")
+    selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique(), key="fandom_level_filter_unique")
+    selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique(), key="race_filter_unique")
+    selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique(), key="league_filter_unique")
+    selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique(), key="team_filter_unique")
+    selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[14:], key="income_level_filter_unique")
 
     # Apply filters
-    filtered_df = df.copy()
+    filtered_df = df
     if selected_fandom_levels:
-        filtered_df = filtered_df[filtered_df['Fandom Level'].isin(selected_fandom_levels)]
+        filtered_df = filtered_df.filter(pl.col('Fandom Level').is_in(selected_fandom_levels))
     if selected_races:
-        filtered_df = filtered_df[filtered_df['Race'].isin(selected_races)]
+        filtered_df = filtered_df.filter(pl.col('Race').is_in(selected_races))
     if selected_leagues:
-        filtered_df = filtered_df[filtered_df['League'].isin(selected_leagues)]
+        filtered_df = filtered_df.filter(pl.col('League').is_in(selected_leagues))
     if selected_teams:
-        filtered_df = filtered_df[filtered_df['Team'].isin(selected_teams)]
+        filtered_df = filtered_df.filter(pl.col('Team').is_in(selected_teams))
     if selected_income_levels:
-        filtered_df = filtered_df[filtered_df[selected_income_levels].sum(axis=1) > 0]
+        filtered_df = filtered_df.filter(filtered_df.select(selected_income_levels).sum(axis=1) > 0)
+
+    # Convert Polars DataFrame to Pandas DataFrame for further operations
+    filtered_df = filtered_df.to_pandas()
 
     # Calculate metrics
     income_columns = [
@@ -45,11 +57,11 @@ def app(df):
     # Display metrics in scorecards
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric(label="Total Avid Fans", value=int(total_avid_fans))
+        st.metric(label="Total Avid Fans", value=int(total_avid_fans), key="avid_metric_unique")
     with col2:
-        st.metric(label="Total Casual Fans", value=int(total_casual_fans))
+        st.metric(label="Total Casual Fans", value=int(total_casual_fans), key="casual_metric_unique")
     with col3:
-        st.metric(label="Total Convertible Fans", value=int(total_convertible_fans))
+        st.metric(label="Total Convertible Fans", value=int(total_convertible_fans), key="convertible_metric_unique")
 
     # Display map
     st.header("Fan Opportunity Map")
