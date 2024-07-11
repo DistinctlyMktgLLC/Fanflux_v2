@@ -1,9 +1,12 @@
 import streamlit as st
 import pandas as pd
 from streamlit_option_menu import option_menu
-from Pages import home, leagues_analysis, chatbot_page
+from Pages import home, chatbot_page, leagues_analysis
 
 def sidebar_menu():
+    # Load your data
+    df = pd.read_parquet("data/combined_leagues.parquet")
+
     # Custom CSS for Sidebar Menu
     st.markdown(
         """
@@ -16,10 +19,7 @@ def sidebar_menu():
         unsafe_allow_html=True
     )
 
-    # Load the dataframe
-    df = pd.read_parquet("data/combined_leagues.parquet")
-
-    # Sidebar menu options
+    # Sidebar menu options with emojis/icons
     menu_options = {
         "Home": home.app,
         "Leagues Analysis": leagues_analysis.app,
@@ -33,13 +33,7 @@ def sidebar_menu():
             icons=["house", "bar-chart", "robot"],
             menu_icon="cast",
             default_index=0,
-            key="main_menu_option",
-            styles={
-                "container": {"padding": "5!important", "background-color": "#1d1d1d"},
-                "icon": {"color": "white", "font-size": "25px"},
-                "nav-link": {"font-size": "16px", "text-align": "left", "margin": "0px", "--hover-color": "#565656"},
-                "nav-link-selected": {"background-color": "green"},
-            }
+            key="main_menu_option"
         )
 
     # Run the selected app
