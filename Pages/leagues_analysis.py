@@ -1,6 +1,7 @@
 import streamlit as st
-import polars as pl
 import leafmap.foliumap as leafmap
+import polars as pl
+import pandas as pd
 
 # Load the updated data
 @st.cache_data
@@ -10,30 +11,20 @@ def load_data():
 
 df = load_data().to_pandas()
 
-# Sample 10% of the data for initial display
-initial_sample = df.sample(frac=0.1, random_state=42)
-
 # Main app function for leagues analysis
 def app():
     st.title("Leagues Analysis")
 
     # Filters
     st.sidebar.header("Filters")
-    selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique(), key="fandom_level_filter_leagues_3")
-    selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique(), key="race_filter_leagues_3")
-    selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique(), key="league_filter_leagues_3")
-    selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique(), key="team_filter_leagues_3")
-    selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[12:], key="income_level_filter_leagues_3")
+    selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique(), key="fandom_level_filter_leagues")
+    selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique(), key="race_filter_leagues")
+    selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique(), key="league_filter_leagues")
+    selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique(), key="team_filter_leagues")
+    selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[12:], key="income_level_filter_leagues")
 
-    # Checkbox to toggle sampling
-    use_sample = st.sidebar.checkbox("Use Sample (10% of data)", value=True)
-
-    # Apply filters to the initial sample or the full dataset
-    if use_sample:
-        filtered_df = initial_sample.copy()
-    else:
-        filtered_df = df.copy()
-
+    # Apply filters
+    filtered_df = df.copy()
     if selected_fandom_levels:
         filtered_df = filtered_df[filtered_df['Fandom Level'].isin(selected_fandom_levels)]
     if selected_races:
@@ -44,9 +35,6 @@ def app():
         filtered_df = filtered_df[filtered_df['Team'].isin(selected_teams)]
     if selected_income_levels:
         filtered_df = filtered_df[filtered_df[selected_income_levels].sum(axis=1) > 0]
-
-    # Ensure 'Total Fans' is an integer
-    filtered_df['Total Fans'] = filtered_df['Total Fans'].astype(int)
 
     # Calculate metrics
     total_avid_fans = filtered_df[filtered_df['Fandom Level'] == 'Avid']['Total Fans'].sum()
@@ -62,16 +50,15 @@ def app():
     with col3:
         st.metric(label="Total Convertible Fans", value=int(total_convertible_fans))
 
-    # Display information about sampling
-    if use_sample:
+    # Add explanatory note
+    st.markdown("""
+        **Note:** The initial data displayed is a 10% sample of the total dataset. Adjusting filters will apply to this sample.
+    """)
+    
+    # Add conditional explanatory note
+    if selected_teams and selected_leagues:
         st.markdown("""
-        **Note:** Currently displaying a 10% sample of the data to improve performance. 
-        Use more filters to refine the results or uncheck 'Use Sample' to view the full dataset.
-        """)
-    else:
-        st.markdown("""
-        **Note:** Currently displaying the full dataset. 
-        Using too many filters might cause performance issues. Please use fewer filters if the app becomes slow.
+            **Additional Note:** The total fans displayed in the scorecards represent the sum of fans for the selected teams and leagues. If both teams and leagues are selected, the total fans will be a combined sum.
         """)
 
     # Create the map with marker clustering
@@ -100,5 +87,4 @@ def app():
         m.to_streamlit(width=1200, height=700)
 
 # Run the app function
-if __name__ == "__main__":
-    app()
+app()
