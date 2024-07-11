@@ -6,12 +6,10 @@ from sklearn.utils import resample
 
 # Function to stratified sample
 def stratified_sample(df, n, stratify_col):
-    # Calculate the minimum sample size per group
-    min_size_per_group = min(n // df[stratify_col].nunique(), df.groupby(stratify_col).size().min())
-    # Perform stratified sampling
-    stratified_df = df.groupby(stratify_col, group_keys=False).apply(lambda x: x.sample(min(len(x), min_size_per_group)))
-    # Shuffle the resulting dataframe and take the final sample
-    return stratified_df.sample(n=min(n, len(stratified_df)))
+    # Ensure n does not exceed the number of samples available
+    n = min(n, df[stratify_col].count())
+    stratified_df = df.groupby(stratify_col, group_keys=False).apply(lambda x: x.sample(min(len(x), n // len(df[stratify_col].unique()))))
+    return stratified_df.sample(n=n)
 
 # Main app function for leagues analysis
 def app(df):
@@ -19,11 +17,12 @@ def app(df):
 
     # Filters
     st.sidebar.header("Filters")
-    selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique())
-    selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique())
-    selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique())
-    selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique())
-    selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[14:])
+    df['Fandom Level'] = df['Fandom Level'].str.capitalize()
+    selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique(), key="fandom_level_filter_unique")
+    selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique(), key="race_filter_unique")
+    selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique(), key="league_filter_unique")
+    selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique(), key="team_filter_unique")
+    selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[14:], key="income_level_filter_unique")
 
     # Apply filters
     filtered_df = df.copy()
@@ -58,11 +57,11 @@ def app(df):
     # Display metrics in scorecards
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric(label="Total Avid Fans", value=int(total_avid_fans))
+        st.metric(label="Total Avid Fans", value=int(total_avid_fans), key="avid_metric_unique")
     with col2:
-        st.metric(label="Total Casual Fans", value=int(total_casual_fans))
+        st.metric(label="Total Casual Fans", value=int(total_casual_fans), key="casual_metric_unique")
     with col3:
-        st.metric(label="Total Convertible Fans", value=int(total_convertible_fans))
+        st.metric(label="Total Convertible Fans", value=int(total_convertible_fans), key="convertible_metric_unique")
 
     # Display map
     st.header("Fan Opportunity Map")
@@ -70,15 +69,7 @@ def app(df):
 
     for _, row in sampled_df.iterrows():
         fandom_level = row['Fandom Level']
-        total_fans = int(row[income_columns].sum())  # Convert total fans to integer
-        popup_content = (
-            f"Team: {row['Team']}<br>"
-            f"League: {row['League']}<br>"
-            f"Neighborhood: {row['Neighborhood']}<br>"
-            f"Fandom Level: {fandom_level}<br>"
-            f"Race: {row['Race']}<br>"
-            f"Total Fans: {total_fans}"
-        )
+        popup_content = f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {fandom_level}<br>Race: {row['Race']}<br>Total Fans: {int(row[income_columns].sum())}"
         color = 'red' if fandom_level == 'Avid' else 'blue' if fandom_level == 'Casual' else 'green'
         folium.CircleMarker(
             location=[row['US lat'], row['US lon']],
