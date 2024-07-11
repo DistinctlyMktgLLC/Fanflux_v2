@@ -1,5 +1,6 @@
 import streamlit as st
-import leafmap.foliumap as leafmap
+import folium
+from streamlit_folium import folium_static
 import polars as pl
 
 # Load the updated data
@@ -41,7 +42,7 @@ def app():
     total_convertible_fans = filtered_df[filtered_df['Fandom Level'] == 'Convertible']['Total Fans'].sum()
 
     # Display metrics in scorecards
-    col1, col2, col3 = st.columns([1, 1, 1])
+    col1, col2, col3 = st.columns(3)
     with col1:
         st.metric(label="Total Avid Fans", value=int(total_avid_fans))
     with col2:
@@ -52,34 +53,18 @@ def app():
     # Create the map with marker clustering
     st.subheader("Fan Opportunity Map")
     with st.spinner("Finding Fandom..."):
-        m = leafmap.Map(center=[40, -100], zoom=4, draw_export=False)
-        color_column = "Fandom Level"
-        color_map = {
-            "Avid": "red",
-            "Casual": "blue",
-            "Convertible": "green"
-        }
-        popup = ["Team", "League", "Neighborhood", "Fandom Level", "Race", "Total Fans"]
+        m = folium.Map(location=[40, -100], zoom_start=4)
 
-        m.add_points_from_xy(
-            filtered_df,
-            x="US lon",
-            y="US lat",
-            color_column=color_column,
-            colors=[color_map[val] for val in filtered_df[color_column].unique()],
-            popup=popup,
-            min_width=200,
-            max_width=300
-        )
+        for _, row in filtered_df.iterrows():
+            folium.CircleMarker(
+                location=[row["US lat"], row["US lon"]],
+                radius=5,
+                color={"Avid": "red", "Casual": "blue", "Convertible": "green"}[row["Fandom Level"]],
+                fill=True,
+                popup=f"Team: {row['Team']}<br>League: {row['League']}<br>Neighborhood: {row['Neighborhood']}<br>Fandom Level: {row['Fandom Level']}<br>Race: {row['Race']}<br>Total Fans: {row['Total Fans']}"
+            ).add_to(m)
 
-        st.markdown(
-            f"""
-            <div style="width: 100%; height: 700px;">
-                {m.to_html()}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+        folium_static(m, width=1200, height=700)
 
 # Run the app function
 app()
