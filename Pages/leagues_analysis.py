@@ -1,15 +1,14 @@
 import streamlit as st
-import pandas as pd
-import polars as pl  # Ensure Polars is installed and working
+import polars as pl
 import folium
 from streamlit_folium import folium_static
 
 # Load the data
 @st.cache_data
 def load_data():
-    return pl.read_parquet('data/combined_leagues.parquet').to_pandas()
+    return pl.read_parquet('data/combined_leagues.parquet')
 
-df = load_data()
+df = load_data().to_pandas()
 
 # Main app function for leagues analysis
 def app():
@@ -63,7 +62,6 @@ def app():
     with st.spinner("Finding Fandom..."):
         # Display map
         if not filtered_df.empty:
-            st.header("Fan Opportunity Map")
             folium_map = folium.Map(location=[37.7749, -122.4194], zoom_start=4)
 
             for _, row in filtered_df.iterrows():
