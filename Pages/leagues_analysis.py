@@ -2,16 +2,10 @@ import streamlit as st
 import leafmap.foliumap as leafmap
 import polars as pl
 
-# Load the data
+# Load the updated data
 @st.cache_data
 def load_data():
-    df = pl.read_parquet('data/combined_leagues.parquet')
-    df = df.with_columns([
-        pl.col("Fandom Level").str.to_lowercase()
-    ])
-    df = df.with_columns([
-        pl.struct(pl.col("Fandom Level")).apply(lambda x: x["Fandom Level"].title()).alias("Fandom Level")
-    ])
+    df = pl.read_parquet('data/updated_combined_leagues.parquet')
     return df
 
 df = load_data().to_pandas()
@@ -40,17 +34,6 @@ def app():
         filtered_df = filtered_df[filtered_df['Team'].isin(selected_teams)]
     if selected_income_levels:
         filtered_df = filtered_df[filtered_df[selected_income_levels].sum(axis=1) > 0]
-
-    # Add total fans column
-    income_columns = [
-        'Struggling (Less than $10,000)', 'Getting By ($10,000 to $14,999)', 'Getting By ($15,000 to $19,999)',
-        'Starting Out ($20,000 to $24,999)', 'Starting Out ($25,000 to $29,999)', 'Starting Out ($30,000 to $34,999)',
-        'Middle Class ($35,000 to $39,999)', 'Middle Class ($40,000 to $44,999)', 'Middle Class ($45,000 to $49,999)',
-        'Comfortable ($50,000 to $59,999)', 'Comfortable ($60,000 to $74,999)', 'Doing Well ($75,000 to $99,999)',
-        'Prosperous ($100,000 to $124,999)', 'Prosperous ($125,000 to $149,999)', 'Wealthy ($150,000 to $199,999)',
-        'Affluent ($200,000 or more)'
-    ]
-    filtered_df['Total Fans'] = filtered_df[income_columns].sum(axis=1)
 
     # Calculate metrics
     total_avid_fans = filtered_df[filtered_df['Fandom Level'] == 'Avid']['Total Fans'].sum()
