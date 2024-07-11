@@ -28,7 +28,7 @@ def sidebar_menu():
             icons=["house", "bar-chart", "robot"],
             menu_icon="cast",
             default_index=0,
-            key="main_menu_unique_option",
+            key="main_menu_unique_key_12345",  # Ensuring this key is unique
             styles={
                 "container": {"padding": "5!important", "background-color": "#262730"},
                 "icon": {"color": "white", "font-size": "25px"},
