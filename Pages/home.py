@@ -12,18 +12,18 @@ def app():
     </style>
     """, unsafe_allow_html=True)
 
-    st.subheader("Dive into the Metrics that Matter")
+    st.subheader("Explore Key Insights")
     st.markdown("""
-    - Discover Fan Distribution: Visualize the geographical spread of different fan types.
-    - Analyze Fan Intensity: Understand how passionate fans are about their teams.
-    - Uncover Economic Insights: See how income levels correlate with fan engagement.
+    - **See Where Fans Are**: Visualize where different types of fans are located.
+    - **Measure Fan Passion**: Understand how dedicated fans are to their teams.
+    - **Economic Insights**: Learn how income levels relate to fan engagement.
     """)
 
-    st.subheader("Why It's Important")
+    st.subheader("Why Fanflux Matters")
     st.markdown("""
-    - Target Marketing Efforts: Focus your campaigns where they'll have the most impact.
-    - Boost Fan Engagement: Tailor your strategies to convert casual fans into avid supporters.
-    - Optimize Merchandising: Stock the right products in the right places based on fan demographics.
+    - **Smart Marketing**: Focus your campaigns on the areas that will have the most impact.
+    - **Increase Engagement**: Find ways to turn casual fans into passionate supporters.
+    - **Better Merchandising**: Ensure you have the right products in the right places for your fans.
     """)
 
     st.subheader("Partnered with DonnLynn Partners")
@@ -32,3 +32,7 @@ def app():
 
     Ready to transform your understanding of the sports fan landscape? Let's get started!
     """)
+
+# Run the app
+if __name__ == "__main__":
+    app()
