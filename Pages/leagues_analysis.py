@@ -15,11 +15,11 @@ def app(df):
 
     # Filters
     st.sidebar.header("Filters")
-    selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique())
-    selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique())
-    selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique())
-    selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique())
-    selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[14:])
+    selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique(), key="fandom_level_filter")
+    selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique(), key="race_filter")
+    selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique(), key="league_filter")
+    selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique(), key="team_filter")
+    selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[14:], key="income_level_filter")
 
     # Apply filters
     filtered_df = df.copy()
@@ -54,11 +54,11 @@ def app(df):
     # Display metrics in scorecards
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric(label="Total Avid Fans", value=int(total_avid_fans))
+        st.metric(label="Total Avid Fans", value=int(total_avid_fans), key="avid_metric")
     with col2:
-        st.metric(label="Total Casual Fans", value=int(total_casual_fans))
+        st.metric(label="Total Casual Fans", value=int(total_casual_fans), key="casual_metric")
     with col3:
-        st.metric(label="Total Convertible Fans", value=int(total_convertible_fans))
+        st.metric(label="Total Convertible Fans", value=int(total_convertible_fans), key="convertible_metric")
 
     # Display map
     st.header("Fan Opportunity Map")
