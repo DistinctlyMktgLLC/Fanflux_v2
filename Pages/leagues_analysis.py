@@ -46,17 +46,20 @@ def app():
     with col3:
         st.metric(label="Total Convertible Fans", value=total_convertible_fans)
 
+    # Define color map for specific fandom levels
+    color_map = {
+        "Avid": "red",
+        "Casual": "blue",
+        "Convertible": "green"
+    }
+
+    # Filter the DataFrame to include only rows with "Avid", "Casual", and "Convertible" fandom levels
+    filtered_df = filtered_df[filtered_df['Fandom Level'].isin(color_map.keys())]
+
     # Create the map with marker clustering
     st.subheader("Fan Opportunity Map")
     with st.spinner("Finding Fandom..."):
         m = leafmap.Map(center=[40, -100], zoom=4, draw_export=False)
-
-        # Define color map for specific fandom levels
-        color_map = {
-            "Avid": "red",
-            "Casual": "blue",
-            "Convertible": "green"
-        }
 
         # Add marker clustering to the map
         m.add_points_from_xy(
