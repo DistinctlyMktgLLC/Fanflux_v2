@@ -1,46 +1,36 @@
 import streamlit as st
-import pandas as pd
 from streamlit_option_menu import option_menu
-import os
-from Pages.home import app as home_app
-from Pages.leagues_analysis import app as leagues_analysis_app
-from Pages.chatbot_page import app as chatbot_page_app
-
-# Load the combined data from a single Parquet file
-data_path = "data/combined_leagues.parquet"
-df = pd.read_parquet(data_path)
+from Pages import home, leagues_analysis, chatbot_page
 
 def sidebar_menu():
-    # Custom CSS for Sidebar Menu
     st.markdown(
         """
         <style>
         .sidebar .sidebar-content {
-            background-color: #1d1d1d;
+            background-color: #262730;
         }
         </style>
         """,
         unsafe_allow_html=True
     )
 
-    # Sidebar menu options without emojis/icons
+    # Sidebar menu options
     menu_options = {
-        "Home": home_app,
-        "Leagues Analysis": leagues_analysis_app,
-        "Chatbot": chatbot_page_app
+        "Home": home.app,
+        "Leagues Analysis": leagues_analysis.app,
+        "Chatbot": chatbot_page.app
     }
 
     with st.sidebar:
-        unique_key = "main_menu_" + str(hash(os.urandom(16)))
         selected = option_menu(
             menu_title="Fanflux",
             options=list(menu_options.keys()),
-            icons=["", "", ""],  # No icons
+            icons=["house", "bar-chart", "robot"],
             menu_icon="cast",
             default_index=0,
-            key=unique_key,  # Ensure unique key
+            key="main_menu_option",
             styles={
-                "container": {"padding": "5!important", "background-color": "#1d1d1d"},
+                "container": {"padding": "5!important", "background-color": "#262730"},
                 "icon": {"color": "white", "font-size": "25px"},
                 "nav-link": {"font-size": "16px", "text-align": "left", "margin": "0px", "--hover-color": "#565656"},
                 "nav-link-selected": {"background-color": "green"},
@@ -48,10 +38,8 @@ def sidebar_menu():
         )
 
     # Run the selected app
-    if selected == "Home":
+    if selected in menu_options:
         menu_options[selected]()
-    else:
-        menu_options[selected](df)
 
 # Run the sidebar menu
 sidebar_menu()
