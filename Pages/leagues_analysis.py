@@ -2,6 +2,7 @@ import streamlit as st
 import leafmap.foliumap as leafmap
 import polars as pl
 import pandas as pd
+import uuid
 
 # Load the updated data
 @st.cache_data
@@ -37,7 +38,7 @@ def app():
     selected_fandom_levels = st.sidebar.multiselect(
         "Select Fandom Level", df['Fandom Level'].unique(), 
         default=st.session_state['fandom_level_filter_leagues'],
-        key="fandom_level_filter_leagues"
+        key="fandom_level_filter_leagues_" + str(uuid.uuid4())
     )
     if selected_fandom_levels != st.session_state['fandom_level_filter_leagues']:
         st.session_state['fandom_level_filter_leagues'] = selected_fandom_levels
@@ -46,7 +47,7 @@ def app():
     selected_races = st.sidebar.multiselect(
         "Select Race", df['Race'].unique(), 
         default=st.session_state['race_filter_leagues'],
-        key="race_filter_leagues"
+        key="race_filter_leagues_" + str(uuid.uuid4())
     )
     if selected_races != st.session_state['race_filter_leagues']:
         st.session_state['race_filter_leagues'] = selected_races
@@ -55,7 +56,7 @@ def app():
     selected_leagues = st.sidebar.multiselect(
         "Select League", df['League'].unique(), 
         default=st.session_state['league_filter_leagues'],
-        key="league_filter_leagues"
+        key="league_filter_leagues_" + str(uuid.uuid4())
     )
     if selected_leagues != st.session_state['league_filter_leagues']:
         st.session_state['league_filter_leagues'] = selected_leagues
@@ -64,7 +65,7 @@ def app():
     selected_teams = st.sidebar.multiselect(
         "Select Team", df['Team'].unique(), 
         default=st.session_state['team_filter_leagues'],
-        key="team_filter_leagues"
+        key="team_filter_leagues_" + str(uuid.uuid4())
     )
     if selected_teams != st.session_state['team_filter_leagues']:
         st.session_state['team_filter_leagues'] = selected_teams
@@ -73,7 +74,7 @@ def app():
     selected_income_levels = st.sidebar.multiselect(
         "Select Income Level", df.columns[12:], 
         default=st.session_state['income_level_filter_leagues'],
-        key="income_level_filter_leagues"
+        key="income_level_filter_leagues_" + str(uuid.uuid4())
     )
     if selected_income_levels != st.session_state['income_level_filter_leagues']:
         st.session_state['income_level_filter_leagues'] = selected_income_levels
