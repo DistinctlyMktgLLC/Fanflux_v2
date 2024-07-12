@@ -2,7 +2,6 @@ import streamlit as st
 import leafmap.foliumap as leafmap
 import polars as pl
 import pandas as pd
-import uuid
 
 # Load the updated data
 @st.cache_data
@@ -12,12 +11,8 @@ def load_data():
 
 df = load_data().to_pandas()
 
-# Sample 10% of the dataset for initial display
-sampled_df = df.sample(frac=0.1, random_state=42)
-
-# Generate unique keys for widgets
-def unique_key(base_key):
-    return f"{base_key}_{uuid.uuid4()}"
+# Sample 8% of the dataset for initial display
+sampled_df = df.sample(frac=0.08, random_state=42)
 
 # Main app function for leagues analysis
 def app():
@@ -25,11 +20,11 @@ def app():
 
     # Filters
     st.sidebar.header("Filters")
-    selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique(), key=unique_key("fandom_level_filter_leagues"))
-    selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique(), key=unique_key("race_filter_leagues"))
-    selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique(), key=unique_key("league_filter_leagues"))
-    selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique(), key=unique_key("team_filter_leagues"))
-    selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[12:], key=unique_key("income_level_filter_leagues"))
+    selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique(), key="fandom_level_filter_leagues")
+    selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique(), key="race_filter_leagues")
+    selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique(), key="league_filter_leagues")
+    selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique(), key="team_filter_leagues")
+    selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[12:], key="income_level_filter_leagues")
 
     # Apply filters to the sampled dataset
     filtered_df = sampled_df.copy()
@@ -60,7 +55,7 @@ def app():
 
     # Add explanatory note
     st.markdown("""
-        **Note:** The initial data displayed is a 10% sample of the total dataset. Adjusting filters will apply to this sample.
+        **Note:** The initial data displayed is an 8% sample of the total dataset. Adjusting filters will apply to this sample.
     """)
     
     # Add conditional explanatory note
