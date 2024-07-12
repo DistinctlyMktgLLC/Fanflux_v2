@@ -2,7 +2,6 @@ import streamlit as st
 import leafmap.foliumap as leafmap
 import polars as pl
 import pandas as pd
-import uuid
 
 # Load the updated data
 @st.cache_data
@@ -22,7 +21,7 @@ def app():
     # Filters
     st.sidebar.header("Filters")
     
-    # Initialize session state for filters
+    # Initialize session state for filters if not already set
     if 'fandom_level_filter_leagues' not in st.session_state:
         st.session_state['fandom_level_filter_leagues'] = []
     if 'race_filter_leagues' not in st.session_state:
@@ -40,7 +39,8 @@ def app():
         default=st.session_state['fandom_level_filter_leagues'],
         key="fandom_level_filter_leagues"
     )
-    st.session_state['fandom_level_filter_leagues'] = selected_fandom_levels
+    if selected_fandom_levels != st.session_state['fandom_level_filter_leagues']:
+        st.session_state['fandom_level_filter_leagues'] = selected_fandom_levels
     
     # Race Filter
     selected_races = st.sidebar.multiselect(
@@ -48,7 +48,8 @@ def app():
         default=st.session_state['race_filter_leagues'],
         key="race_filter_leagues"
     )
-    st.session_state['race_filter_leagues'] = selected_races
+    if selected_races != st.session_state['race_filter_leagues']:
+        st.session_state['race_filter_leagues'] = selected_races
 
     # League Filter
     selected_leagues = st.sidebar.multiselect(
@@ -56,7 +57,8 @@ def app():
         default=st.session_state['league_filter_leagues'],
         key="league_filter_leagues"
     )
-    st.session_state['league_filter_leagues'] = selected_leagues
+    if selected_leagues != st.session_state['league_filter_leagues']:
+        st.session_state['league_filter_leagues'] = selected_leagues
 
     # Team Filter
     selected_teams = st.sidebar.multiselect(
@@ -64,7 +66,8 @@ def app():
         default=st.session_state['team_filter_leagues'],
         key="team_filter_leagues"
     )
-    st.session_state['team_filter_leagues'] = selected_teams
+    if selected_teams != st.session_state['team_filter_leagues']:
+        st.session_state['team_filter_leagues'] = selected_teams
 
     # Income Level Filter
     selected_income_levels = st.sidebar.multiselect(
@@ -72,7 +75,8 @@ def app():
         default=st.session_state['income_level_filter_leagues'],
         key="income_level_filter_leagues"
     )
-    st.session_state['income_level_filter_leagues'] = selected_income_levels
+    if selected_income_levels != st.session_state['income_level_filter_leagues']:
+        st.session_state['income_level_filter_leagues'] = selected_income_levels
 
     # Apply filters to the sampled dataset
     filtered_df = sampled_df.copy()
