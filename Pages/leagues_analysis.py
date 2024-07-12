@@ -141,3 +141,6 @@ def app():
         )
 
         m.to_streamlit(width=1200, height=700)
+
+# Run the app function
+app()
