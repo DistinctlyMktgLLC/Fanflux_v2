@@ -19,51 +19,47 @@ sampled_df = df.sample(frac=0.08, random_state=42)
 def app():
     st.title("Leagues Analysis")
 
-    # Initialize session state for filters if not already set
-    if 'fandom_level_filter_leagues' not in st.session_state:
-        st.session_state['fandom_level_filter_leagues'] = []
-    if 'race_filter_leagues' not in st.session_state:
-        st.session_state['race_filter_leagues'] = []
-    if 'league_filter_leagues' not in st.session_state:
-        st.session_state['league_filter_leagues'] = []
-    if 'team_filter_leagues' not in st.session_state:
-        st.session_state['team_filter_leagues'] = []
-    if 'income_level_filter_leagues' not in st.session_state:
-        st.session_state['income_level_filter_leagues'] = []
-
     # Filters
     st.sidebar.header("Filters")
+    
+    # Fandom Level Filter
     selected_fandom_levels = st.sidebar.multiselect(
         "Select Fandom Level", df['Fandom Level'].unique(), 
-        default=st.session_state['fandom_level_filter_leagues'],
+        default=st.session_state.get('fandom_level_filter_leagues', []),
         key=str(uuid.uuid4())
     )
+    st.session_state['fandom_level_filter_leagues'] = selected_fandom_levels
+    
+    # Race Filter
     selected_races = st.sidebar.multiselect(
         "Select Race", df['Race'].unique(), 
-        default=st.session_state['race_filter_leagues'],
+        default=st.session_state.get('race_filter_leagues', []),
         key=str(uuid.uuid4())
     )
+    st.session_state['race_filter_leagues'] = selected_races
+
+    # League Filter
     selected_leagues = st.sidebar.multiselect(
         "Select League", df['League'].unique(), 
-        default=st.session_state['league_filter_leagues'],
+        default=st.session_state.get('league_filter_leagues', []),
         key=str(uuid.uuid4())
     )
+    st.session_state['league_filter_leagues'] = selected_leagues
+
+    # Team Filter
     selected_teams = st.sidebar.multiselect(
         "Select Team", df['Team'].unique(), 
-        default=st.session_state['team_filter_leagues'],
+        default=st.session_state.get('team_filter_leagues', []),
         key=str(uuid.uuid4())
     )
+    st.session_state['team_filter_leagues'] = selected_teams
+
+    # Income Level Filter
     selected_income_levels = st.sidebar.multiselect(
         "Select Income Level", df.columns[12:], 
-        default=st.session_state['income_level_filter_leagues'],
+        default=st.session_state.get('income_level_filter_leagues', []),
         key=str(uuid.uuid4())
     )
-
-    # Update session state
-    st.session_state['fandom_level_filter_leagues'] = selected_fandom_levels
-    st.session_state['race_filter_leagues'] = selected_races
-    st.session_state['league_filter_leagues'] = selected_leagues
-    st.session_state['team_filter_leagues'] = selected_teams
     st.session_state['income_level_filter_leagues'] = selected_income_levels
 
     # Apply filters to the sampled dataset
