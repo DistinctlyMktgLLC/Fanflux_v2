@@ -2,7 +2,6 @@ import streamlit as st
 import leafmap.foliumap as leafmap
 import polars as pl
 import pandas as pd
-import uuid
 
 # Load the updated data
 @st.cache_data
@@ -12,8 +11,8 @@ def load_data():
 
 df = load_data().to_pandas()
 
-# Sample 8% of the dataset for initial display
-sampled_df = df.sample(frac=0.08, random_state=42)
+# Sample 10% of the dataset for initial display
+sampled_df = df.sample(frac=0.1, random_state=42)
 
 # Main app function for leagues analysis
 def app():
@@ -21,58 +20,11 @@ def app():
 
     # Filters
     st.sidebar.header("Filters")
-    
-    # Initialize session state for filters if not already set
-    if 'fandom_level_filter_leagues' not in st.session_state:
-        st.session_state['fandom_level_filter_leagues'] = []
-    if 'race_filter_leagues' not in st.session_state:
-        st.session_state['race_filter_leagues'] = []
-    if 'league_filter_leagues' not in st.session_state:
-        st.session_state['league_filter_leagues'] = []
-    if 'team_filter_leagues' not in st.session_state:
-        st.session_state['team_filter_leagues'] = []
-    if 'income_level_filter_leagues' not in st.session_state:
-        st.session_state['income_level_filter_leagues'] = []
-
-    # Fandom Level Filter
-    selected_fandom_levels = st.sidebar.multiselect(
-        "Select Fandom Level", df['Fandom Level'].unique(), 
-        default=st.session_state['fandom_level_filter_leagues'],
-        key="fandom_level_filter_leagues"
-    )
-    st.session_state['fandom_level_filter_leagues'] = selected_fandom_levels
-    
-    # Race Filter
-    selected_races = st.sidebar.multiselect(
-        "Select Race", df['Race'].unique(), 
-        default=st.session_state['race_filter_leagues'],
-        key="race_filter_leagues"
-    )
-    st.session_state['race_filter_leagues'] = selected_races
-
-    # League Filter
-    selected_leagues = st.sidebar.multiselect(
-        "Select League", df['League'].unique(), 
-        default=st.session_state['league_filter_leagues'],
-        key="league_filter_leagues"
-    )
-    st.session_state['league_filter_leagues'] = selected_leagues
-
-    # Team Filter
-    selected_teams = st.sidebar.multiselect(
-        "Select Team", df['Team'].unique(), 
-        default=st.session_state['team_filter_leagues'],
-        key="team_filter_leagues"
-    )
-    st.session_state['team_filter_leagues'] = selected_teams
-
-    # Income Level Filter
-    selected_income_levels = st.sidebar.multiselect(
-        "Select Income Level", df.columns[12:], 
-        default=st.session_state['income_level_filter_leagues'],
-        key="income_level_filter_leagues"
-    )
-    st.session_state['income_level_filter_leagues'] = selected_income_levels
+    selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique(), key="fandom_level_filter_leagues")
+    selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique(), key="race_filter_leagues")
+    selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique(), key="league_filter_leagues")
+    selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique(), key="team_filter_leagues")
+    selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[12:], key="income_level_filter_leagues")
 
     # Apply filters to the sampled dataset
     filtered_df = sampled_df.copy()
@@ -103,7 +55,7 @@ def app():
 
     # Add explanatory note
     st.markdown("""
-        **Note:** The initial data displayed is an 8% sample of the total dataset. Adjusting filters will apply to this sample.
+        **Note:** The initial data displayed is a 10% sample of the total dataset. Adjusting filters will apply to this sample.
     """)
     
     # Add conditional explanatory note
