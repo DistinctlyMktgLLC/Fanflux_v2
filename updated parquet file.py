@@ -15,15 +15,19 @@ income_columns = [
     'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)'
 ]
 
-# Create a new column 'Total Fans' by summing across income columns
-df = df.with_column(
-    sum([pl.col(col) for col in income_columns]).alias('Total Fans')
-)
+# Check and drop the existing 'Total Fans' column if it exists
+if 'Total Fans' in df.columns:
+    df = df.drop('Total Fans')
+
+# Add the Total Fans column by summing across income columns
+df = df.with_columns([
+    pl.sum([pl.col(col) for col in income_columns]).alias('Total Fans')
+])
 
 # Correct the Fandom Level column to title case
-df = df.with_column(
+df = df.with_columns([
     pl.col("Fandom Level").str.to_lowercase().str.to_title_case().alias("Fandom Level")
-)
+])
 
 # Save the updated dataframe back to a parquet file
 df.write_parquet('data/updated_combined_leagues.parquet')
