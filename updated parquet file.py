@@ -15,6 +15,10 @@ income_columns = [
     'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)'
 ]
 
+# Remove the existing 'Total Fans' column if it exists
+if 'Total Fans' in df.columns:
+    df = df.drop('Total Fans')
+
 # Add the Total Fans column by summing across income columns
 df = df.with_columns([
     pl.col(income_columns).sum().alias('Total Fans')
