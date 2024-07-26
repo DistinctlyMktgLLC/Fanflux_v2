@@ -15,8 +15,9 @@ income_columns = [
     'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)'
 ]
 
-# Ensure no existing 'Total Fans' column
-df = df.drop('Total Fans', None)  # `None` avoids error if the column doesn't exist
+# Check and drop the existing 'Total Fans' column if it exists
+if 'Total Fans' in df.columns:
+    df = df.drop('Total Fans')
 
 # Add the Total Fans column by summing across income columns
 df = df.with_columns([
