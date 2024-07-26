@@ -15,13 +15,12 @@ income_columns = [
     'Wealthy ($150,000 to $199,999)', 'Affluent ($200,000 or more)'
 ]
 
-# Check and drop the existing 'Total Fans' column if it exists
-if 'Total Fans' in df.columns:
-    df = df.drop('Total Fans')
+# Ensure no existing 'Total Fans' column
+df = df.drop('Total Fans', None)  # `None` avoids error if the column doesn't exist
 
 # Add the Total Fans column by summing across income columns
 df = df.with_columns([
-    pl.sum([pl.col(col) for col in income_columns]).alias('Total Fans')
+    pl.sum_horizontal([pl.col(col) for col in income_columns]).alias('Total Fans')
 ])
 
 # Correct the Fandom Level column to title case
