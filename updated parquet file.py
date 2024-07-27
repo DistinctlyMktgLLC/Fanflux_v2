@@ -26,7 +26,7 @@ df = df.with_columns([
 
 # Correct the Fandom Level column to title case
 df = df.with_columns([
-    pl.col("Fandom Level").str.to_lowercase().str.to_title_case().alias("Fandom Level")
+    pl.col("Fandom Level").str.to_lowercase().str.to_titlecase().alias("Fandom Level")
 ])
 
 # Save the updated dataframe back to a parquet file

@@ -17,9 +17,11 @@ def load_data():
     return df
 
 try:
-    df = load_data().to_pandas()
+    # Convert Polars DataFrame to pandas DataFrame using fastparquet
+    df = load_data().to_pandas(engine='fastparquet')
 except Exception as e:
     logger.error(f"Error loading data: {e}")
+    df = pd.DataFrame()  # Initialize an empty DataFrame in case of error
 
 # Sample 10% of the dataset for initial display
 sampled_df = df.sample(frac=0.1, random_state=42)
