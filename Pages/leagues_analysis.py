@@ -40,6 +40,7 @@ def app():
         selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[12:], key="income_level_filter_leagues")
     except Exception as e:
         logger.error(f"Error setting up filters: {e}")
+        selected_fandom_levels = selected_races = selected_leagues = selected_teams = selected_income_levels = []
 
     # Apply filters to the sampled dataset
     filtered_df = sampled_df.copy()
