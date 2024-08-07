@@ -17,8 +17,8 @@ def load_data():
     return df
 
 try:
-    # Convert Polars DataFrame to pandas DataFrame using fastparquet
-    df = load_data().to_pandas(engine='fastparquet')
+    # Convert Polars DataFrame to pandas DataFrame
+    df = load_data().to_pandas()
 except Exception as e:
     logger.error(f"Error loading data: {e}")
     df = pd.DataFrame()  # Initialize an empty DataFrame in case of error
@@ -34,11 +34,11 @@ def app():
     st.sidebar.header("Filters")
     try:
         logger.info("Setting up filters...")
-        selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique(), key="fandom_level_filter_leagues")
-        selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique(), key="race_filter_leagues")
-        selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique(), key="league_filter_leagues")
-        selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique(), key="team_filter_leagues")
-        selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[12:], key="income_level_filter_leagues")
+        selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique() if 'Fandom Level' in df.columns else [], key="fandom_level_filter_leagues")
+        selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique() if 'Race' in df.columns else [], key="race_filter_leagues")
+        selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique() if 'League' in df.columns else [], key="league_filter_leagues")
+        selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique() if 'Team' in df.columns else [], key="team_filter_leagues")
+        selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[12:] if df.shape[1] > 12 else [], key="income_level_filter_leagues")
         logger.info("Filters set up successfully.")
     except Exception as e:
         logger.error(f"Error setting up filters: {e}")
@@ -62,11 +62,12 @@ def app():
 
     # Calculate metrics
     try:
-        total_avid_fans = filtered_df[filtered_df['Fandom Level'] == 'Avid']['Total Fans'].sum()
-        total_casual_fans = filtered_df[filtered_df['Fandom Level'] == 'Casual']['Total Fans'].sum()
-        total_convertible_fans = filtered_df[filtered_df['Fandom Level'] == 'Convertible']['Total Fans'].sum()
+        total_avid_fans = filtered_df[filtered_df['Fandom Level'] == 'Avid']['Total Fans'].sum() if 'Fandom Level' in filtered_df.columns else 0
+        total_casual_fans = filtered_df[filtered_df['Fandom Level'] == 'Casual']['Total Fans'].sum() if 'Fandom Level' in filtered_df.columns else 0
+        total_convertible_fans = filtered_df[filtered_df['Fandom Level'] == 'Convertible']['Total Fans'].sum() if 'Fandom Level' in filtered_df.columns else 0
     except Exception as e:
         logger.error(f"Error calculating metrics: {e}")
+        total_avid_fans = total_casual_fans = total_convertible_fans = 0
 
     # Display metrics in scorecards
     col1, col2, col3 = st.columns(3)
@@ -102,25 +103,28 @@ def app():
         try:
             m = leafmap.Map(center=[40, -100], zoom=4, draw_export=False)
             color_column = "Fandom Level"
-            color_map = {
-                "Avid": "red",
-                "Casual": "blue",
-                "Convertible": "green"
-            }
-            popup = ["Team", "League", "Neighborhood", "Fandom Level", "Race", "Total Fans"]
+            if 'Fandom Level' in filtered_df.columns:
+                color_map = {
+                    "Avid": "red",
+                    "Casual": "blue",
+                    "Convertible": "green"
+                }
+                popup = ["Team", "League", "Neighborhood", "Fandom Level", "Race", "Total Fans"]
 
-            m.add_points_from_xy(
-                filtered_df,
-                x="US lon",
-                y="US lat",
-                color_column=color_column,
-                colors=[color_map[val] for val in filtered_df[color_column].unique()],
-                popup=popup,
-                min_width=200,
-                max_width=300
-            )
+                m.add_points_from_xy(
+                    filtered_df,
+                    x="US lon",
+                    y="US lat",
+                    color_column=color_column,
+                    colors=[color_map[val] for val in filtered_df[color_column].unique()],
+                    popup=popup,
+                    min_width=200,
+                    max_width=300
+                )
 
-            m.to_streamlit(width=1200, height=700)
+                m.to_streamlit(width=1200, height=700)
+            else:
+                st.error("The required data for the map is not available.")
         except Exception as e:
             logger.error(f"Error creating map: {e}")
 

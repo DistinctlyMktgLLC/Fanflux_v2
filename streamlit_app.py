@@ -1,6 +1,6 @@
 import streamlit as st
 
-# Set page configuration
+# Set page configuration at the very beginning
 st.set_page_config(page_title="Fanflux", layout="wide")
 
 # Importing the leagues analysis app function
