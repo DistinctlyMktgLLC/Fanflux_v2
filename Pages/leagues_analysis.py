@@ -33,11 +33,13 @@ def app():
     # Filters
     st.sidebar.header("Filters")
     try:
+        logger.info("Setting up filters...")
         selected_fandom_levels = st.sidebar.multiselect("Select Fandom Level", df['Fandom Level'].unique(), key="fandom_level_filter_leagues")
         selected_races = st.sidebar.multiselect("Select Race", df['Race'].unique(), key="race_filter_leagues")
         selected_leagues = st.sidebar.multiselect("Select League", df['League'].unique(), key="league_filter_leagues")
         selected_teams = st.sidebar.multiselect("Select Team", df['Team'].unique(), key="team_filter_leagues")
         selected_income_levels = st.sidebar.multiselect("Select Income Level", df.columns[12:], key="income_level_filter_leagues")
+        logger.info("Filters set up successfully.")
     except Exception as e:
         logger.error(f"Error setting up filters: {e}")
         selected_fandom_levels = selected_races = selected_leagues = selected_teams = selected_income_levels = []
@@ -82,13 +84,13 @@ def app():
     st.markdown("""
         **Note:** The initial data displayed is a 10% sample of the total dataset. Adjusting filters will apply to this sample.
     """)
-    
+
     # Add conditional explanatory note
     if selected_teams and selected_leagues:
         st.markdown("""
             **Additional Note:** The total fans displayed in the scorecards represent the sum of fans for the selected teams and leagues. If both teams and leagues are selected, the total fans will be a combined sum.
         """)
-    
+
     # Add note for selecting teams and leagues
     st.markdown("""
         **Selection Tip:** You can pick different teams in different leagues. Ensure your league choices sync with the teams you select to get accurate insights.
